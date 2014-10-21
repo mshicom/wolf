@@ -10,6 +10,7 @@
 
 //wolf
 #include "state_base.h"
+//#include "state_position.h"
 
 #include <iostream>
 
@@ -31,188 +32,200 @@
  *  - The non-const references allow no-cost manipulations of P and Q directly on the remote storage vector pointed by the Map.
  * 
  */
+template<unsigned int N>
 class StatePose : public StateBase
 {
     private:
-        Eigen::Map<Eigen::Vector3s> p_; ///< position
-        Eigen::Map<Eigen::Quaternions> q_; ///< orientation quaternion
+        Eigen::Matrix<WolfScalar, N, 1> n_; ///< position
 
     public:
-
-        /** \brief Default local constructor. 
-         * 
-         * Default local constructor. The pose is set to the origin and the rest of states to zero.
-         * 
-         */
         StatePose();
-
-        /** \brief Local constructor from size
-         * 
-         * Local constructor from size
-         * \param _size dimension of the state vector
-         * 
-         */
-        StatePose(unsigned int _size);
-
-        /** \brief Local constructor from vector
-         * 
-         * Local constructor from vector. 
-         * \param _x the state vector
-         *  
-         */
-        StatePose(const Eigen::VectorXs & _x);
-        
-        /** \brief Local constructor from StatePose
-         * 
-         * Local constructor from StatePose. 
-         * \param _x the state vector
-         *  
-         */
-        StatePose(const StatePose& _pose);
-
-        /**
-         * Local constructor from state vector
-         * \param _size dimension of the state vector
-         * \param _p position
-         * \param _q orientation quaternion (must be normalized)
-         *
-         * NOTE: Enter a valid unity Quaternion. It is not normalized by the constructor.
-         */
-        StatePose(unsigned int _size, Eigen::Vector3s& _p, Eigen::Quaternions& _q);
-
-        /**
-         * Remote constructor
-         * \param _storage storage vector
-         * \param _idx index where the state maps to the remote storage vector
-         * \param _size dimension of the state vector
-         *
-         * Note: The state takes the values existing in the given storage vector.
-         *
-         * Note: Enter a valid unity Quaternion. It is not normalized by the constructor.
-         */
-        StatePose(Eigen::VectorXs& _storage, unsigned int _idx, unsigned int _size);
-
-        /**
-         * Remote constructor from vector
-         * \param _storage storage vector
-         * \param _idx index where the state maps to the remote storage vector
-         * \param _x the state vector.
-         *
-         * Note: The state takes the values existing in the given storage vector.
-         *
-         * Note: The Quaternion is not normalized by the constructor.
-         */
-        StatePose(Eigen::VectorXs& _storage, unsigned int _idx, Eigen::VectorXs& _x);
-
-        /**
-         * Remote constructor from vectors
-         * \param _storage storage vector
-         * \param _idx index where the state maps to the remote storage vector
-         * \param _size dimension of the state vector
-         * \param _p position
-         * \param _q orientation quaternion (must be normalized by the caller)
-         */
-        StatePose(Eigen::VectorXs& _storage, unsigned int _idx, unsigned int _size, Eigen::Vector3s& _p,
-                  Eigen::Quaternions& _q);
-
-        /**
-         * Destructor
-         */
         virtual ~StatePose();
-
-        /**
-         * \brief Set to origin
-         *
-         * Set state to the origin.
-         *
-         * Sets the position to 0, the quaternion to Quaternions::Identity(), and the rest of the states to 0.
-         *
-         * This class may be overloaded in case the states other than P, Q need a different origin than the default 0.
-         */
-        virtual void setToOrigin();
-
-        /**
-         * Set position
-         * \param _pos position
-         */
-        void p(Eigen::Vector3s& _pos);
-
-        /**
-         * Get reference to position
-         */
-        Eigen::Map<Eigen::Vector3s>& p();
-
-        /**
-         * Get reference to position
-         */
-        const Eigen::Map<Eigen::Vector3s>& p() const;
-
-
-        /**
-         * Set quaternion
-         * \param _quat quaternion
-         */
-        void q(Eigen::Quaternions& _quat);
-
-        /**
-         * Get reference to quaternion
-         */
-        Eigen::Map<Eigen::Quaternions>& q();
-
-        /**
-         * Get reference to quaternion
-         */
-        const Eigen::Map<Eigen::Quaternions>& q() const;
-
-        /**
-         * \brief compose this pose with a local pose
-         * \param _local_pose local pose to compose with. Acts as local wrt this.
-         * \return a composed pose, this * _other
-         *
-         * Composes another pose locally on top of this.
-         */
-        virtual StatePose composeWithLocal(const StatePose& _local_pose) const;
-        virtual void composeWithLocal(const StatePose& _local_pose, StatePose& _return_pose) const;
-        virtual void composeWithLocal(const StatePose& _local_pose);
-
-        /**
-         * \brief compose this pose with a base pose
-         * \param _base_pose base pose to compose with. Acts as global or base wrt this.
-         * \return a composed pose, _other * this
-         *
-         * Composes this pose on top of another.
-         */
-        virtual StatePose composeOnTopOf(const StatePose& _base_pose) const;
-        virtual void composeOnTopOf(const StatePose& _base_pose, StatePose& _return_pose) const;
-        virtual void composeOnTopOf(const StatePose& _base_pose);
-
-        /**
-         * \brief compose poses
-         * \param _reference_pose the pose in relation to which we compose
-         *
-         * Expresses this pose relative to another
-         */
-        virtual StatePose composeRelativeTo(const StatePose& _reference_pose) const;
-        virtual void composeRelativeTo(const StatePose& _reference_pose, StatePose& _return_pose) const;
-        virtual void composeRelativeTo(const StatePose& _reference_pose);
-
-        /**
-         * \brief inverse pose
-         * \return a State pose whose pose is the inverse of this.
-         */
-        virtual StatePose inverse() const;
-        void inverse(StatePose& _result) const;
-
-        virtual void remap(Eigen::VectorXs& _st_remote, const unsigned int _idx);
-
 };
+
+
+// template<>
+// class StatePose<3> : public StatePosition<3>
+// {
+//     private:
+//         Eigen::Map<Eigen::Quaternions> q_; ///< orientation quaternion
+
+//     public:
+
+//         /** \brief Default local constructor. 
+//          * 
+//          * Default local constructor. The pose is set to the origin and the rest of states to zero.
+//          * 
+//          */
+//         StatePose();
+
+//         // /** \brief Local constructor from size
+//         //  * 
+//         //  * Local constructor from size
+//         //  * \param _size dimension of the state vector
+//         //  * 
+//         //  */
+//         // StatePose(unsigned int _size);
+
+//         // /** \brief Local constructor from vector
+//         //  * 
+//         //  * Local constructor from vector. 
+//         //  * \param _x the state vector
+//         //  *  
+//         //  */
+//         // StatePose(const Eigen::VectorXs & _x);
+        
+//         // /** \brief Local constructor from StatePose
+//         //  * 
+//         //  * Local constructor from StatePose. 
+//         //  * \param _x the state vector
+//         //  *  
+//         //  */
+//         // StatePose(const StatePose& _pose);
+
+//         // /**
+//         //  * Local constructor from state vector
+//         //  * \param _size dimension of the state vector
+//         //  * \param _p position
+//         //  * \param _q orientation quaternion (must be normalized)
+//         //  *
+//         //  * NOTE: Enter a valid unity Quaternion. It is not normalized by the constructor.
+//         //  */
+//         // StatePose(unsigned int _size, Eigen::Vector3s& _p, Eigen::Quaternions& _q);
+
+//         // *
+//         //  * Remote constructor
+//         //  * \param _storage storage vector
+//         //  * \param _idx index where the state maps to the remote storage vector
+//         //  * \param _size dimension of the state vector
+//         //  *
+//         //  * Note: The state takes the values existing in the given storage vector.
+//         //  *
+//         //  * Note: Enter a valid unity Quaternion. It is not normalized by the constructor.
+         
+//         // StatePose(Eigen::VectorXs& _storage, unsigned int _idx, unsigned int _size);
+
+//         // /**
+//         //  * Remote constructor from vector
+//         //  * \param _storage storage vector
+//         //  * \param _idx index where the state maps to the remote storage vector
+//         //  * \param _x the state vector.
+//         //  *
+//         //  * Note: The state takes the values existing in the given storage vector.
+//         //  *
+//         //  * Note: The Quaternion is not normalized by the constructor.
+//         //  */
+//         // StatePose(Eigen::VectorXs& _storage, unsigned int _idx, Eigen::VectorXs& _x);
+
+//         // /**
+//         //  * Remote constructor from vectors
+//         //  * \param _storage storage vector
+//         //  * \param _idx index where the state maps to the remote storage vector
+//         //  * \param _size dimension of the state vector
+//         //  * \param _p position
+//         //  * \param _q orientation quaternion (must be normalized by the caller)
+//         //  */
+//         // StatePose(Eigen::VectorXs& _storage, unsigned int _idx, unsigned int _size, Eigen::Vector3s& _p,
+//         //           Eigen::Quaternions& _q);
+
+//         *
+//          * Destructor
+         
+//         virtual ~StatePose();
+
+//         // /**
+//         //  * \brief Set to origin
+//         //  *
+//         //  * Set state to the origin.
+//         //  *
+//         //  * Sets the position to 0, the quaternion to Quaternions::Identity(), and the rest of the states to 0.
+//         //  *
+//         //  * This class may be overloaded in case the states other than P, Q need a different origin than the default 0.
+//         //  */
+//         // virtual void setToOrigin();
+
+//         // /**
+//         //  * Set position
+//         //  * \param _pos position
+//         //  */
+//         // void p(Eigen::Vector3s& _pos);
+
+//         // /**
+//         //  * Get reference to position
+//         //  */
+//         // Eigen::Map<Eigen::Vector3s>& p();
+
+//         // /**
+//         //  * Get reference to position
+//         //  */
+//         // const Eigen::Map<Eigen::Vector3s>& p() const;
+
+
+//         // /**
+//         //  * Set quaternion
+//         //  * \param _quat quaternion
+//         //  */
+//         // void q(Eigen::Quaternions& _quat);
+
+//         // /**
+//         //  * Get reference to quaternion
+//         //  */
+//         // Eigen::Map<Eigen::Quaternions>& q();
+
+//         // /**
+//         //  * Get reference to quaternion
+//         //  */
+//         // const Eigen::Map<Eigen::Quaternions>& q() const;
+
+//         // /**
+//         //  * \brief compose this pose with a local pose
+//         //  * \param _local_pose local pose to compose with. Acts as local wrt this.
+//         //  * \return a composed pose, this * _other
+//         //  *
+//         //  * Composes another pose locally on top of this.
+//         //  */
+//         // virtual StatePose composeWithLocal(const StatePose& _local_pose) const;
+//         // virtual void composeWithLocal(const StatePose& _local_pose, StatePose& _return_pose) const;
+//         // virtual void composeWithLocal(const StatePose& _local_pose);
+
+//         // /**
+//         //  * \brief compose this pose with a base pose
+//         //  * \param _base_pose base pose to compose with. Acts as global or base wrt this.
+//         //  * \return a composed pose, _other * this
+//         //  *
+//         //  * Composes this pose on top of another.
+//         //  */
+//         // virtual StatePose composeOnTopOf(const StatePose& _base_pose) const;
+//         // virtual void composeOnTopOf(const StatePose& _base_pose, StatePose& _return_pose) const;
+//         // virtual void composeOnTopOf(const StatePose& _base_pose);
+
+//         // /**
+//         //  * \brief compose poses
+//         //  * \param _reference_pose the pose in relation to which we compose
+//         //  *
+//         //  * Expresses this pose relative to another
+//         //  */
+//         // virtual StatePose composeRelativeTo(const StatePose& _reference_pose) const;
+//         // virtual void composeRelativeTo(const StatePose& _reference_pose, StatePose& _return_pose) const;
+//         // virtual void composeRelativeTo(const StatePose& _reference_pose);
+
+//         // /**
+//         //  * \brief inverse pose
+//         //  * \return a State pose whose pose is the inverse of this.
+//         //  */
+//         // virtual StatePose inverse() const;
+//         // void inverse(StatePose& _result) const;
+
+//         // virtual void remap(Eigen::VectorXs& _st_remote, const unsigned int _idx);
+
+// };
 
 
 //////////////////////////////////////
 // IMPLEMENTATION
 //////////////////////////////////////
 
-inline void StatePose::setToOrigin()
+/*inline void StatePose::setToOrigin()
 {
     state_estimated_map_ = Eigen::VectorXs::Zero(size());
     q_.w() = 1.0; // faster than q_.setIdentity();
@@ -324,6 +337,81 @@ inline void StatePose::remap(Eigen::VectorXs& _st_remote, const unsigned int _id
     StateRootBase::remap(_st_remote, _idx);
     new (&p_) Eigen::Map<Eigen::VectorXs>    (&state_estimated_map_(0), 3);
     new (&q_) Eigen::Map<Eigen::Quaternions> (&state_estimated_map_(3));
+}*/
+
+
+
+
+template<unsigned int N>
+StatePose<N>::StatePose() :
+        StateBase(N),//,
+        n_(state_estimated_map_.data(), N)
+        //q_(state_estimated_map_.data() + 3)//
+{
+//    setToOrigin();
+}
+
+// StatePose::StatePose(unsigned int _size) :
+//         StateBase(_size), //
+//         p_(state_estimated_map_.data(), 3), //
+//         q_(state_estimated_map_.data() + 3)//
+// {
+// //    setToOrigin();
+// }
+
+// StatePose::StatePose(const Eigen::VectorXs & _x) :
+//         StateBase(_x), //
+//         p_(state_estimated_map_.data(), 3), //
+//         q_(state_estimated_map_.data() + 3)//
+// {
+// }
+
+// StatePose::StatePose(const StatePose& _pose) : 
+//         StateBase(7),
+//         p_(state_estimated_map_.data(), 3), //
+//         q_(state_estimated_map_.data() + 3)//        
+// {
+//     p_ = _pose.p();
+//     q_ = _pose.q();
+// }
+
+// StatePose::StatePose(unsigned int _size, Eigen::Vector3s& _p, Eigen::Quaternions& _q) :
+//         StateBase(_size), //
+//         p_(state_estimated_map_.data(), 3), //
+//         q_(state_estimated_map_.data() + 3)//
+// {
+//     p(_p);
+//     q(_q);
+// }
+
+// StatePose::StatePose(Eigen::VectorXs& _storage, unsigned int _idx, unsigned int _size) :
+//         StateBase(_storage, _idx, _size), //  constructor
+//         p_(_storage.data() + _idx, 3), // position
+//         q_(_storage.data() + _idx + 3) // orientation quaternion
+// {
+//     // nothing to do
+// }
+
+// StatePose::StatePose(Eigen::VectorXs& _storage, unsigned int _idx, Eigen::VectorXs& _x) :
+//         StateBase(_storage, _idx, _x), //  constructor
+//         p_(_storage.data() + _idx, 3), // position
+//         q_(_storage.data() + _idx + 3) // orientation quaternion
+// {
+// }
+
+// StatePose::StatePose(Eigen::VectorXs& _storage, unsigned int _idx, unsigned int _size, Eigen::Vector3s& _p, Eigen::Quaternions& _q) :
+//         StateBase(_storage, _idx, _size), //  constructor
+//         p_(_storage.data() + _idx, 3), // position
+//         q_(_storage.data() + _idx + 3) // orientation quaternion
+// {
+//     p(_p);
+//     q(_q);
+// }
+
+template<unsigned int N>
+StatePose<N>::~StatePose()
+{
+    // nothing to do
 }
 
 #endif /* STATE_POSE_H_ */

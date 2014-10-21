@@ -40,16 +40,17 @@ SET(HDRS
     quaternion_tools.h
     raw_base.h
     sensor_base.h
+
     state_base.h
-    state_error.h
-    state_error_imu.h
-    state_error_pose.h
-    state_error_pqv.h
-    state_imu.h
-    state_pose.h
-    state_pq.h
-    state_pqv.h
-    state_root_base.h
+    state_point.h
+
+    # state_imu.h
+    
+    # state_error.h
+    # state_error_imu.h
+    # state_error_pose.h
+    # state_error_pqv.h    
+
     time_stamp.h
     trans_pin_hole.h
     trans_sensor.h
@@ -60,15 +61,14 @@ SET(HDRS
 #sources
 SET(SRCS
     state_base.cpp
-#     state_error.cpp
-#     state_error_imu.cpp
-#     state_error_pose.cpp
-#     state_error_pqv.cpp
-    state_imu.cpp
-    state_pose.cpp
-    state_pq.cpp
-    state_pqv.cpp
-    state_root_base.cpp
+    state_point.cpp
+
+    # state_imu.cpp
+    
+    # state_error.cpp
+    # state_error_imu.cpp
+    # state_error_pose.cpp
+    # state_error_pqv.cpp
     time_stamp.cpp)
 
 #optional HDRS and SRCS

@@ -4,16 +4,16 @@
 #TARGET_LINK_LIBRARIES(test_quaternion ${PROJECT_NAME})
 
 #test_map
-ADD_EXECUTABLE(test_map test_map.cpp)
-TARGET_LINK_LIBRARIES(test_map ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_map test_map.cpp)
+# TARGET_LINK_LIBRARIES(test_map ${PROJECT_NAME})
 
 #test_circular_buffer
 #ADD_EXECUTABLE(test_circular_buffer test_circular_buffer.cpp)
 #TARGET_LINK_LIBRARIES(test_circular_buffer ${PROJECT_NAME})
 
 #test_states
-#ADD_EXECUTABLE(test_states test_states.cpp)
-#TARGET_LINK_LIBRARIES(test_states ${PROJECT_NAME})
+ADD_EXECUTABLE(test_states test_states.cpp)
+TARGET_LINK_LIBRARIES(test_states ${PROJECT_NAME})
 
 #test_error_states
 # ADD_EXECUTABLE(test_error_states test_error_states.cpp)
@@ -60,12 +60,12 @@ TARGET_LINK_LIBRARIES(test_map ${PROJECT_NAME})
 #TARGET_LINK_LIBRARIES(test_pointers ${PROJECT_NAME})
 
 # test_mid_nodes
-ADD_EXECUTABLE(test_mid_nodes test_mid_nodes.cpp)
-TARGET_LINK_LIBRARIES(test_mid_nodes ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_mid_nodes test_mid_nodes.cpp)
+# TARGET_LINK_LIBRARIES(test_mid_nodes ${PROJECT_NAME})
 
 # test_virtual_hierarchy
-ADD_EXECUTABLE(test_virtual_hierarchy test_virtual_hierarchy.cpp)
-TARGET_LINK_LIBRARIES(test_virtual_hierarchy ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_virtual_hierarchy test_virtual_hierarchy.cpp)
+# TARGET_LINK_LIBRARIES(test_virtual_hierarchy ${PROJECT_NAME})
 
 # test_eigen_jet
 #ADD_EXECUTABLE(test_eigen_jet test_eigen_jet.cpp)
