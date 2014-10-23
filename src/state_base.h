@@ -5,8 +5,8 @@
  *      \author: jvallve
  */
 
-#ifndef STATE_ROOT_BASE_H_
-#define STATE_ROOT_BASE_H_
+#ifndef STATE_BASE_H_
+#define STATE_BASE_H_
 
 // wolf
 #include "wolf.h"
