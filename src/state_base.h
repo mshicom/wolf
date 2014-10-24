@@ -10,6 +10,7 @@
 
 // wolf
 #include "wolf.h"
+#include <iostream>
 
 /** \brief Base class for all kind of states.
  * 
@@ -93,7 +94,7 @@ class StateBase
         /**
          * Get the size of the state
          */
-        unsigned int size();
+        unsigned int size() const;
 
         // Setters and getters
 
@@ -113,6 +114,10 @@ class StateBase
          */
         void x(const Eigen::VectorXs& _x);
 
+        /**
+		 * Print the state vector
+		 */
+        virtual void print() const;
 };
 
 /////////////////////////////////
@@ -146,7 +151,7 @@ inline void StateBase::remap(Eigen::VectorXs& _st_remote, const unsigned int _id
     new (&state_estimated_map_) Eigen::Map<Eigen::VectorXs>(&_st_remote(_idx), this->size());
 }
 
-inline unsigned int StateBase::size()
+inline unsigned int StateBase::size() const
 {
     return state_estimated_map_.size();
 }
@@ -167,7 +172,10 @@ inline Eigen::Map<Eigen::VectorXs>& StateBase::x()
     return state_estimated_map_;
 }
 
-
+inline void StateBase::print() const
+{
+    std::cout << state_estimated_map_.transpose() << std::endl;
+}
 
 
 #endif /* STATE_BASE_H_ */

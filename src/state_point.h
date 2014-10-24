@@ -61,7 +61,6 @@ class StatePoint : public StateBase
          * Destructor
          */
         virtual ~StatePoint();
-
 };
 
 #endif /* STATE_POINT_H_ */

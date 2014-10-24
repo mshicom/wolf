@@ -5,6 +5,7 @@
  *      \author: jvallve
  */
 
+#include <iostream>
 #include "state_base.h"
 
 using namespace Eigen;
@@ -13,7 +14,7 @@ StateBase::StateBase(const unsigned int _size) :
         state_estimated_local_(_size), //
         state_estimated_map_(state_estimated_local_.data(), _size) //
 {
-//    state_estimated_local_ = VectorXs::Zero(_size); // makes sure it initializes to zero
+    state_estimated_local_ = VectorXs::Zero(_size); // makes sure it initializes to zero
 }
 
 StateBase::StateBase(const VectorXs& _x) :

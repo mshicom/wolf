@@ -5,12 +5,11 @@
  *      \author: jvallve
  */
 
-#ifndef STATE_P_H_
-#define STATE_P_H_
+#ifndef STATE_ORIENTATION_H_
+#define STATE_ORIENTATION_H_
 
 // wolf
 #include "state_base.h"
-#include "state_point.h"
 #include "wolf.h"
 
 /** \brief Class for states which have at least a position
@@ -23,13 +22,11 @@
  * It inherits StateBase, so it can be constructed as local or remote.
  * 
  */
-template <unsigned int DIM>
-class StateP : public StateBase
+enum orientationParameter {THETA, EULER, QUATERION};
+
+template <orientationParameter OPARAM>
+class StateOrientation : public StateBase
 {
-	protected:
-
-		StatePoint p_;
-
     public:
 
 		// Local Constructors
@@ -37,26 +34,26 @@ class StateP : public StateBase
 		 * Local constructor from size. Map member will map local vector.
 		 * \param _size size of the state vector
 		 */
-		StateP();
+		StateOrientation();
 
 		// Local Constructors
 		/**
 		 * Local constructor from size. Map member will map local vector.
 		 * \param _size size of the state vector
 		 */
-		StateP(const unsigned int _size);
+		StateOrientation(const unsigned int _size);
 
 		/**
          * Local constructor from vector. Map member will map local vector.
          * \param _x the state vector
          */
-        StateP(const Eigen::VectorXs& _x);
+        StateOrientation(const Eigen::VectorXs& _x);
 
         /**
 		 * Local copy constructor. Map member will map local vector.
 		 * \param _state_p the state
 		 */
-		StateP(const StateP& _state_p);
+		StateOrientation(const StateOrientation& _state_p);
 
         // Remote Constructors
         /**
@@ -65,7 +62,7 @@ class StateP : public StateBase
          * \param _idx index where the state maps to the remote storage vector
          * \param _size size of the state vector
          */
-        StateP(Eigen::VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size);
+        StateOrientation(Eigen::VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size);
 
         /**
          * Remote constructor from vector. Map member will map remote storage vector.
@@ -73,12 +70,12 @@ class StateP : public StateBase
          * \param _idx index where the state maps to the remote storage vector
          * \param _x the state vector
          */
-        StateP(Eigen::VectorXs& _st_remote, const unsigned int _idx, const Eigen::VectorXs& _x);
+        StateOrientation(Eigen::VectorXs& _st_remote, const unsigned int _idx, const Eigen::VectorXs& _x);
 
         /**
          * Destructor
          */
-        virtual ~StateP();
+        virtual ~StateOrientation();
 
         /**
 		 * Change the mapped positions in the remote vector of the stateEstimatedMap
@@ -100,61 +97,61 @@ class StateP : public StateBase
 using namespace Eigen;
 
 template<unsigned int DIM>
-StateP<DIM>::StateP() :
+StateOrientation<DIM>::StateOrientation() :
         StateBase(DIM), //
 		p_(state_estimated_local_, 0, DIM)
 {
 }
 
 template<unsigned int DIM>
-StateP<DIM>::StateP(const unsigned int _size) :
+StateOrientation<DIM>::StateOrientation(const unsigned int _size) :
         StateBase(_size), //
 		p_(state_estimated_local_, 0, DIM)
 {
 }
 
 template<unsigned int DIM>
-StateP<DIM>::StateP(const VectorXs& _x) :
+StateOrientation<DIM>::StateOrientation(const VectorXs& _x) :
 		StateBase(_x), //
 		p_(state_estimated_local_, 0, DIM)
 {
 }
 
 template<unsigned int DIM>
-StateP<DIM>::StateP(const StateP& _state_p) :
+StateOrientation<DIM>::StateOrientation(const StateOrientation& _state_p) :
 		StateBase(_state_p.x()), //
 		p_(state_estimated_local_, 0, DIM)
 {
 }
 
 template<unsigned int DIM>
-StateP<DIM>::StateP(VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size) :
+StateOrientation<DIM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size) :
         StateBase(_st_remote,_idx, _size), //
 		p_(_st_remote, 0, DIM)
 {
 }
 
 template<unsigned int DIM>
-StateP<DIM>::StateP(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
+StateOrientation<DIM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
 		StateBase(_st_remote,_idx, _x), //
 		p_(_st_remote, 0, DIM)
 {
 }
 
 template<unsigned int DIM>
-StateP<DIM>::~StateP()
+StateOrientation<DIM>::~StateOrientation()
 {
 }
 
 template<unsigned int DIM>
-inline void StateP<DIM>::remap(VectorXs& _st_remote, const unsigned int _idx)
+inline void StateOrientation<DIM>::remap(VectorXs& _st_remote, const unsigned int _idx)
 {
 	StateBase::remap(_st_remote, _idx);
 	p_.remap(_st_remote, _idx);
 }
 
 template<unsigned int DIM>
-inline void StateP<DIM>::print() const
+inline void StateOrientation<DIM>::print() const
 {
 	std::cout << "p: ";
 	p_.print();
