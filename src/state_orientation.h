@@ -154,39 +154,37 @@ using namespace Eigen;
 
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation() :
-        StateBase(O_PARAM)
-{
-}
-
-template<>
-StateOrientation<QUATERNION>::StateOrientation() :
-        StateBase(4),
-		q_(state_estimated_local_.data() + 3)
+        StateBase(O_PARAM),
+		q_(O_PARAM == QUATERNION ? state_estimated_local_.data() + 3 : NULL)
 {
 }
 
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(const VectorXs& _x) :
-		StateBase(_x)
+		StateBase(_x),
+		q_(O_PARAM == QUATERNION ? state_estimated_local_.data() + 3 : NULL)
 {
 	assert(O_PARAM == _x.size());
 }
 
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(const StateOrientation<O_PARAM>& _state_p) :
-		StateBase(_state_p.x())
+		StateBase(_state_p.x()),
+		q_(O_PARAM == QUATERNION ? state_estimated_local_.data() + 3 : NULL)
 {
 }
 
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx) :
-        StateBase(_st_remote,_idx, O_PARAM)
+        StateBase(_st_remote,_idx, O_PARAM),
+		q_(O_PARAM == QUATERNION ? _st_remote.data() + 3 : NULL)
 {
 }
 
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
-		StateBase(_st_remote,_idx, _x)
+		StateBase(_st_remote,_idx, _x),
+		q_(O_PARAM == QUATERNION ? _st_remote.data() + 3 : NULL)
 {
 	assert(O_PARAM == _x.size());
 }
