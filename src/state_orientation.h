@@ -1,5 +1,5 @@
 /*
- * state_p.h
+ * state_orientation.h
  *
  *  Created on: Oct 23, 2014
  *      \author: jvallve
@@ -13,12 +13,10 @@
 #include "state_base.h"
 #include "wolf.h"
 
-/** \brief Class for states which have at least a position
+/** \brief Class for state containing an orientation
  *
- * A position state is a state containing at least a state_point of the dimension fixed by the DIM non-type template: 2D or 3D.
- *
- * Derive from this class to include additional substates such as orientation, velocities or other possible
- * things related to motion.
+ * An orientation state is a non-type template state containing an orientation using the orientation parametrization fixed by O_PARAM
+ * which can be THETA (2D yaw), EULER angles or QUATERNION.
  *
  * It inherits StateBase, so it can be constructed as local or remote.
  * 
@@ -86,69 +84,9 @@ class StateOrientation : public StateBase
 
 };
 
-//template<>
-//class StateOrientation<QUATERNION> : public StateBase
-//{
-//	protected:
-//		Eigen::Map<Eigen::Quaternions> q_; ///< mapped vector, to remote storage
-//	public:
-//
-//		// Local Constructors
-//		/**
-//		 * Local constructor from size. Map member will map local vector.
-//		 * \param _size size of the state vector
-//		 */
-//		StateOrientation();
-//
-//		/**
-//		 * Local constructor from vector. Map member will map local vector.
-//		 * \param _x the state vector
-//		 */
-//		StateOrientation(const Eigen::VectorXs& _x);
-//
-//		/**
-//		 * Local copy constructor. Map member will map local vector.
-//		 * \param _state_p the state
-//		 */
-//		StateOrientation(const StateOrientation<QUATERNION>& _state_p);
-//
-//		// Remote Constructors
-//		/**
-//		 * Remote constructor from size. Map member will map remote storage vector.
-//		 * \param _st_remote storage vector
-//		 * \param _idx index where the state maps to the remote storage vector
-//		 * \param _size size of the state vector
-//		 */
-//		StateOrientation(Eigen::VectorXs& _st_remote, const unsigned int _idx);
-//
-//		/**
-//		 * Remote constructor from vector. Map member will map remote storage vector.
-//		 * \param _st_remote storage vector
-//		 * \param _idx index where the state maps to the remote storage vector
-//		 * \param _x the state vector
-//		 */
-//		StateOrientation(Eigen::VectorXs& _st_remote, const unsigned int _idx, const Eigen::VectorXs& _x);
-//
-//		/**
-//		 * Destructor
-//		 */
-//		virtual ~StateOrientation();
-//
-//		/**
-//		 * Change the mapped positions in the remote vector of the stateEstimatedMap
-//		 */
-//		virtual void remap(Eigen::VectorXs& _st_remote, const unsigned int _idx);
-//
-//		/**
-//		 * Print the state point
-//		 */
-//		virtual void print() const;
-//};
-
 /////////////////////////////////
 // IMPLEMENTATION
 /////////////////////////////////
-
 
 using namespace Eigen;
 
