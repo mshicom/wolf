@@ -9,6 +9,7 @@
 #define STATE_POINT_H_
 
 // wolf
+#include <iostream>
 #include "state_base.h"
 #include "wolf.h"
 
@@ -61,6 +62,21 @@ class StatePoint : public StateBase
          * Destructor
          */
         virtual ~StatePoint();
+
+        /**
+		 * Print the state point
+		 */
+		virtual void print() const;
 };
+
+/////////////////////////////////
+// IMPLEMENTATION
+/////////////////////////////////
+
+inline void StatePoint::print() const
+{
+	std::cout << "point: ";
+	StateBase::print();
+}
 
 #endif /* STATE_POINT_H_ */

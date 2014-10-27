@@ -2,6 +2,7 @@
 #include "state_base.h"
 #include "state_point.h"
 #include "state_p.h"
+#include "state_orientation.h"
 
 using namespace std;
 using namespace Eigen;
@@ -27,7 +28,9 @@ int main()
     //  StateBase basetest(&storage, 17, smaller);
     //  StateBase basetest(&storage, 25, larger);
 
-    cout << "------ StatePoint 2D CONSTRUCTORS:" << endl;
+    cout << endl;
+    cout << "--------------------------------------------" << endl;
+    cout << "-------- StatePoint 2D CONSTRUCTORS --------" << endl;
     storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
     index = 0;
     bsize = 4;
@@ -39,29 +42,45 @@ int main()
     cout << "index     : " << index << endl;
     cout << "bsize     : " << bsize << endl;
     cout << "VectorA (Xs) : " << VectorA.transpose() << endl;
-    cout << "VectorB (2s) : " << VectorB.transpose() << endl;
+    cout << "VectorB (2s) : " << VectorB.transpose() << endl << endl;
 
-    StatePoint point2D_b(2);
-    cout << "Local constructor from size ,  size : " << point2D_b.size() << endl;
-    StatePoint point2D_c(VectorA);
-    cout << "Local constructor from VectorA,  x : " << point2D_c.x().transpose() << endl;
-    StatePoint point2D_e(VectorB);
-    cout << "Local constructor from VectorB,  x : " << point2D_e.x().transpose() << endl;
+    cout << "Local constructor from size 2" << endl;
+    StatePoint point2D_a(2);
+    point2D_a.print();
+
+    cout << "Local constructor from VectorA" << endl;
+	StatePoint point2D_b(VectorA);
+	point2D_b.print();
+
+	cout << "Local constructor from VectorB" << endl;
+	StatePoint point2D_c(VectorB);
+	point2D_c.print();
+
+    cout << "Local constructor from StatePoint" << endl;
     StatePoint point2D_d(point2D_c);
-    cout << "Local constructor from StatePoint,x : " << point2D_d.x().transpose() << endl;
-    StatePoint point2D_f(storage, index, 2);
-    cout << "Remote constructor from size,     x : " << point2D_f.x().transpose() << endl;
-    StatePoint point2D_g(storage, index, VectorA);
-    cout << "Remote constructor from VectorA, x : " << point2D_g.x().transpose() << endl;
-    StatePoint point2D_h(storage, index, VectorB);
-    cout << "Remote constructor from VectorB, x : " << point2D_h.x().transpose() << endl;
-    point2D_h.remap(storage, 4);
-    cout << "Remap to idx 4,                   x : " << point2D_h.x().transpose() << endl;
-    cout << "Print: ";
-    point2D_h.print();
+    point2D_d.print();
+
+    cout << "Remote constructor from size" << endl;
+	StatePoint point2D_e(storage, index, 2);
+	point2D_e.print();
+
+    cout << "Remote constructor from VectorA" << endl;
+    StatePoint point2D_f(storage, index, VectorA);
+    point2D_f.print();
+
+    cout << "Remote constructor from VectorB" << endl;
+    StatePoint point2D_g(storage, index, VectorB);
+    point2D_g.print();
+
+    cout << "Remap to idx 4" << endl;
+    point2D_g.remap(storage, 4);
+    point2D_g.print();
+
     cout << "storage   : " << storage.transpose() << endl;
 
-    cout << "------ StatePoint 3D CONSTRUCTORS:" << endl;
+    cout << endl;
+    cout << "--------------------------------------------" << endl;
+	cout << "-------- StatePoint 3D CONSTRUCTORS --------" << endl;
     storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
 	index = 0;
 	bsize = 4;
@@ -73,29 +92,45 @@ int main()
 	cout << "index     : " << index << endl;
 	cout << "bsize     : " << bsize << endl;
 	cout << "VectorC (Xs) : " << VectorC.transpose() << endl;
-	cout << "VectorD (3s) : " << VectorD.transpose() << endl;
+	cout << "VectorD (3s) : " << VectorD.transpose() << endl << endl;
 
-    StatePoint point3D_b(3);
-    cout << "Local constructor from size ,  size : " << point3D_b.size() << endl;
-    StatePoint point3D_c(VectorC);
-    cout << "Local constructor from VectorC,   x : " << point3D_c.x().transpose() << endl;
-    StatePoint point3D_e(VectorD);
-    cout << "Local constructor from VectorD,   x : " << point3D_e.x().transpose() << endl;
+    cout << "Local constructor from size" << endl;
+    StatePoint point3D_a(3);
+    point3D_a.print();
+
+    cout << "Local constructor from VectorC" << endl;
+    StatePoint point3D_b(VectorC);
+    point3D_b.print();
+
+    cout << "Local constructor from VectorD" << endl;
+    StatePoint point3D_c(VectorD);
+    point3D_c.print();
+
+    cout << "Local constructor from StatePoint" << endl;
     StatePoint point3D_d(point3D_c);
-    cout << "Local constructor from StatePoint,x : " << point3D_d.x().transpose() << endl;
-    StatePoint point3D_f(storage, index, 3);
-    cout << "Remote constructor from size,     x : " << point3D_f.x().transpose() << endl;
-    StatePoint point3D_g(storage, index, VectorC);
-    cout << "Remote constructor from VectorA,  x : " << point3D_g.x().transpose() << endl;
-    StatePoint point3D_h(storage, index, VectorD);
-    cout << "Remote constructor from VectorD,  x : " << point3D_h.x().transpose() << endl;
-    point3D_h.remap(storage, 4);
-    cout << "Remap to idx 4,                   x : " << point3D_h.x().transpose() << endl;
-    cout << "Print: ";
-    point3D_h.print();
-	cout << "storage   : " << storage.transpose() << endl;
+    point3D_d.print();
+
+    cout << "Remote constructor from size" << endl;
+    StatePoint point3D_e(storage, index, 3);
+    point3D_e.print();
+
+    cout << "Remote constructor from VectorA" << endl;
+    StatePoint point3D_f(storage, index, VectorC);
+    point3D_f.print();
+
+    cout << "Remote constructor from VectorD" << endl;
+    StatePoint point3D_g(storage, index, VectorD);
+    point3D_g.print();
+
+    cout << "Remap to idx 4" << endl;
+	point3D_g.remap(storage, 4);
+    point3D_g.print();
+
+    cout << "storage   : " << storage.transpose() << endl;
     
-    cout << "------ StateP<2> CONSTRUCTORS:" << endl;
+    cout << endl;
+    cout << "--------------------------------------------" << endl;
+	cout << "---------- StateP<2> CONSTRUCTORS ----------" << endl;
 	storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
 	index = 5;
 	bsize = 6;
@@ -105,31 +140,49 @@ int main()
 	cout << "index     : " << index << endl;
 	cout << "bsize     : " << bsize << endl;
 	cout << "VectorA (Xs) : " << VectorA.transpose() << endl;
-	cout << "VectorE (Xs) : " << VectorE.transpose() << endl;
+	cout << "VectorE (Xs) : " << VectorE.transpose() << endl << endl;
 
+	cout << "Local constructor" << endl;
 	StateP<2> p2D_a;
-	cout << "Local constructor ,            size : " << p2D_a.size() << endl;
+	p2D_a.print();
+
+	cout << "Local constructor from bsize" << endl;
 	StateP<2> p2D_b(bsize);
-	cout << "Local constructor from bsize,  size : " << p2D_b.size() << endl;
+	p2D_b.print();
+
+	cout << "Local constructor from VectorA" << endl;
 	StateP<2> p2D_c(VectorA);
-	cout << "Local constructor from VectorA,   x : " << p2D_c.x().transpose() << endl;
-	StateP<2> p2D_e(VectorE);
-	cout << "Local constructor from VectorE,   x : " << p2D_e.x().transpose() << endl;
-	StateP<2> p2D_d(p2D_e);
-	cout << "Local constructor from StateP,    x : " << p2D_d.x().transpose() << endl;
+	p2D_c.print();
+
+	cout << "Local constructor from VectorE" << endl;
+	StateP<2> p2D_d(VectorE);
+	p2D_d.print();
+
+	cout << "Local constructor from StateP" << endl;
+	StateP<2> p2D_e(p2D_d);
+	p2D_e.print();
+
+	cout << "Remote constructor from bsize" << endl;
 	StateP<2> p2D_f(storage, index, bsize);
-	cout << "Remote constructor from bsize,    x : " << p2D_f.x().transpose() << endl;
+	p2D_f.print();
+
+	cout << "Remote constructor from VectorA" << endl;
 	StateP<2> p2D_g(storage, index, VectorA);
-	cout << "Remote constructor from VectorA,  x : " << p2D_g.x().transpose() << endl;
+	p2D_g.print();
+
+	cout << "Remote constructor from VectorE" << endl;
 	StateP<2> p2D_h(storage, index, VectorE);
-	cout << "Remote constructor from VectorE,  x : " << p2D_h.x().transpose() << endl;
-	p2D_h.remap(storage, 3);
-	cout << "Remap to idx 3,                   x : " << p2D_h.x().transpose() << endl;
-	cout << "Print: ";
 	p2D_h.print();
+
+	cout << "Remap to idx 3" << endl;
+	p2D_h.remap(storage, 3);
+	p2D_h.print();
+
 	cout << "storage   : " << storage.transpose() << endl;
 
-	cout << "------ StateP<3> CONSTRUCTORS:" << endl;
+	cout << endl;
+	cout << "--------------------------------------------" << endl;
+	cout << "---------- StateP<3> CONSTRUCTORS ----------" << endl;
 	storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
 	index = 5;
 	bsize = 6;
@@ -137,30 +190,190 @@ int main()
 	cout << "index     : " << index << endl;
 	cout << "bsize     : " << bsize << endl;
 	cout << "VectorC (Xs) : " << VectorC.transpose() << endl;
-	cout << "VectorE (Xs) : " << VectorE.transpose() << endl;
+	cout << "VectorE (Xs) : " << VectorE.transpose() << endl << endl;
 
+	cout << "Local constructor from bsize" << endl;
 	StateP<3> p3D_a;
-	cout << "Local constructor from bsize,  size : " << p3D_a.size() << endl;
+	p3D_a.print();
+
+	cout << "Local constructor from bsize" << endl;
 	StateP<3> p3D_b(bsize);
-	cout << "Local constructor from bsize,  size : " << p3D_b.size() << endl;
+	p3D_b.print();
+
+	cout << "Local constructor from VectorC" << endl;
 	StateP<3> p3D_c(VectorC);
-	cout << "Local constructor from VectorC,   x : " << p3D_c.x().transpose() << endl;
-	StateP<3> p3D_e(VectorE);
-	cout << "Local constructor from VectorE,   x : " << p3D_e.x().transpose() << endl;
-	StateP<3> p3D_d(p3D_e);
-	cout << "Local constructor from StateP,    x : " << p3D_d.x().transpose() << endl;
+	p3D_c.print();
+
+	cout << "Local constructor from VectorE" << endl;
+	StateP<3> p3D_d(VectorE);
+	p3D_d.print();
+
+	cout << "Local constructor from StateP" << endl;
+	StateP<3> p3D_e(p3D_d);
+	p3D_e.print();
+
+	cout << "Remote constructor from bsize" << endl;
 	StateP<3> p3D_f(storage, index, bsize);
-	cout << "Remote constructor from bsize,    x : " << p3D_f.x().transpose() << endl;
+	p3D_f.print();
+
+	cout << "Remote constructor from VectorC" << endl;
 	StateP<3> p3D_g(storage, index, VectorC);
-	cout << "Remote constructor from VectorC,  x : " << p3D_g.x().transpose() << endl;
+	p3D_g.print();
+
+	cout << "Remote constructor from VectorE" << endl;
 	StateP<3> p3D_h(storage, index, VectorE);
-	cout << "Remote constructor from VectorE,  x : " << p3D_h.x().transpose() << endl;
-	p3D_h.remap(storage, 3);
-	cout << "Remap to idx 3,                   x : " << p3D_h.x().transpose() << endl;
-	cout << "Print: ";
 	p3D_h.print();
+
+	cout << "Remap to idx 3" << endl;
+	p3D_h.remap(storage, 3);
+	p3D_h.print();
+
 	cout << "storage   : " << storage.transpose() << endl;
 
+	cout << endl;
+	cout << "--------------------------------------------" << endl;
+	cout << "--- StateOrientation<THETA> CONSTRUCTORS ---" << endl;
+	storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+	index = 0;
+	VectorXs VectorF(1);
+	VectorF << 2.7;
+	Matrix<WolfScalar,1,1> VectorG(1);
+	VectorG << 3.7;
+	cout << "storage   : " << storage.transpose() << endl;
+	cout << "index     : " << index << endl;
+	cout << "VectorF (Xs) : " << VectorF.transpose() << endl;
+	cout << "VectorG (1s) : " << VectorG.transpose() << endl << endl;
+
+	cout << "Local constructor from size" << endl;
+	StateOrientation<THETA> orientation2D_a;
+	orientation2D_a.print();
+
+	cout << "Local constructor from VectorF" << endl;
+	StateOrientation<THETA> orientation2D_b(VectorF);
+	orientation2D_b.print();
+
+	cout << "Local constructor from VectorG" << endl;
+	StateOrientation<THETA> orientation2D_c(VectorG);
+	orientation2D_c.print();
+
+	cout << "Local constructor from StatePoint" << endl;
+	StateOrientation<THETA> orientation2D_d(orientation2D_c);
+	orientation2D_d.print();
+
+	cout << "Remote constructor from size" << endl;
+	StateOrientation<THETA> orientation2D_e(storage, index);
+	orientation2D_e.print();
+
+	cout << "Remote constructor from VectorF" << endl;
+	StateOrientation<THETA> orientation2D_f(storage, index, VectorF);
+	orientation2D_f.print();
+
+	cout << "Remote constructor from VectorG" << endl;
+	StateOrientation<THETA> orientation2D_g(storage, index, VectorG);
+	orientation2D_g.print();
+
+	cout << "Remap to idx 4" << endl;
+	orientation2D_g.remap(storage, 4);
+	orientation2D_g.print();
+
+	cout << "storage   : " << storage.transpose() << endl;
+
+
+	cout << endl;
+	cout << "--------------------------------------------" << endl;
+	cout << "--- StateOrientation<EULER> CONSTRUCTORS ---" << endl;
+	storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+	index = 0;
+	VectorXs VectorH(3);
+	VectorH << 1.1, 2.2, 3.3;
+	Vector3s VectorI;
+	VectorI << 4.4, 5.5, 6.6;
+	cout << "storage   : " << storage.transpose() << endl;
+	cout << "index     : " << index << endl;
+	cout << "VectorH (Xs) : " << VectorH.transpose() << endl;
+	cout << "VectorI (3s) : " << VectorI.transpose() << endl << endl;
+
+	cout << "Local constructor from size" << endl;
+	StateOrientation<EULER> orientation3D_a;
+	orientation3D_a.print();
+
+	cout << "Local constructor from VectorH" << endl;
+	StateOrientation<EULER> orientation3D_b(VectorH);
+	orientation3D_b.print();
+
+	cout << "Local constructor from VectorI" << endl;
+	StateOrientation<EULER> orientation3D_c(VectorI);
+	orientation3D_c.print();
+
+	cout << "Local constructor from StatePoint" << endl;
+	StateOrientation<EULER> orientation3D_d(orientation3D_c);
+	orientation3D_d.print();
+
+	cout << "Remote constructor from size" << endl;
+	StateOrientation<EULER> orientation3D_e(storage, index);
+	orientation3D_e.print();
+
+	cout << "Remote constructor from VectorH" << endl;
+	StateOrientation<EULER> orientation3D_f(storage, index, VectorH);
+	orientation3D_f.print();
+
+	cout << "Remote constructor from VectorI" << endl;
+	StateOrientation<EULER> orientation3D_g(storage, index, VectorI);
+	orientation3D_g.print();
+
+	cout << "Remap to idx 4" << endl;
+	orientation3D_g.remap(storage, 4);
+	orientation3D_g.print();
+
+	cout << "storage   : " << storage.transpose() << endl;
+
+	cout << endl;
+	cout << "--------------------------------------------" << endl;
+	cout << "--StateOrientation<QUATERNION> CONSTRUCTORS-" << endl;
+	storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+	index = 0;
+	VectorXs VectorH(4);
+	VectorH << 1.1, 2.2, 3.3, 4.4;
+	Vector4s VectorI;
+	VectorI << 5.5, 6.6, 7.7, 8.8;
+	cout << "storage   : " << storage.transpose() << endl;
+	cout << "index     : " << index << endl;
+	cout << "VectorH (Xs) : " << VectorH.transpose() << endl;
+	cout << "VectorI (4s) : " << VectorI.transpose() << endl << endl;
+
+	cout << "Local constructor from size" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_a;
+	orientation3Dq_a.print();
+
+	cout << "Local constructor from VectorH" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_b(VectorH);
+	orientation3Dq_b.print();
+
+	cout << "Local constructor from VectorI" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_c(VectorI);
+	orientation3Dq_c.print();
+
+	cout << "Local constructor from StatePoint" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_d(orientation3D_c);
+	orientation3Dq_d.print();
+
+	cout << "Remote constructor from size" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_e(storage, index);
+	orientation3Dq_e.print();
+
+	cout << "Remote constructor from VectorH" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_f(storage, index, VectorH);
+	orientation3Dq_f.print();
+
+	cout << "Remote constructor from VectorI" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_g(storage, index, VectorI);
+	orientation3Dq_g.print();
+
+	cout << "Remap to idx 4" << endl;
+	orientation3Dq_g.remap(storage, 4);
+	orientation3Dq_g.print();
+
+	cout << "storage   : " << storage.transpose() << endl;
 
 
     //cout << "------ StatePose<3> CONSTRUCTORS:" << endl;

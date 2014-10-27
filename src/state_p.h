@@ -156,7 +156,6 @@ inline void StateP<DIM>::remap(VectorXs& _st_remote, const unsigned int _idx)
 template<unsigned int DIM>
 inline void StateP<DIM>::print() const
 {
-	std::cout << "p: ";
 	p_.print();
 }
 

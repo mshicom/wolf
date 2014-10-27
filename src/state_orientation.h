@@ -9,6 +9,7 @@
 #define STATE_ORIENTATION_H_
 
 // wolf
+#include <iostream>
 #include "state_base.h"
 #include "wolf.h"
 
@@ -22,12 +23,12 @@
  * It inherits StateBase, so it can be constructed as local or remote.
  * 
  */
-enum orientationParameter {THETA, EULER, QUATERION};
+enum orientationParametrization {THETA=1, EULER=3, QUATERNION=4};
 
-template <orientationParameter OPARAM>
+template <orientationParametrization O_PARAM>
 class StateOrientation : public StateBase
 {
-    public:
+public:
 
 		// Local Constructors
 		/**
@@ -35,13 +36,6 @@ class StateOrientation : public StateBase
 		 * \param _size size of the state vector
 		 */
 		StateOrientation();
-
-		// Local Constructors
-		/**
-		 * Local constructor from size. Map member will map local vector.
-		 * \param _size size of the state vector
-		 */
-		StateOrientation(const unsigned int _size);
 
 		/**
          * Local constructor from vector. Map member will map local vector.
@@ -53,7 +47,7 @@ class StateOrientation : public StateBase
 		 * Local copy constructor. Map member will map local vector.
 		 * \param _state_p the state
 		 */
-		StateOrientation(const StateOrientation& _state_p);
+		StateOrientation(const StateOrientation<O_PARAM>& _state_p);
 
         // Remote Constructors
         /**
@@ -62,7 +56,7 @@ class StateOrientation : public StateBase
          * \param _idx index where the state maps to the remote storage vector
          * \param _size size of the state vector
          */
-        StateOrientation(Eigen::VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size);
+        StateOrientation(Eigen::VectorXs& _st_remote, const unsigned int _idx);
 
         /**
          * Remote constructor from vector. Map member will map remote storage vector.
@@ -89,6 +83,13 @@ class StateOrientation : public StateBase
 
 };
 
+template<>
+class StateOrientation<QUATERNION> : public StateBase
+{
+	protected:
+		Eigen::Map<Eigen::Quaternions> q_; ///< mapped vector, to remote storage
+};
+
 /////////////////////////////////
 // IMPLEMENTATION
 /////////////////////////////////
@@ -96,65 +97,65 @@ class StateOrientation : public StateBase
 
 using namespace Eigen;
 
-template<unsigned int DIM>
-StateOrientation<DIM>::StateOrientation() :
-        StateBase(DIM), //
-		p_(state_estimated_local_, 0, DIM)
+template <orientationParametrization O_PARAM>
+StateOrientation<O_PARAM>::StateOrientation() :
+        StateBase(O_PARAM)
 {
 }
 
-template<unsigned int DIM>
-StateOrientation<DIM>::StateOrientation(const unsigned int _size) :
-        StateBase(_size), //
-		p_(state_estimated_local_, 0, DIM)
+template <orientationParametrization O_PARAM>
+StateOrientation<O_PARAM>::StateOrientation(const VectorXs& _x) :
+		StateBase(_x)
+{
+	assert(O_PARAM == _x.size());
+}
+
+template <orientationParametrization O_PARAM>
+StateOrientation<O_PARAM>::StateOrientation(const StateOrientation<O_PARAM>& _state_p) :
+		StateBase(_state_p.x())
 {
 }
 
-template<unsigned int DIM>
-StateOrientation<DIM>::StateOrientation(const VectorXs& _x) :
-		StateBase(_x), //
-		p_(state_estimated_local_, 0, DIM)
+template <orientationParametrization O_PARAM>
+StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx) :
+        StateBase(_st_remote,_idx, O_PARAM)
 {
 }
 
-template<unsigned int DIM>
-StateOrientation<DIM>::StateOrientation(const StateOrientation& _state_p) :
-		StateBase(_state_p.x()), //
-		p_(state_estimated_local_, 0, DIM)
+template <orientationParametrization O_PARAM>
+StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
+		StateBase(_st_remote,_idx, _x)
+{
+	assert(O_PARAM == _x.size());
+}
+
+template <orientationParametrization O_PARAM>
+StateOrientation<O_PARAM>::~StateOrientation()
 {
 }
 
-template<unsigned int DIM>
-StateOrientation<DIM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size) :
-        StateBase(_st_remote,_idx, _size), //
-		p_(_st_remote, 0, DIM)
-{
-}
-
-template<unsigned int DIM>
-StateOrientation<DIM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
-		StateBase(_st_remote,_idx, _x), //
-		p_(_st_remote, 0, DIM)
-{
-}
-
-template<unsigned int DIM>
-StateOrientation<DIM>::~StateOrientation()
-{
-}
-
-template<unsigned int DIM>
-inline void StateOrientation<DIM>::remap(VectorXs& _st_remote, const unsigned int _idx)
+template <orientationParametrization O_PARAM>
+inline void StateOrientation<O_PARAM>::remap(VectorXs& _st_remote, const unsigned int _idx)
 {
 	StateBase::remap(_st_remote, _idx);
-	p_.remap(_st_remote, _idx);
 }
 
-template<unsigned int DIM>
-inline void StateOrientation<DIM>::print() const
+template <orientationParametrization O_PARAM>
+void StateOrientation<O_PARAM>::print() const
 {
-	std::cout << "p: ";
-	p_.print();
+	std::cout << "orientation ";
+	switch(O_PARAM)
+	{
+		case THETA :
+			std::cout << "(yaw): ";
+			break;
+		case EULER:
+			std::cout << "(euler angles): ";
+			break;
+		case QUATERNION :
+			std::cout << "(quaternion): ";
+	}
+	StateBase::print();
 }
 
-#endif /* STATE_P_H_ */
+#endif /* STATE_ORIENTATION_H_ */
