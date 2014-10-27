@@ -45,6 +45,7 @@ SET(HDRS
     state_point.h
     state_orientation.h
     state_p.h
+    state_po.h
 
     # state_imu.h
     

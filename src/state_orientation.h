@@ -21,7 +21,6 @@
  * It inherits StateBase, so it can be constructed as local or remote.
  * 
  */
-enum orientationParametrization {THETA=1, EULER=3, QUATERNION=4};
 
 template <orientationParametrization O_PARAM>
 class StateOrientation : public StateBase

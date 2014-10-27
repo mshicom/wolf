@@ -9,8 +9,7 @@
 #define STATE_PO_H_
 
 // wolf
-#include "state_base.h"
-#include "state_point.h"
+#include "state_p.h"
 #include "state_orientation.h"
 #include "wolf.h"
 
@@ -22,18 +21,15 @@
  * Derive from this class to include additional substates such as orientation, velocities or other possible
  * things related to motion.
  *
- * It inherits StateBase, so it can be constructed as local or remote.
+ * It inherits StateP, so it can be constructed as local or remote.
  * 
  */
 
-enum orientationParametrization {THETA=1, EULER=3, QUATERNION=4};
-
 template <unsigned int DIM, orientationParametrization O_PARAM>
-class StatePO : public StateBase
+class StatePO : protected StateP<DIM>
 {
 	protected:
 
-		StatePoint p_;
 		StateOrientation<O_PARAM> o_;
 
     public:
@@ -59,6 +55,12 @@ class StatePO : public StateBase
         StatePO(const Eigen::VectorXs& _x);
 
         /**
+		 * Local constructor from StatePoint and StateOrientation. Map member will map local vector.
+		 * \param _x the state vector
+		 */
+		StatePO(const StatePoint& _p, const StateOrientation<O_PARAM>& _o);
+
+		/**
 		 * Local copy constructor. Map member will map local vector.
 		 * \param _state_p the state
 		 */
@@ -107,50 +109,53 @@ using namespace Eigen;
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
 StatePO<DIM,O_PARAM>::StatePO() :
-        StateBase(DIM+O_PARAM), //
-		p_(state_estimated_local_, 0, DIM),
-		o_(state_estimated_local_, DIM)
+	StateP<DIM>(DIM+O_PARAM), //
+	o_(StateP<DIM>::state_estimated_local_, DIM)
 {
 }
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
 StatePO<DIM,O_PARAM>::StatePO(const unsigned int _size) :
-        StateBase(_size), //
-		p_(state_estimated_local_, 0, DIM),
-		o_(state_estimated_local_, DIM)
+	StateP<DIM>(_size), //
+	o_(StateP<DIM>::state_estimated_local_, DIM)
 {
 }
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
 StatePO<DIM,O_PARAM>::StatePO(const VectorXs& _x) :
-		StateBase(_x), //
-		p_(state_estimated_local_, 0, DIM),
-		o_(state_estimated_local_, DIM)
+	StateP<DIM>(_x), //
+	o_(StateP<DIM>::state_estimated_local_, DIM)
+{
+}
+
+template<unsigned int DIM, orientationParametrization O_PARAM>
+StatePO<DIM,O_PARAM>::StatePO(const StatePoint& _p, const StateOrientation<O_PARAM>& _o) :
+	StateP<DIM>(_p.x(), DIM+O_PARAM),
+	o_(StateP<DIM>::state_estimated_local_,DIM,_o.x())
 {
 }
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
 StatePO<DIM,O_PARAM>::StatePO(const StatePO& _state_p) :
-		StateBase(_state_p.x()), //
-		p_(state_estimated_local_, 0, DIM),
-		o_(state_estimated_local_, DIM)
+	StateP<DIM>(_state_p.x()),
+	o_(StateP<DIM>::state_estimated_local_, DIM)
 {
 }
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
 StatePO<DIM,O_PARAM>::StatePO(VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size) :
-        StateBase(_st_remote,_idx, _size), //
-		p_(_st_remote, 0, DIM),
-		o_(_st_remote, DIM)
+	StateP<DIM>(_st_remote,_idx, _size),
+	o_(_st_remote, DIM)
 {
+	assert(_size >= DIM + O_PARAM);
 }
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
 StatePO<DIM,O_PARAM>::StatePO(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
-		StateBase(_st_remote,_idx, _x), //
-		p_(_st_remote, 0, DIM),
-		o_(_st_remote, DIM)
+	StateP<DIM>(_st_remote,_idx, _x),
+	o_(_st_remote, DIM)
 {
+	assert(_x.size() >= DIM + O_PARAM);
 }
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
@@ -161,15 +166,14 @@ StatePO<DIM,O_PARAM>::~StatePO()
 template<unsigned int DIM, orientationParametrization O_PARAM>
 inline void StatePO<DIM,O_PARAM>::remap(VectorXs& _st_remote, const unsigned int _idx)
 {
-	StateBase::remap(_st_remote, _idx);
-	p_.remap(_st_remote, _idx);
+	StateP<DIM>::remap(_st_remote, _idx);
 	o_.remap(_st_remote, _idx + DIM);
 }
 
 template<unsigned int DIM, orientationParametrization O_PARAM>
 inline void StatePO<DIM,O_PARAM>::print() const
 {
-	p_.print();
+	StateP<DIM>::print();
 	o_.print();
 }
 

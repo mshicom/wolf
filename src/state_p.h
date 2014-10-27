@@ -53,6 +53,13 @@ class StateP : public StateBase
         StateP(const Eigen::VectorXs& _x);
 
         /**
+		 * Local constructor from vector and size. Map member will map local vector.
+		 * \param _x the state vector
+		 * \param _size size of the state vector
+		 */
+		StateP(const Eigen::VectorXs& _x, const unsigned int _size);
+
+		/**
 		 * Local copy constructor. Map member will map local vector.
 		 * \param _state_p the state
 		 */
@@ -118,6 +125,14 @@ StateP<DIM>::StateP(const VectorXs& _x) :
 		StateBase(_x), //
 		p_(state_estimated_local_, 0, DIM)
 {
+}
+
+template<unsigned int DIM>
+StateP<DIM>::StateP(const Eigen::VectorXs& _x, const unsigned int _size) :
+		StateBase(_size), //
+		p_(state_estimated_local_, 0, _x)
+{
+	assert(_x.size() == DIM);
 }
 
 template<unsigned int DIM>

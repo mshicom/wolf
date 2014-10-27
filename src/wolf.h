@@ -98,6 +98,20 @@ typedef enum
     REGULAR_FRAME ///< marks a regular frame. It does play at optimizations but it will be discarded from the window once a newer frame arrives.
 } FrameType;
 
+/**
+ * \brief Enumeration of all possible orientation parametrization
+ *
+ * Enumeration of all possible orientation parametrization.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ *
+ */
+typedef enum
+{
+	THETA=1,     ///< Mostly used in 2D poses: yaw.
+	EULER=3,     ///< 3D: Euler angles: roll,pitch,yaw.
+	QUATERNION=4 ///< 3D: Quaternion.
+} orientationParametrization;
 
 /////////////////////////////////////////////////////////////////////////
 //      TYPEDEFS FOR POINTERS AND ITERATORS IN THE WOLF TREE
