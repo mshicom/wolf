@@ -52,7 +52,7 @@ int main()
 	StatePoint point2D_b(VectorA);
 	point2D_b.print();
 
-	cout << "Local constructor from VectorB" << endl;
+	cout << "Local copy constructor" << endl;
 	StatePoint point2D_c(VectorB);
 	point2D_c.print();
 
@@ -106,7 +106,7 @@ int main()
     StatePoint point3D_c(VectorD);
     point3D_c.print();
 
-    cout << "Local constructor from StatePoint" << endl;
+    cout << "Local copy constructor" << endl;
     StatePoint point3D_d(point3D_c);
     point3D_d.print();
 
@@ -158,7 +158,7 @@ int main()
 	StateP<2> p2D_d(VectorE);
 	p2D_d.print();
 
-	cout << "Local constructor from StateP" << endl;
+	cout << "Local copy constructor" << endl;
 	StateP<2> p2D_e(p2D_d);
 	p2D_e.print();
 
@@ -208,7 +208,7 @@ int main()
 	StateP<3> p3D_d(VectorE);
 	p3D_d.print();
 
-	cout << "Local constructor from StateP" << endl;
+	cout << "Local copy constructor" << endl;
 	StateP<3> p3D_e(p3D_d);
 	p3D_e.print();
 
@@ -256,7 +256,7 @@ int main()
 	StateOrientation<THETA> orientation2D_c(VectorG);
 	orientation2D_c.print();
 
-	cout << "Local constructor from StatePoint" << endl;
+	cout << "Local copy constructor" << endl;
 	StateOrientation<THETA> orientation2D_d(orientation2D_c);
 	orientation2D_d.print();
 
@@ -305,7 +305,7 @@ int main()
 	StateOrientation<EULER> orientation3D_c(VectorI);
 	orientation3D_c.print();
 
-	cout << "Local constructor from StatePoint" << endl;
+	cout << "Local copy constructor" << endl;
 	StateOrientation<EULER> orientation3D_d(orientation3D_c);
 	orientation3D_d.print();
 
@@ -332,41 +332,41 @@ int main()
 	cout << "--StateOrientation<QUATERNION> CONSTRUCTORS-" << endl;
 	storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
 	index = 0;
-	VectorXs VectorH(4);
-	VectorH << 1.1, 2.2, 3.3, 4.4;
-	Vector4s VectorI;
-	VectorI << 5.5, 6.6, 7.7, 8.8;
+	VectorXs VectorJ(4);
+	VectorJ << 1.1, 2.2, 3.3, 4.4;
+	Vector4s VectorK;
+	VectorK << 5.5, 6.6, 7.7, 8.8;
 	cout << "storage   : " << storage.transpose() << endl;
 	cout << "index     : " << index << endl;
-	cout << "VectorH (Xs) : " << VectorH.transpose() << endl;
-	cout << "VectorI (4s) : " << VectorI.transpose() << endl << endl;
+	cout << "VectorJ (Xs) : " << VectorJ.transpose() << endl;
+	cout << "VectorK (4s) : " << VectorK.transpose() << endl << endl;
 
 	cout << "Local constructor from size" << endl;
 	StateOrientation<QUATERNION> orientation3Dq_a;
 	orientation3Dq_a.print();
 
-	cout << "Local constructor from VectorH" << endl;
-	StateOrientation<QUATERNION> orientation3Dq_b(VectorH);
+	cout << "Local constructor from VectorJ" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_b(VectorJ);
 	orientation3Dq_b.print();
 
-	cout << "Local constructor from VectorI" << endl;
-	StateOrientation<QUATERNION> orientation3Dq_c(VectorI);
+	cout << "Local constructor from VectorK" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_c(VectorK);
 	orientation3Dq_c.print();
 
-	cout << "Local constructor from StatePoint" << endl;
-	StateOrientation<QUATERNION> orientation3Dq_d(orientation3D_c);
+	cout << "Local copy constructor" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_d(orientation3Dq_c);
 	orientation3Dq_d.print();
 
 	cout << "Remote constructor from size" << endl;
 	StateOrientation<QUATERNION> orientation3Dq_e(storage, index);
 	orientation3Dq_e.print();
 
-	cout << "Remote constructor from VectorH" << endl;
-	StateOrientation<QUATERNION> orientation3Dq_f(storage, index, VectorH);
+	cout << "Remote constructor from VectorJ" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_f(storage, index, VectorJ);
 	orientation3Dq_f.print();
 
-	cout << "Remote constructor from VectorI" << endl;
-	StateOrientation<QUATERNION> orientation3Dq_g(storage, index, VectorI);
+	cout << "Remote constructor from VectorK" << endl;
+	StateOrientation<QUATERNION> orientation3Dq_g(storage, index, VectorK);
 	orientation3Dq_g.print();
 
 	cout << "Remap to idx 4" << endl;
