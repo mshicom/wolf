@@ -11,6 +11,7 @@
 // wolf
 #include <iostream>
 #include "state_base.h"
+#include "state_orientation.h"
 #include "wolf.h"
 
 /** \brief Class for position states.
@@ -63,20 +64,69 @@ class StatePoint : public StateBase
          */
         virtual ~StatePoint();
 
+		/**
+		 * Rotation of the point
+		 */
+        template <orientationParametrization O_PARAM>
+		void operator*=(const StateOrientation<O_PARAM>& _o);
+
         /**
 		 * Print the state point
 		 */
 		virtual void print() const;
+
 };
 
 /////////////////////////////////
 // IMPLEMENTATION
 /////////////////////////////////
 
-inline void StatePoint::print() const
+template <>
+void StatePoint::operator*=(const StateOrientation<THETA>& _o)
 {
-	std::cout << "point: ";
-	StateBase::print();
+	MatrixXs R(2,2);
+
+	R << cos(_o.stateEstimatedMap()(0)), -sin(_o.stateEstimatedMap()(0)), sin(_o.stateEstimatedMap()(0)), cos(_o.stateEstimatedMap()(0));
+	this->state_estimated_map_ *= R;
+}
+
+template <>
+void StatePoint::operator*=(const StateOrientation<EULER>& _o)
+{
+	//TODO
+}
+
+template <>
+void StatePoint::operator*=(const StateOrientation<QUATERNION>& _o)
+{
+	this->state_estimated_map_ = _o.q() * this->state_estimated_map_;
+}
+
+//template <orientationParametrization O_PARAM>
+//void StatePoint::operator*=(const StateOrientation<O_PARAM>& _o)
+//{
+//	switch(O_PARAM)
+//	{
+//		case THETA :
+//			MatrixXs R(2,2);
+//			R << cos(_o.state_estimated_map), -sin(_o.state_estimated_map), sin(_o.state_estimated_map), cos(_o.state_estimated_map);
+//			this->state_estimated_map_ *= R;
+//			break;
+//		case EULER:
+//			//TODO
+//			break;
+//		case QUATERNION :
+//			this->state_estimated_map_ = _o.q_ * this->state_estimated_map_;
+//			break;
+//	}
+//}
+
+template <orientationParametrization O_PARAM>
+StatePoint operator*(const StateOrientation<O_PARAM>& _o, const StatePoint& _p)
+{
+	StatePoint res(_p);
+	res *= _o;
+	return res;
 }
 
 #endif /* STATE_POINT_H_ */

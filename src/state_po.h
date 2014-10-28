@@ -15,7 +15,8 @@
 
 /** \brief Class for states which have at least a position and an orientation
  *
- * A PO state is a non-type template state containing at least a state_point and a state_orientation of the dimension
+ * StatePO inherits StateP<DIM> so it includes a StatePoint of dimension DIM.
+ * The StatePO is a non-type template state containing at least a position and a orientation. The dimension is
  * fixed by DIM (2D or 3D) and the orientation parametrization fixed by O_PARAM which can be THETA (2D), EULER angles or QUATERNION.
  *
  * Derive from this class to include additional substates such as orientation, velocities or other possible

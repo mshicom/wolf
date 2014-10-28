@@ -32,3 +32,9 @@ StatePoint::StatePoint(VectorXs& _st_remote, const unsigned int _idx, const Vect
 StatePoint::~StatePoint()
 {
 }
+
+void StatePoint::print() const
+{
+	std::cout << "point: ";
+	StateBase::print();
+}
