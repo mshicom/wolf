@@ -82,22 +82,21 @@ class StatePoint : public StateBase
 /////////////////////////////////
 
 template <>
-void StatePoint::operator*=(const StateOrientation<THETA>& _o)
+inline void StatePoint::operator*=(const StateOrientation<THETA>& _o)
 {
 	MatrixXs R(2,2);
-
-	R << cos(_o.stateEstimatedMap()(0)), -sin(_o.stateEstimatedMap()(0)), sin(_o.stateEstimatedMap()(0)), cos(_o.stateEstimatedMap()(0));
-	this->state_estimated_map_ *= R;
+	R << _o.stateEstimatedMap()(0), -_o.stateEstimatedMap()(1), _o.stateEstimatedMap()(1), _o.stateEstimatedMap()(0);
+	this->state_estimated_map_ = R * state_estimated_map_;
 }
 
 template <>
-void StatePoint::operator*=(const StateOrientation<EULER>& _o)
+inline void StatePoint::operator*=(const StateOrientation<EULER>& _o)
 {
 	//TODO
 }
 
 template <>
-void StatePoint::operator*=(const StateOrientation<QUATERNION>& _o)
+inline void StatePoint::operator*=(const StateOrientation<QUATERNION>& _o)
 {
 	this->state_estimated_map_ = _o.q() * this->state_estimated_map_;
 }
@@ -122,11 +121,37 @@ void StatePoint::operator*=(const StateOrientation<QUATERNION>& _o)
 //}
 
 template <orientationParametrization O_PARAM>
-StatePoint operator*(const StateOrientation<O_PARAM>& _o, const StatePoint& _p)
+inline StatePoint operator*(const StateOrientation<O_PARAM>& _o, const StatePoint& _p)
 {
 	StatePoint res(_p);
 	res *= _o;
 	return res;
 }
+
+template <>
+inline StatePoint operator*(const StateOrientation<THETA>& _o, const StatePoint& _p)
+{
+	MatrixXs R(2,2);
+	R << cos(_o.stateEstimatedMap()(0)), -sin(_o.stateEstimatedMap()(0)), sin(_o.stateEstimatedMap()(0)), cos(_o.stateEstimatedMap()(0));
+	StatePoint res(R * _p.stateEstimatedMap());
+	return res;
+}
+
+template <>
+inline StatePoint operator*(const StateOrientation<EULER>& _o, const StatePoint& _p)
+{
+	//TODO
+	StatePoint res(_p);
+	return res;
+}
+
+template <>
+inline StatePoint operator*(const StateOrientation<QUATERNION>& _o, const StatePoint& _p)
+{
+	StatePoint res(_o.q() * _p.stateEstimatedMap());
+	return res;
+}
+
+
 
 #endif /* STATE_POINT_H_ */

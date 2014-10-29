@@ -78,6 +78,11 @@ class StateOrientation : public StateBase
         const Eigen::Map<Eigen::Quaternions>& q() const;
 
         /**
+		 * Get the minimal representation
+         */
+        const Eigen::VectorXs get_angles() const;
+
+        /**
 		 * Change the mapped positions in the remote vector of the stateEstimatedMap
 		 */
 		virtual void remap(Eigen::VectorXs& _st_remote, const unsigned int _idx);
@@ -90,27 +95,27 @@ class StateOrientation : public StateBase
 		/**
 		 * Composition of rotations
 		 */
-		StateOrientation<O_PARAM> operator+(const StateOrientation<O_PARAM>& _o) const;
+		StateOrientation<O_PARAM> operator*(const StateOrientation<O_PARAM>& _o) const;
 
 		/**
 		 * Composition of rotations
 		 */
-		void operator+=(const StateOrientation<O_PARAM>& _o);
+		void operator*=(const StateOrientation<O_PARAM>& _o);
 
 		/**
 		 * Inverse rotation
 		 */
-		StateOrientation<O_PARAM> operator-() const;
+		StateOrientation<O_PARAM> inverse() const;
 
 		/**
 		 * Substraction of rotations
 		 */
-		StateOrientation<O_PARAM> operator-(const StateOrientation<O_PARAM>& _o) const;
+		//StateOrientation<O_PARAM> operator/(const StateOrientation<O_PARAM>& _o) const;
 
 		/**
 		 * Substraction of rotations
 		 */
-		void operator-=(const StateOrientation<O_PARAM>& _o);
+		//void operator/=(const StateOrientation<O_PARAM>& _o);
 
 		/**
 		 * Normalization of rotation: impose (-pi,pi] in THETA and EULER angles and normalize in QUATERNION
@@ -141,7 +146,7 @@ StateOrientation<O_PARAM>::StateOrientation(const VectorXs& _x) :
 
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(const StateOrientation<O_PARAM>& _state_o) :
-		StateBase(state_estimated_local_),
+		StateBase(_state_o.x()),
 		q_(O_PARAM == QUATERNION ? state_estimated_local_.data() + 3 : NULL)
 {
 }
@@ -151,6 +156,7 @@ StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned
         StateBase(_st_remote,_idx, O_PARAM),
 		q_(O_PARAM == QUATERNION ? _st_remote.data() + 3 : NULL)
 {
+	assert(_st_remote.size() >= _idx + O_PARAM);
 }
 
 template <orientationParametrization O_PARAM>
@@ -170,6 +176,24 @@ template <orientationParametrization O_PARAM>
 inline const Eigen::Map<Eigen::Quaternions>& StateOrientation<O_PARAM>::q() const
 {
 	return q_;
+}
+
+template <>
+inline const Eigen::VectorXs StateOrientation<THETA>::get_angles() const
+{
+	return Eigen::VectorXs(atan2(this->state_estimated_map_(0), this->state_estimated_map_(1)));
+}
+
+template <>
+inline const Eigen::VectorXs StateOrientation<EULER>::get_angles() const
+{
+	return this->StateBase::stateEstimatedMap();
+}
+
+template <>
+inline const Eigen::VectorXs StateOrientation<QUATERNION>::get_angles() const
+{
+	return q_.matrix().eulerAngles(2,1,0);
 }
 
 template <orientationParametrization O_PARAM>
@@ -198,14 +222,17 @@ void StateOrientation<O_PARAM>::print() const
 }
 
 template<>
-inline StateOrientation<THETA> StateOrientation<THETA>::operator+(const StateOrientation<THETA>& _o) const
+inline StateOrientation<THETA> StateOrientation<THETA>::operator*(const StateOrientation<THETA>& _o) const
 {
-	StateOrientation<THETA> res(this->state_estimated_map_+_o.state_estimated_map_);
+	StateOrientation<THETA> res(Vector2s(this->state_estimated_map_(0) * _o.state_estimated_map_(0)
+									   - this->state_estimated_map_(1) * _o.state_estimated_map_(1),
+									     this->state_estimated_map_(0) * _o.state_estimated_map_(1)
+									   + this->state_estimated_map_(1) * _o.state_estimated_map_(0)));
 	return res;
 }
 
 template<>
-inline StateOrientation<EULER> StateOrientation<EULER>::operator+(const StateOrientation<EULER>& _o) const
+inline StateOrientation<EULER> StateOrientation<EULER>::operator*(const StateOrientation<EULER>& _o) const
 {
 	//TODO
 	StateOrientation<EULER> res(this->state_estimated_map_+_o.state_estimated_map_);
@@ -213,19 +240,22 @@ inline StateOrientation<EULER> StateOrientation<EULER>::operator+(const StateOri
 }
 
 template<>
-inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator+(const StateOrientation<QUATERNION>& _o) const
+inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator*(const StateOrientation<QUATERNION>& _o) const
 {
 	StateOrientation<QUATERNION> res((this->q_*_o.q_).coeffs());
 	return res;
 }
 
 //template <orientationParametrization O_PARAM>
-//StateOrientation<O_PARAM> StateOrientation<O_PARAM>::operator+(const StateOrientation<O_PARAM>& _o) const
+//StateOrientation<O_PARAM> StateOrientation<O_PARAM>::operator*(const StateOrientation<O_PARAM>& _o) const
 //{
 //	switch(O_PARAM)
 //	{
 //		case THETA :
-//			StateOrientation<O_PARAM> res1(this->state_estimated_map_+_o.state_estimated_map_);
+//			StateOrientation<THETA> res1(Matrix(this->state_estimated_map_(0) * _o.state_estimated_map_(0)
+//					                   - this->state_estimated_map_(1) * _o.state_estimated_map_(1),
+//					                     this->state_estimated_map_(0) * _o.state_estimated_map_(1)
+//				                       + this->state_estimated_map_(1) * _o.state_estimated_map_(0)));
 //			return res1;
 //			break;
 //		case EULER:
@@ -241,33 +271,41 @@ inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator+(cons
 //}
 
 template <>
-inline void StateOrientation<THETA>::operator+=(const StateOrientation<THETA>& _o)
+inline void StateOrientation<THETA>::operator*=(const StateOrientation<THETA>& _o)
 {
-	this->state_estimated_map_+=_o.state_estimated_map_;
+	this->state_estimated_map_= Vector2s(this->state_estimated_map_(0) * _o.state_estimated_map_(0)
+									   - this->state_estimated_map_(1) * _o.state_estimated_map_(1),
+									     this->state_estimated_map_(0) * _o.state_estimated_map_(1)
+								       + this->state_estimated_map_(1) * _o.state_estimated_map_(0));
 }
 
 template <>
-inline void StateOrientation<EULER>::operator+=(const StateOrientation<EULER>& _o)
+inline void StateOrientation<EULER>::operator*=(const StateOrientation<EULER>& _o)
 {
 	//TODO
+	this->state_estimated_map_ += _o.state_estimated_map_;
 }
 
 template <>
-inline void StateOrientation<QUATERNION>::operator+=(const StateOrientation<QUATERNION>& _o)
+inline void StateOrientation<QUATERNION>::operator*=(const StateOrientation<QUATERNION>& _o)
 {
 	this->q_*=_o.q_;
 }
 
 //template <orientationParametrization O_PARAM>
-//void StateOrientation<O_PARAM>::operator+=(const StateOrientation<O_PARAM>& _o)
+//void StateOrientation<O_PARAM>::operator*=(const StateOrientation<O_PARAM>& _o)
 //{
 //	switch(O_PARAM)
 //	{
 //		case THETA :
-//			this->state_estimated_map_+=_o.state_estimated_map_;
+//			this->state_estimated_map_= Vector2s(this->state_estimated_map_(0) * _o.state_estimated_map_(0)
+//											   - this->state_estimated_map_(1) * _o.state_estimated_map_(1),
+//												 this->state_estimated_map_(0) * _o.state_estimated_map_(1)
+//											   + this->state_estimated_map_(1) * _o.state_estimated_map_(0));
 //			break;
 //		case EULER:
 //			//TODO
+//			this->state_estimated_map_ += _o.state_estimated_map_;
 //			break;
 //		case QUATERNION :
 //			this->q_*=_o.q_;
@@ -276,29 +314,29 @@ inline void StateOrientation<QUATERNION>::operator+=(const StateOrientation<QUAT
 //}
 
 template <>
-inline StateOrientation<THETA> StateOrientation<THETA>::operator-() const
+inline StateOrientation<THETA> StateOrientation<THETA>::inverse() const
 {
-	StateOrientation<THETA> res(-this->state_estimated_map_);
+	StateOrientation<THETA> res(Vector2s(this->state_estimated_map_(0), - this->state_estimated_map_(1)));
 	return res;
 }
 
 template <>
-inline StateOrientation<EULER> StateOrientation<EULER>::operator-() const
+inline StateOrientation<EULER> StateOrientation<EULER>::inverse() const
 {
 	//TODO
-	StateOrientation<EULER> res(*this);
+	StateOrientation<EULER> res(-this->state_estimated_map_);
 	return res;
 }
 
 template <>
-inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator-() const
+inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::inverse() const
 {
 	StateOrientation<QUATERNION> res(this->q_.conjugate().coeffs());
 	return res;
 }
 
 //template <orientationParametrization O_PARAM>
-//StateOrientation<O_PARAM> StateOrientation<O_PARAM>::operator-() const
+//StateOrientation<O_PARAM> StateOrientation<O_PARAM>::inverse() const
 //{
 //	switch(O_PARAM)
 //	{
@@ -319,30 +357,30 @@ inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator-() co
 //	}
 //}
 
-template <>
-inline StateOrientation<THETA> StateOrientation<THETA>::operator-(const StateOrientation<THETA>& _o) const
-{
-	StateOrientation<THETA> res(this->state_estimated_map_-_o.state_estimated_map_);
-	return res;
-}
-
-template <>
-inline StateOrientation<EULER> StateOrientation<EULER>::operator-(const StateOrientation<EULER>& _o) const
-{
-	//TODO
-	StateOrientation<EULER> res(this->state_estimated_map_-_o.state_estimated_map_);
-	return res;
-}
-
-template <>
-inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator-(const StateOrientation<QUATERNION>& _o) const
-{
-	StateOrientation<QUATERNION> res((this->q_*_o.q_.conjugate()).coeffs());
-	return res;
-}
+//template <>
+//inline StateOrientation<THETA> StateOrientation<THETA>::operator/(const StateOrientation<THETA>& _o) const
+//{
+//	StateOrientation<THETA> res(this->state_estimated_map_-_o.state_estimated_map_);
+//	return res;
+//}
+//
+//template <>
+//inline StateOrientation<EULER> StateOrientation<EULER>::operator/(const StateOrientation<EULER>& _o) const
+//{
+//	//TODO
+//	StateOrientation<EULER> res(this->state_estimated_map_-_o.state_estimated_map_);
+//	return res;
+//}
+//
+//template <>
+//inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator/(const StateOrientation<QUATERNION>& _o) const
+//{
+//	StateOrientation<QUATERNION> res((this->q_*_o.q_.conjugate()).coeffs());
+//	return res;
+//}
 
 //template <orientationParametrization O_PARAM>
-//StateOrientation<O_PARAM> StateOrientation<O_PARAM>::operator-(const StateOrientation<O_PARAM>& _o) const
+//StateOrientation<O_PARAM> StateOrientation<O_PARAM>::operator/(const StateOrientation<O_PARAM>& _o) const
 //{
 //	switch(O_PARAM)
 //	{
@@ -362,27 +400,27 @@ inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator-(cons
 //	}
 //}
 
-template <>
-inline void StateOrientation<THETA>::operator-=(const StateOrientation<THETA>& _o)
-{
-	this->state_estimated_map_-=_o.state_estimated_map_;
-}
-
-template <>
-inline void StateOrientation<EULER>::operator-=(const StateOrientation<EULER>& _o)
-{
-	//TODO
-	this->state_estimated_map_-=_o.state_estimated_map_;
-}
-
-template <>
-inline void StateOrientation<QUATERNION>::operator-=(const StateOrientation<QUATERNION>& _o)
-{
-	this->q_*=_o.q_.conjugate();
-}
+//template <>
+//inline void StateOrientation<THETA>::operator/=(const StateOrientation<THETA>& _o)
+//{
+//	this->state_estimated_map_-=_o.state_estimated_map_;
+//}
+//
+//template <>
+//inline void StateOrientation<EULER>::operator/=(const StateOrientation<EULER>& _o)
+//{
+//	//TODO
+//	this->state_estimated_map_-=_o.state_estimated_map_;
+//}
+//
+//template <>
+//inline void StateOrientation<QUATERNION>::operator/=(const StateOrientation<QUATERNION>& _o)
+//{
+//	this->q_*=_o.q_.conjugate();
+//}
 
 //template <orientationParametrization O_PARAM>
-//void StateOrientation<O_PARAM>::operator-=(const StateOrientation<O_PARAM>& _o)
+//void StateOrientation<O_PARAM>::operator/=(const StateOrientation<O_PARAM>& _o)
 //{
 //	switch(O_PARAM)
 //	{
@@ -401,7 +439,7 @@ inline void StateOrientation<QUATERNION>::operator-=(const StateOrientation<QUAT
 template <>
 inline void StateOrientation<THETA>::normalize()
 {
-	this->state_estimated_map_(0)-= 2 * M_PI * floor( (this->state_estimated_map_(0) + M_PI) / 2 * M_PI );
+	this->state_estimated_map_ /= sqrt(this->state_estimated_map_.transpose() *  this->state_estimated_map_);
 }
 
 template <>
