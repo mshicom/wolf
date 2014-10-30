@@ -35,6 +35,6 @@ StatePoint::~StatePoint()
 
 void StatePoint::print() const
 {
-	std::cout << "point: ";
 	StateBase::print();
+	std::cout << std::endl;
 }

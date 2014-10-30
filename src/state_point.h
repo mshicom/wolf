@@ -132,7 +132,7 @@ template <>
 inline StatePoint operator*(const StateOrientation<THETA>& _o, const StatePoint& _p)
 {
 	MatrixXs R(2,2);
-	R << cos(_o.stateEstimatedMap()(0)), -sin(_o.stateEstimatedMap()(0)), sin(_o.stateEstimatedMap()(0)), cos(_o.stateEstimatedMap()(0));
+	R << _o.stateEstimatedMap()(0), -_o.stateEstimatedMap()(1), _o.stateEstimatedMap()(1), _o.stateEstimatedMap()(0);
 	StatePoint res(R * _p.stateEstimatedMap());
 	return res;
 }
@@ -141,7 +141,12 @@ template <>
 inline StatePoint operator*(const StateOrientation<EULER>& _o, const StatePoint& _p)
 {
 	//TODO
-	StatePoint res(_p);
+	Vector3s angles = _o.get_angles();
+	Matrix3s R;
+	R = AngleAxiss(angles(0), Vector3s::UnitZ())
+	  * AngleAxiss(angles(1), Vector3s::UnitY())
+	  * AngleAxiss(angles(2), Vector3s::UnitX());
+	StatePoint res(R * _p.stateEstimatedMap());
 	return res;
 }
 

@@ -19,6 +19,8 @@
  * An orientation state is a non-type template state containing an orientation using the orientation parametrization fixed by O_PARAM
  * which can be THETA (2D yaw), EULER angles or QUATERNION.
  *
+ * THETA angle is represented by a complex number. It can be initiallized giving 1 value (angle in rads) or 2 values (real and imaginary parts).
+ *
  * It inherits StateBase, so it can be constructed as local or remote.
  * 
  */
@@ -98,7 +100,7 @@ class StateOrientation : public StateBase
 		StateOrientation<O_PARAM> operator*(const StateOrientation<O_PARAM>& _o) const;
 
 		/**
-		 * Composition of rotations
+		 * Composition of rotations overloading the result in *this
 		 */
 		void operator*=(const StateOrientation<O_PARAM>& _o);
 
@@ -108,14 +110,14 @@ class StateOrientation : public StateBase
 		StateOrientation<O_PARAM> inverse() const;
 
 		/**
-		 * Substraction of rotations
+		 * Composition with the inverse rotation of the given one
 		 */
-		//StateOrientation<O_PARAM> operator/(const StateOrientation<O_PARAM>& _o) const;
+		StateOrientation<O_PARAM> operator/(const StateOrientation<O_PARAM>& _o) const;
 
 		/**
-		 * Substraction of rotations
+		 * Composition with the inverse rotation of the given one overloading the result in *this
 		 */
-		//void operator/=(const StateOrientation<O_PARAM>& _o);
+		void operator/=(const StateOrientation<O_PARAM>& _o);
 
 		/**
 		 * Normalization of rotation: impose (-pi,pi] in THETA and EULER angles and normalize in QUATERNION
@@ -144,6 +146,14 @@ StateOrientation<O_PARAM>::StateOrientation(const VectorXs& _x) :
 	assert(O_PARAM == _x.size());
 }
 
+template <>
+StateOrientation<THETA>::StateOrientation(const VectorXs& _x) :
+		StateBase(_x.size() == 2 ? _x : VectorXs(Vector2s(cos(_x(0)), sin(_x(0))))),
+		q_(NULL)
+{
+	assert(StateBase::size() == 2);
+}
+
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(const StateOrientation<O_PARAM>& _state_o) :
 		StateBase(_state_o.x()),
@@ -167,6 +177,13 @@ StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned
 	assert(O_PARAM == _x.size());
 }
 
+template <>
+StateOrientation<THETA>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
+		StateBase(_st_remote,_idx, _x.size() == 2 ? _x : VectorXs(Vector2s(cos(_x(0)), sin(_x(0))))),
+		q_(NULL)
+{
+}
+
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::~StateOrientation()
 {
@@ -181,7 +198,9 @@ inline const Eigen::Map<Eigen::Quaternions>& StateOrientation<O_PARAM>::q() cons
 template <>
 inline const Eigen::VectorXs StateOrientation<THETA>::get_angles() const
 {
-	return Eigen::VectorXs(atan2(this->state_estimated_map_(0), this->state_estimated_map_(1)));
+	Eigen::VectorXs res(1);
+	res(0) = atan2(this->state_estimated_map_(1), this->state_estimated_map_(0));
+	return res;
 }
 
 template <>
@@ -205,20 +224,20 @@ inline void StateOrientation<O_PARAM>::remap(VectorXs& _st_remote, const unsigne
 template <orientationParametrization O_PARAM>
 void StateOrientation<O_PARAM>::print() const
 {
-	std::cout << "orientation ";
+	StateBase::print();
 	switch(O_PARAM)
 	{
 		case THETA :
-			std::cout << "(yaw): ";
+			std::cout << "i (complex)" << std::endl;
+			std::cout << "    " << get_angles() << "(yaw)" << std::endl;
 			break;
 		case EULER:
-			std::cout << "(euler angles): ";
+			std::cout << "(euler angles)" << std::endl;
 			break;
 		case QUATERNION :
-			std::cout << "(quaternion): ";
+			std::cout << "(quaternion)" << std::endl;
 			break;
 	}
-	StateBase::print();
 }
 
 template<>
@@ -234,8 +253,17 @@ inline StateOrientation<THETA> StateOrientation<THETA>::operator*(const StateOri
 template<>
 inline StateOrientation<EULER> StateOrientation<EULER>::operator*(const StateOrientation<EULER>& _o) const
 {
-	//TODO
-	StateOrientation<EULER> res(this->state_estimated_map_+_o.state_estimated_map_);
+	//TODO: Treure tot això a quaternion_tools o algo així
+	Matrix3s R1, R2, R;
+	R1 = AngleAxiss(this->state_estimated_map_(0), Vector3s::UnitZ())
+	   * AngleAxiss(this->state_estimated_map_(1), Vector3s::UnitY())
+	   * AngleAxiss(this->state_estimated_map_(2), Vector3s::UnitX());
+	R2 = AngleAxiss(_o.state_estimated_map_(0), Vector3s::UnitZ())
+	   * AngleAxiss(_o.state_estimated_map_(1), Vector3s::UnitY())
+	   * AngleAxiss(_o.state_estimated_map_(2), Vector3s::UnitX());
+	R = R1 * R2;
+
+	StateOrientation<EULER> res(Vector3s(atan2(R(2,1),R(2,2)), atan2(-R(2,0), sqrt(pow(R(2,1),2)+pow(R(2,2),2))), atan2(R(1,0),R(0,0))));
 	return res;
 }
 
@@ -283,7 +311,21 @@ template <>
 inline void StateOrientation<EULER>::operator*=(const StateOrientation<EULER>& _o)
 {
 	//TODO
-	this->state_estimated_map_ += _o.state_estimated_map_;
+	Matrix3s m1, m2, m;
+	m1 = AngleAxiss(this->state_estimated_map_(0), Vector3s::UnitZ())
+	   * AngleAxiss(this->state_estimated_map_(1), Vector3s::UnitY())
+	   * AngleAxiss(this->state_estimated_map_(2), Vector3s::UnitX());
+	m2 = AngleAxiss(_o.state_estimated_map_(0), Vector3s::UnitZ())
+	   * AngleAxiss(_o.state_estimated_map_(1), Vector3s::UnitY())
+	   * AngleAxiss(_o.state_estimated_map_(2), Vector3s::UnitX());
+	m = m1 * m2;
+
+	this->state_estimated_map_(0) = atan2(m(2,1),m(2,2));
+	this->state_estimated_map_(1) = atan2(-m(2,0),sqrt(pow(m(2,1),2)+pow(m(2,2),2)));
+	this->state_estimated_map_(2) = atan2(m(1,0),m(0,0));
+	//\theta_{x} = atan2\left(r_{32}, r_{33}\right)
+	//\theta_{y} = atan2\left(-r_{31}, \sqrt{r_{32}^2 + r_{33}^2}\right)
+	//\theta_{z} = atan2\left(r_{21}, r_{11}\right)
 }
 
 template <>
@@ -316,7 +358,7 @@ inline void StateOrientation<QUATERNION>::operator*=(const StateOrientation<QUAT
 template <>
 inline StateOrientation<THETA> StateOrientation<THETA>::inverse() const
 {
-	StateOrientation<THETA> res(Vector2s(this->state_estimated_map_(0), - this->state_estimated_map_(1)));
+	StateOrientation<THETA> res(Vector2s(this->state_estimated_map_(0), -this->state_estimated_map_(1)));
 	return res;
 }
 
@@ -357,27 +399,31 @@ inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::inverse() cons
 //	}
 //}
 
-//template <>
-//inline StateOrientation<THETA> StateOrientation<THETA>::operator/(const StateOrientation<THETA>& _o) const
-//{
-//	StateOrientation<THETA> res(this->state_estimated_map_-_o.state_estimated_map_);
-//	return res;
-//}
-//
-//template <>
-//inline StateOrientation<EULER> StateOrientation<EULER>::operator/(const StateOrientation<EULER>& _o) const
-//{
-//	//TODO
-//	StateOrientation<EULER> res(this->state_estimated_map_-_o.state_estimated_map_);
-//	return res;
-//}
-//
-//template <>
-//inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator/(const StateOrientation<QUATERNION>& _o) const
-//{
-//	StateOrientation<QUATERNION> res((this->q_*_o.q_.conjugate()).coeffs());
-//	return res;
-//}
+template <>
+inline StateOrientation<THETA> StateOrientation<THETA>::operator/(const StateOrientation<THETA>& _o) const
+{
+
+	StateOrientation<THETA> res(Vector2s(this->state_estimated_map_(0) * _o.state_estimated_map_(0)
+							  	  	   + this->state_estimated_map_(1) * _o.state_estimated_map_(1),
+									   - this->state_estimated_map_(0) * _o.state_estimated_map_(1)
+									   + this->state_estimated_map_(1) * _o.state_estimated_map_(0)));
+	return res;
+}
+
+template <>
+inline StateOrientation<EULER> StateOrientation<EULER>::operator/(const StateOrientation<EULER>& _o) const
+{
+	//TODO
+	StateOrientation<EULER> res(this->state_estimated_map_-_o.state_estimated_map_);
+	return res;
+}
+
+template <>
+inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::operator/(const StateOrientation<QUATERNION>& _o) const
+{
+	StateOrientation<QUATERNION> res((this->q_*_o.q_.conjugate()).coeffs());
+	return res;
+}
 
 //template <orientationParametrization O_PARAM>
 //StateOrientation<O_PARAM> StateOrientation<O_PARAM>::operator/(const StateOrientation<O_PARAM>& _o) const
@@ -400,24 +446,27 @@ inline StateOrientation<QUATERNION> StateOrientation<QUATERNION>::inverse() cons
 //	}
 //}
 
-//template <>
-//inline void StateOrientation<THETA>::operator/=(const StateOrientation<THETA>& _o)
-//{
-//	this->state_estimated_map_-=_o.state_estimated_map_;
-//}
-//
-//template <>
-//inline void StateOrientation<EULER>::operator/=(const StateOrientation<EULER>& _o)
-//{
-//	//TODO
-//	this->state_estimated_map_-=_o.state_estimated_map_;
-//}
-//
-//template <>
-//inline void StateOrientation<QUATERNION>::operator/=(const StateOrientation<QUATERNION>& _o)
-//{
-//	this->q_*=_o.q_.conjugate();
-//}
+template <>
+inline void StateOrientation<THETA>::operator/=(const StateOrientation<THETA>& _o)
+{
+	this->state_estimated_map_ = Vector2s(this->state_estimated_map_(0) * _o.state_estimated_map_(0)
+									    + this->state_estimated_map_(1) * _o.state_estimated_map_(1),
+									    - this->state_estimated_map_(0) * _o.state_estimated_map_(1)
+									    + this->state_estimated_map_(1) * _o.state_estimated_map_(0));
+}
+
+template <>
+inline void StateOrientation<EULER>::operator/=(const StateOrientation<EULER>& _o)
+{
+	//TODO
+	this->state_estimated_map_-=_o.state_estimated_map_;
+}
+
+template <>
+inline void StateOrientation<QUATERNION>::operator/=(const StateOrientation<QUATERNION>& _o)
+{
+	this->q_*=_o.q_.conjugate();
+}
 
 //template <orientationParametrization O_PARAM>
 //void StateOrientation<O_PARAM>::operator/=(const StateOrientation<O_PARAM>& _o)
@@ -446,6 +495,9 @@ template <>
 inline void StateOrientation<EULER>::normalize()
 {
 	//TODO
+	this->state_estimated_map_(0)-= 2 * M_PI * floor( (this->state_estimated_map_(0) + M_PI) / 2 * M_PI );
+	this->state_estimated_map_(1)-= 2 * M_PI * floor( (this->state_estimated_map_(1) + M_PI) / 2 * M_PI );
+	this->state_estimated_map_(2)-= 2 * M_PI * floor( (this->state_estimated_map_(2) + M_PI) / 2 * M_PI );
 }
 
 template <>

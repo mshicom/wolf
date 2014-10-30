@@ -174,7 +174,7 @@ inline Eigen::Map<Eigen::VectorXs>& StateBase::x()
 
 inline void StateBase::print() const
 {
-    std::cout << state_estimated_map_.transpose() << std::endl;
+    std::cout << "    " << state_estimated_map_.transpose();
 }
 
 

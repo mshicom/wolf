@@ -55,6 +55,7 @@ typedef Matrix<WolfScalar, 2, 2> Matrix2s;                ///< 2x2 matrix of rea
 typedef Matrix<WolfScalar, 3, 3> Matrix3s;                ///< 3x3 matrix of real scalar_t type
 typedef Matrix<WolfScalar, 4, 4> Matrix4s;                ///< 4x4 matrix of real scalar_t type
 typedef Matrix<WolfScalar, Dynamic, Dynamic> MatrixXs;    ///< variable size matrix of real scalar_t type
+typedef Matrix<WolfScalar, 1, 1> Vector1s;                ///< 2-vector of real scalar_t type
 typedef Matrix<WolfScalar, 2, 1> Vector2s;                ///< 2-vector of real scalar_t type
 typedef Matrix<WolfScalar, 3, 1> Vector3s;                ///< 3-vector of real scalar_t type
 typedef Matrix<WolfScalar, 4, 1> Vector4s;                ///< 4-vector of real scalar_t type
@@ -112,20 +113,6 @@ typedef enum
 	EULER=3,     ///< 3D: Euler angles: roll,pitch,yaw.
 	QUATERNION=4 ///< 3D: Quaternion.
 } orientationParametrization;
-
-/**
- * \brief Enumeration of all possible orientation parametrization
- *
- * Enumeration of all possible orientation parametrization.
- *
- * You may add items to this list as needed. Be concise with names, and document your entries.
- *
- */
-typedef enum
-{
-	ZYX,     ///< ROLL-PITCH-YAW.
-	ZYZ
-} eulerRepresentation;
 
 /////////////////////////////////////////////////////////////////////////
 //      TYPEDEFS FOR POINTERS AND ITERATORS IN THE WOLF TREE
