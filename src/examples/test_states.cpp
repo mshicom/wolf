@@ -14,8 +14,8 @@ int main()
 	bool test_p = 0;
 	bool test_orientation = 0;
 	bool test_operators= 1;
-	bool test_po2 = 1;
-	bool test_po3 = 1;
+	bool test_po2 = 0;
+	bool test_po3 = 0;
 
     cout << "\nStates demo";
     cout << "\n-----------\n" << endl;
@@ -396,17 +396,15 @@ int main()
 		cout << endl;
 		cout << "--------------------------------------------" << endl;
 		cout << "----------------- OPERATORS ----------------" << endl;
-		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
-		cout << "storage   : " << storage.transpose() << endl;
 
-		cout << "THETA - Local:" << endl;
+		cout << "----------------- THETA - Local:" << endl;
 
 		VectorXs VectorF2(1);
 		VectorF2 << 0.7;
 		StateOrientation<THETA> o2D_a(VectorF2);
 		cout << "o1" << endl;
 		o2D_a.print();
-		VectorF2 << 1.2;
+		VectorF2 << -1.2;
 		StateOrientation<THETA> o2D_b(VectorF2);
 		cout << "o2" << endl;
 		o2D_b.print();
@@ -435,134 +433,182 @@ int main()
 		o2D_a /= o2D_b;
 		o2D_a.print();
 
-		cout << "Remote constructor from size" << endl;
-		StateOrientation<THETA> orientation2D_e(storage, index);
-		orientation2D_e.print();
-
-		cout << "Remote constructor from VectorF" << endl;
-		StateOrientation<THETA> orientation2D_f(storage, index, VectorF2);
-		orientation2D_f.print();
-
-		cout << "Remote constructor from VectorG" << endl;
-		StateOrientation<THETA> orientation2D_g(storage, index, VectorF2);
-		orientation2D_g.print();
-
-		cout << "Remap to idx 4" << endl;
-		orientation2D_g.remap(storage, 4);
-		orientation2D_g.print();
-
-		cout << "storage   : " << storage.transpose() << endl;
-
-
-		cout << endl;
-		cout << "--------------------------------------------" << endl;
-		cout << "--- StateOrientation<EULER> CONSTRUCTORS ---" << endl;
+		cout << "----------------- THETA - Remote:" << endl;
 		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
-		index = 0;
-		VectorXs VectorH(3);
-		VectorH << 1.1, 2.2, 3.3;
-		Vector3s VectorI;
-		VectorI << 4.4, 5.5, 6.6;
-		cout << "storage   : " << storage.transpose() << endl;
-		cout << "index     : " << index << endl;
-		cout << "VectorH (Xs) : " << VectorH.transpose() << endl;
-		cout << "VectorI (3s) : " << VectorI.transpose() << endl << endl;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "o7" << endl;
+		StateOrientation<THETA> o2D_g(storage, 0);
+		o2D_g.print();
 
-		cout << "Local constructor from size" << endl;
-		StateOrientation<EULER> orientation3D_a;
-		orientation3D_a.print();
+		cout << "o8 from vector" << endl;
+		StateOrientation<THETA> o2D_h(storage, 3, VectorF2);
+		o2D_h.print();
 
-		cout << "Local constructor from VectorH" << endl;
-		StateOrientation<EULER> orientation3D_b(VectorH);
-		orientation3D_b.print();
-
-		cout << "Local constructor from VectorI" << endl;
-		StateOrientation<EULER> orientation3D_c(VectorI);
-		orientation3D_c.print();
-
-		cout << "Local copy constructor" << endl;
-		StateOrientation<EULER> orientation3D_d(orientation3D_c);
-		orientation3D_d.print();
-
-		cout << "Remote constructor from size" << endl;
-		StateOrientation<EULER> orientation3D_e(storage, index);
-		orientation3D_e.print();
-
-		cout << "Remote constructor from VectorH" << endl;
-		StateOrientation<EULER> orientation3D_f(storage, index, VectorH);
-		orientation3D_f.print();
-
-		cout << "Remote constructor from VectorI" << endl;
-		StateOrientation<EULER> orientation3D_g(storage, index, VectorI);
-		orientation3D_g.print();
-
-		cout << "Remap to idx 4" << endl;
-		orientation3D_g.remap(storage, 4);
-		orientation3D_g.print();
-
+		cout << "o7 *= o8" << endl;
+		o2D_g *= o2D_h;
+		o2D_g.print();
 		cout << "storage   : " << storage.transpose() << endl;
 
-		cout << endl;
-		cout << "--------------------------------------------" << endl;
-		cout << "--StateOrientation<QUATERNION> CONSTRUCTORS-" << endl;
-		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
-		index = 0;
-		VectorXs VectorJ(4);
-		VectorJ << 1.1, 2.2, 3.3, 4.4;
-		Vector4s VectorK;
-		VectorK << 5.5, 6.6, 7.7, 8.8;
+		cout << "o8.makeInverse()" << endl;
+		o2D_h.makeInverse();
+		o2D_h.print();
 		cout << "storage   : " << storage.transpose() << endl;
-		cout << "index     : " << index << endl;
-		cout << "VectorJ (Xs) : " << VectorJ.transpose() << endl;
-		cout << "VectorK (4s) : " << VectorK.transpose() << endl << endl;
 
-		cout << "Local constructor from size" << endl;
-		StateOrientation<QUATERNION> orientation3Dq_a;
-		orientation3Dq_a.print();
+		cout << "o7 *= o8" << endl;
+		o2D_g *= o2D_h;
+		o2D_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
 
-		cout << "Local constructor from VectorJ" << endl;
-		StateOrientation<QUATERNION> orientation3Dq_b(VectorJ);
-		orientation3Dq_b.print();
+		cout << "----------------- EULER - Local:" << endl;
+		VectorXs VectorF3(3);
+		VectorF3 << 1.1, 2.2, 3.3;
 
-		cout << "Local constructor from VectorK" << endl;
-		StateOrientation<QUATERNION> orientation3Dq_c(VectorK);
-		orientation3Dq_c.print();
+		StateOrientation<EULER> o3D_a(VectorF3);
+		cout << "o1" << endl;
+		o3D_a.print();
+		VectorF3 << -1.2, 0.2, 2.3;
+		StateOrientation<EULER> o3D_b(VectorF3);
+		cout << "o2" << endl;
+		o3D_b.print();
 
-		cout << "Local copy constructor" << endl;
-		StateOrientation<QUATERNION> orientation3Dq_d(orientation3Dq_c);
-		orientation3Dq_d.print();
+		cout << "o3 = o1 * o2" << endl;
+		StateOrientation<EULER> o3D_c = o3D_a * o3D_b;
+		o3D_c.print();
 
-		cout << "Remote constructor from size" << endl;
-		StateOrientation<QUATERNION> orientation3Dq_e(storage, index);
-		orientation3Dq_e.print();
+		cout << "o1 *= o2" << endl;
+		o3D_a *= o3D_b;
+		o3D_a.print();
 
-		cout << "Remote constructor from VectorJ" << endl;
-		StateOrientation<QUATERNION> orientation3Dq_f(storage, index, VectorJ);
-		orientation3Dq_f.print();
+		cout << "o4 = (o1.inverse()).inverse()" << endl;
+		StateOrientation<EULER> o3D_d = (o3D_a.inverse()).inverse();
+		o3D_d.print();
 
-		cout << "Remote constructor from VectorK" << endl;
-		StateOrientation<QUATERNION> orientation3Dq_g(storage, index, VectorK);
-		orientation3Dq_g.print();
+		cout << "o5 = o1 / o2" << endl;
+		StateOrientation<EULER> o3D_e = o3D_a / o3D_b;
+		o3D_e.print();
 
-		cout << "Remap to idx 4" << endl;
-		orientation3Dq_g.remap(storage, 4);
-		orientation3Dq_g.print();
+		cout << "o6 = o1 * o2.inverse()" << endl;
+		StateOrientation<EULER> o3D_f = o3D_a * o3D_b.inverse();
+		o3D_f.print();
 
+		cout << "o1 /= o2" << endl;
+		o3D_a /= o3D_b;
+		o3D_a.print();
+
+		cout << "----------------- EULER - Remote:" << endl;
+		storage << 0.1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "o7" << endl;
+		StateOrientation<EULER> o3D_g(storage, 0);
+		o3D_g.print();
+
+		cout << "o8 from vector" << endl;
+		StateOrientation<EULER> o3D_h(storage, 3, VectorF3);
+		o3D_h.print();
+
+		cout << "o7 *= o8" << endl;
+		o3D_g *= o3D_h;
+		o3D_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o8.makeInverse()" << endl;
+		o3D_h.makeInverse();
+		o3D_h.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o7 *= o8" << endl;
+		o3D_g *= o3D_h;
+		o3D_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o7.normalize()" << endl;
+		o3D_g.normalize();
+		o3D_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "----------------- QUATERNION - Local:" << endl;
+		VectorXs VectorF4(4);
+		VectorF4 << 1.1, 2.2, 3.3, 2.1;
+
+		StateOrientation<QUATERNION> o3Dq_a(VectorF4);
+		cout << "o1" << endl;
+		o3Dq_a.print();
+		VectorF4 << -1.2, 0.2, 2.3, 0.9;
+		StateOrientation<QUATERNION> o3Dq_b(VectorF4);
+		cout << "o2" << endl;
+		o3Dq_b.print();
+
+		cout << "o3 = o1 * o2" << endl;
+		StateOrientation<QUATERNION> o3Dq_c = o3Dq_a * o3Dq_b;
+		o3Dq_c.print();
+
+		cout << "o1 *= o2" << endl;
+		o3Dq_a *= o3Dq_b;
+		o3Dq_a.print();
+		o3Dq_b.print();
+
+		cout << "o4 = (o1.inverse()).inverse()" << endl;
+		StateOrientation<QUATERNION> o3Dq_d = (o3Dq_a.inverse()).inverse();
+		o3Dq_d.print();
+
+		cout << "o5 = o1 / o2" << endl;
+		StateOrientation<QUATERNION> o3Dq_e = o3Dq_a / o3Dq_b;
+		o3Dq_e.print();
+
+		cout << "o6 = o1 * o2.inverse()" << endl;
+		StateOrientation<QUATERNION> o3Dq_f = o3Dq_a * o3Dq_b.inverse();
+		o3Dq_f.print();
+
+		cout << "o1 /= o2" << endl;
+		o3Dq_a /= o3Dq_b;
+		o3Dq_a.print();
+
+		cout << "----------------- QUATERNION - Remote:" << endl;
+		storage << 0.1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "o7" << endl;
+		StateOrientation<QUATERNION> o3Dq_g(storage, 0);
+		o3Dq_g.print();
+		cout << "o7.normalize()" << endl;
+		o3Dq_g.normalize();
+		o3Dq_g.print();
+
+		cout << "o8 from vector" << endl;
+		StateOrientation<QUATERNION> o3Dq_h(storage, 4, VectorF4);
+		o3Dq_h.print();
+
+		cout << "o7 *= o8" << endl;
+		o3Dq_g *= o3Dq_h;
+		o3Dq_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o8.makeInverse()" << endl;
+		o3Dq_h.makeInverse();
+		o3Dq_h.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o7 *= o8" << endl;
+		o3Dq_g *= o3Dq_h;
+		o3Dq_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o7.normalize()" << endl;
+		o3Dq_g.normalize();
+		o3Dq_g.print();
 		cout << "storage   : " << storage.transpose() << endl;
     }
-
-
+    cout << "end" << endl;
     if (test_po2)
 	{
     	cout << endl;
 		cout << "--------------------------------------------" << endl;
-		cout << "-------StatePO<pose3D> CONSTRUCTORS--------" << endl;
+		cout << "-------StatePO<2D,THETA> CONSTRUCTORS--------" << endl;
 		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
 		index = 0;
-		VectorXs VectorDynamic(3);
-		VectorDynamic << 1.1, 2.2, 3.3;
-		Vector3s VectorStatic;
-		VectorStatic << 5.5, 6.6, 7.7;
+		VectorXs VectorDynamic(4);
+		VectorDynamic << 1.1, 2.2, 0.9, 0.1;
+		Vector4s VectorStatic;
+		VectorStatic << 5.5, 6.6, 7.7, 0.8;
 		cout << "storage   : " << storage.transpose() << endl;
 		cout << "index     : " << index << endl;
 		cout << "VectorDynamic : " << VectorDynamic.transpose() << endl;
@@ -586,7 +632,7 @@ int main()
 
 		cout << "Local constructor from StatePoint and StateOrientation" << endl;
 		StatePoint p_aux(VectorStatic.head(2));
-		StateOrientation<THETA> o_aux(VectorStatic.tail(1));
+		StateOrientation<THETA> o_aux(VectorStatic.tail(2));
 		StatePO<2,THETA> pose2D_c2(p_aux, o_aux);
 		pose2D_c2.print();
 
@@ -595,7 +641,7 @@ int main()
 		pose2D_d.print();
 
 		cout << "Remote constructor from size" << endl;
-		StatePO<2,THETA> pose2D_e(storage, index, 3);
+		StatePO<2,THETA> pose2D_e(storage, index, 4);
 		pose2D_e.print();
 
 		cout << "Remote constructor from VectorDynamic" << endl;

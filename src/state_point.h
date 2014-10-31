@@ -81,82 +81,56 @@ class StatePoint : public StateBase
 // IMPLEMENTATION
 /////////////////////////////////
 
+//#################################################################
+// operator *=
 template <>
 inline void StatePoint::operator*=(const StateOrientation<THETA>& _o)
 {
-	MatrixXs R(2,2);
-	R << _o.stateEstimatedMap()(0), -_o.stateEstimatedMap()(1), _o.stateEstimatedMap()(1), _o.stateEstimatedMap()(0);
-	this->state_estimated_map_ = R * state_estimated_map_;
+	this->state_estimated_map_.head(2) = _o.getRotationMatrix() * this->state_estimated_map_.head(2);
 }
 
 template <>
 inline void StatePoint::operator*=(const StateOrientation<EULER>& _o)
 {
-	//TODO
+	assert(StateBase::size() == 3);
+	this->state_estimated_map_ = _o.getRotationMatrix() * this->state_estimated_map_;
 }
 
 template <>
 inline void StatePoint::operator*=(const StateOrientation<QUATERNION>& _o)
 {
+	assert(StateBase::size() == 3);
 	this->state_estimated_map_ = _o.q() * this->state_estimated_map_;
 }
 
-//template <orientationParametrization O_PARAM>
-//void StatePoint::operator*=(const StateOrientation<O_PARAM>& _o)
-//{
-//	switch(O_PARAM)
-//	{
-//		case THETA :
-//			MatrixXs R(2,2);
-//			R << cos(_o.state_estimated_map), -sin(_o.state_estimated_map), sin(_o.state_estimated_map), cos(_o.state_estimated_map);
-//			this->state_estimated_map_ *= R;
-//			break;
-//		case EULER:
-//			//TODO
-//			break;
-//		case QUATERNION :
-//			this->state_estimated_map_ = _o.q_ * this->state_estimated_map_;
-//			break;
-//	}
-//}
-
+//#################################################################
+// operator *
 template <orientationParametrization O_PARAM>
 inline StatePoint operator*(const StateOrientation<O_PARAM>& _o, const StatePoint& _p)
 {
-	StatePoint res(_p);
-	res *= _o;
-	return res;
+	return StatePoint(_o.getRotationMatrix() * _p.stateEstimatedMap());
 }
 
 template <>
 inline StatePoint operator*(const StateOrientation<THETA>& _o, const StatePoint& _p)
 {
-	MatrixXs R(2,2);
-	R << _o.stateEstimatedMap()(0), -_o.stateEstimatedMap()(1), _o.stateEstimatedMap()(1), _o.stateEstimatedMap()(0);
-	StatePoint res(R * _p.stateEstimatedMap());
+	StatePoint res(_p);
+	res.stateEstimatedMap().head(2) = _o.getRotationMatrix() * _p.stateEstimatedMap().head(2);
 	return res;
 }
 
 template <>
 inline StatePoint operator*(const StateOrientation<EULER>& _o, const StatePoint& _p)
 {
-	//TODO
-	Vector3s angles = _o.get_angles();
-	Matrix3s R;
-	R = AngleAxiss(angles(0), Vector3s::UnitZ())
-	  * AngleAxiss(angles(1), Vector3s::UnitY())
-	  * AngleAxiss(angles(2), Vector3s::UnitX());
-	StatePoint res(R * _p.stateEstimatedMap());
-	return res;
+	assert(_p.size() == 3);
+	return StatePoint(_o.getRotationMatrix() * _p.stateEstimatedMap());
 }
 
 template <>
 inline StatePoint operator*(const StateOrientation<QUATERNION>& _o, const StatePoint& _p)
 {
-	StatePoint res(_o.q() * _p.stateEstimatedMap());
-	return res;
+	assert(_p.size() == 3);
+	return StatePoint(_o.q() * _p.stateEstimatedMap());
 }
-
-
 
 #endif /* STATE_POINT_H_ */
