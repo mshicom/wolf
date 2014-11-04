@@ -51,7 +51,7 @@ class StateOrientation : public StateBase
 		 * Local copy constructor. Map member will map local vector.
 		 * \param _state_p the state
 		 */
-		StateOrientation(const StateOrientation<O_PARAM>& _state_o);
+        StateOrientation(const StateOrientation<O_PARAM>& _state_o);
 
         // Remote Constructors
         /**
@@ -142,6 +142,8 @@ class StateOrientation : public StateBase
 
 using namespace Eigen;
 
+//#################################################################
+// Local empty constructor
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation() :
         StateBase(O_PARAM),
@@ -149,6 +151,8 @@ StateOrientation<O_PARAM>::StateOrientation() :
 {
 }
 
+//#################################################################
+// Local constructor from vector
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(const VectorXs& _x) :
 		StateBase(_x),
@@ -165,6 +169,8 @@ StateOrientation<THETA>::StateOrientation(const VectorXs& _x) :
 	assert(StateBase::size() == 2);
 }
 
+//#################################################################
+// Local copy constructor
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(const StateOrientation<O_PARAM>& _state_o) :
 		StateBase(_state_o.x()),
@@ -172,18 +178,22 @@ StateOrientation<O_PARAM>::StateOrientation(const StateOrientation<O_PARAM>& _st
 {
 }
 
+//#################################################################
+// Remote constructor from idx
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx) :
         StateBase(_st_remote,_idx, O_PARAM),
-		q_(O_PARAM == QUATERNION ? _st_remote.data() : NULL)
+		q_(O_PARAM == QUATERNION ? _st_remote.data() + _idx : NULL)
 {
 	assert(_st_remote.size() >= _idx + O_PARAM);
 }
 
+//#################################################################
+// Remote constructor from vector and idx
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::StateOrientation(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
 		StateBase(_st_remote,_idx, _x),
-		q_(O_PARAM == QUATERNION ? _st_remote.data() : NULL)
+		q_(O_PARAM == QUATERNION ? _st_remote.data()  + _idx: NULL)
 {
 	assert(O_PARAM == _x.size());
 }
@@ -195,6 +205,8 @@ StateOrientation<THETA>::StateOrientation(VectorXs& _st_remote, const unsigned i
 {
 }
 
+//#################################################################
+// Destructor
 template <orientationParametrization O_PARAM>
 StateOrientation<O_PARAM>::~StateOrientation()
 {

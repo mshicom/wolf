@@ -38,9 +38,15 @@ class StatePoint : public StateBase
 
         /**
          * Local constructor from vector. Map member will map local vector.
-         * \param _x the state point
+         * \param _p the point vector
          */
         StatePoint(const Eigen::VectorXs& _p);
+
+        /**
+         * Local copy constructor. Map member will map local vector.
+         * \param _x the state point
+         */
+        StatePoint(const StatePoint& _x);
 
         // Remote Constructors
         /**
@@ -65,6 +71,36 @@ class StatePoint : public StateBase
         virtual ~StatePoint();
 
 		/**
+		 * combinations of points
+		 */
+        void operator+=(const StatePoint& _p);
+
+		/**
+		 * combinations of points
+		 */
+        StatePoint operator+(const StatePoint& _p) const;
+
+		/**
+		 * substraction of points
+		 */
+        void operator-=(const StatePoint& _p);
+
+		/**
+		 * substraction of points
+		 */
+        StatePoint operator-(const StatePoint& _p) const;
+
+		/**
+		 * opposite point
+		 */
+        StatePoint operator-() const;
+
+		/**
+		 * make opposite point
+		 */
+        void makeOpposite();
+
+		/**
 		 * Rotation of the point
 		 */
         template <orientationParametrization O_PARAM>
@@ -80,6 +116,52 @@ class StatePoint : public StateBase
 /////////////////////////////////
 // IMPLEMENTATION
 /////////////////////////////////
+
+//#################################################################
+// operator =+
+inline void StatePoint::operator+=(const StatePoint& _p)
+{
+	assert(StateBase::size() == _p.size());
+	this->state_estimated_map_ += _p.stateEstimatedMap();
+}
+
+//#################################################################
+// operator +
+inline StatePoint StatePoint::operator+(const StatePoint& _p) const
+{
+	assert(StateBase::size() == _p.size());
+	return StatePoint(this->state_estimated_map_ + _p.stateEstimatedMap());
+}
+
+//#################################################################
+// operator =-
+inline void StatePoint::operator-=(const StatePoint& _p)
+{
+	assert(StateBase::size() == _p.size());
+	this->state_estimated_map_ -= _p.stateEstimatedMap();
+}
+
+//#################################################################
+// operator -
+inline StatePoint StatePoint::operator-(const StatePoint& _p) const
+{
+	assert(StateBase::size() == _p.size());
+	return StatePoint(this->state_estimated_map_ - _p.stateEstimatedMap());
+}
+
+//#################################################################
+// operator -()
+inline StatePoint StatePoint::operator-() const
+{
+	return StatePoint(-this->state_estimated_map_);
+}
+
+//#################################################################
+// makeOpposite
+inline void StatePoint::makeOpposite()
+{
+	this->state_estimated_map_ = -this->state_estimated_map_;
+}
 
 //#################################################################
 // operator *=
@@ -115,7 +197,7 @@ template <>
 inline StatePoint operator*(const StateOrientation<THETA>& _o, const StatePoint& _p)
 {
 	StatePoint res(_p);
-	res.stateEstimatedMap().head(2) = _o.getRotationMatrix() * _p.stateEstimatedMap().head(2);
+	res.stateEstimatedMap().head(2) =_o.getRotationMatrix() * _p.stateEstimatedMap().head(2);
 	return res;
 }
 

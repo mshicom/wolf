@@ -13,7 +13,8 @@ int main()
 	bool test_point = 0;
 	bool test_p = 0;
 	bool test_orientation = 0;
-	bool test_operators= 1;
+	bool test_operators= 0;
+	bool test_operators2= 1;
 	bool test_po2 = 0;
 	bool test_po3 = 0;
 
@@ -597,6 +598,275 @@ int main()
 		o3Dq_g.print();
 		cout << "storage   : " << storage.transpose() << endl;
     }
+    if(test_operators2)
+    {
+		cout << endl;
+		cout << "--------------------------------------------" << endl;
+		cout << "----------------- OPERATORS ----------------" << endl;
+
+		cout << "----------------- POINT - Local:" << endl;
+
+		VectorXs VectorF5(2);
+		VectorF5 << 0.7, 5.1;
+		StatePoint p2D_a(VectorF5);
+		cout << "p1" << endl;
+		p2D_a.print();
+		VectorF5 << -1.2, 6.4;
+		StatePoint p2D_b(VectorF5);
+		cout << "p2" << endl;
+		p2D_b.print();
+
+		cout << "p3 = p1 + p2" << endl;
+		StatePoint p2D_c = p2D_a + p2D_b;
+		p2D_c.print();
+
+		cout << "p1 += p2" << endl;
+		p2D_a += p2D_b;
+		p2D_a.print();
+
+		cout << "p4 = -p1" << endl;
+		StatePoint p2D_d = -p2D_a;
+		p2D_d.print();
+
+		cout << "p5 = p1 - p2" << endl;
+		StatePoint p2D_e = p2D_a - p2D_b;
+		p2D_e.print();
+
+		cout << "p6 = p1 + (-p2)" << endl;
+		StatePoint p2D_f = p2D_a + (-p2D_b);
+		p2D_f.print();
+
+		cout << "p1 -= p2" << endl;
+		p2D_a -= p2D_b;
+		p2D_a.print();
+
+		cout << "----------------- POINT - Remote:" << endl;
+		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "p7" << endl;
+		StatePoint p2D_g(storage, 0, 2);
+		p2D_g.print();
+
+		cout << "p8 from vector" << endl;
+		StatePoint p2D_h(storage, 3, VectorF5);
+		p2D_h.print();
+
+		cout << "p7 += p8" << endl;
+		p2D_g += p2D_h;
+		p2D_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "p8.makeOpposite()" << endl;
+		p2D_h.makeOpposite();
+		p2D_h.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "p7 += p8" << endl;
+		p2D_g += p2D_h;
+		p2D_g.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "----------------- Point 2D - Orientation<THETA> Local:" << endl;
+
+		VectorXs VectorF6(2);
+		VectorF6 << 0.7, 5.1;
+		StatePoint p2D_i(VectorF6);
+		cout << "p1" << endl;
+		p2D_i.print();
+		VectorXs VectorF7(1);
+		VectorF7 << M_PI/2;
+		StateOrientation<THETA> oTH_a(VectorF7);
+		cout << "o1" << endl;
+		oTH_a.print();
+
+		cout << "p2 = o1 * p1" << endl;
+		StatePoint p2D_j = oTH_a * p2D_i;
+		p2D_j.print();
+
+		cout << "p3 = o1.inverse() * (o1 * p1)" << endl;
+		StatePoint p2D_k = oTH_a.inverse() * (oTH_a * p2D_i);
+		p2D_k.print();
+
+		cout << "p4 = (o1.inverse() * o1) * p1" << endl;
+		StatePoint p2D_l = (oTH_a.inverse() * oTH_a) * p2D_i;
+		p2D_l.print();
+
+		cout << "----------------- Point 2D - Orientation<THETA> - Remote:" << endl;
+		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "p5" << endl;
+		StatePoint p2D_m(storage, 0, 2);
+		p2D_m.print();
+
+		cout << "o2 from vector" << endl;
+		StateOrientation<THETA> oTH_b(storage, 2, VectorF7);
+		oTH_b.print();
+
+		cout << "p5 *= o2" << endl;
+		p2D_m *= oTH_b;
+		p2D_m.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o2.makeInverse()" << endl;
+		oTH_b.makeInverse();
+		oTH_b.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "p5 *= o2" << endl;
+		p2D_m *= oTH_b;
+		p2D_m.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "----------------- Point 3D - Orientation<THETA> Local:" << endl;
+
+		VectorXs VectorF8(3);
+		VectorF8 << 0.7, 5.1, 8.3;
+		StatePoint p3D_a(VectorF8);
+		cout << "p1" << endl;
+		p3D_a.print();
+		cout << "o1" << endl;
+		oTH_a.print();
+
+		cout << "p2 = o1 * p1" << endl;
+		StatePoint p3D_b = oTH_a * p3D_a;
+		p3D_b.print();
+
+		cout << "p3 = o1.inverse() * (o1 * p1)" << endl;
+		StatePoint p3D_c = oTH_a.inverse() * (oTH_a * p3D_a);
+		p3D_c.print();
+
+		cout << "p4 = (o1.inverse() * o1) * p1" << endl;
+		StatePoint p3D_d = (oTH_a.inverse() * oTH_a) * p3D_a;
+		p3D_d.print();
+
+		cout << "----------------- Point 3D - Orientation<THETA> - Remote:" << endl;
+		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "p5" << endl;
+		StatePoint p3D_e(storage, 0, 3);
+		p3D_e.print();
+
+		cout << "o2 from vector" << endl;
+		StateOrientation<THETA> oTH_c(storage, 3, VectorF7);
+		oTH_c.print();
+
+		cout << "p5 *= o2" << endl;
+		p3D_e *= oTH_c;
+		p3D_e.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o2.makeInverse()" << endl;
+		oTH_c.makeInverse();
+		oTH_c.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "p5 *= o2" << endl;
+		p3D_e *= oTH_c;
+		p3D_e.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "----------------- Point 3D - Orientation<EULER> Local:" << endl;
+
+		cout << "p1" << endl;
+		p3D_a.print();
+		VectorXs VectorF9(3);
+		VectorF9 << M_PI/2, M_PI/2, 0.0;
+		StateOrientation<EULER> oEU_a(VectorF9);
+		cout << "o1" << endl;
+		oEU_a.print();
+
+		cout << "p2 = o1 * p1" << endl;
+		StatePoint p3D_f = oEU_a * p3D_a;
+		p3D_f.print();
+
+		cout << "p3 = o1.inverse() * (o1 * p1)" << endl;
+		StatePoint p3D_g = oEU_a.inverse() * (oEU_a * p3D_a);
+		p3D_g.print();
+
+		cout << "p4 = (o1.inverse() * o1) * p1" << endl;
+		StatePoint p3D_h = (oEU_a.inverse() * oEU_a) * p3D_a;
+		p3D_h.print();
+
+		cout << "----------------- Point 3D - Orientation<EULER> - Remote:" << endl;
+		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "p5" << endl;
+		StatePoint p3D_i(storage, 0, 3);
+		p3D_i.print();
+
+		cout << "o2 from vector" << endl;
+		StateOrientation<EULER> oEU_b(storage, 3, VectorF9);
+		oEU_b.print();
+
+		cout << "p5 *= o2" << endl;
+		p3D_i *= oEU_b;
+		p3D_i.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o2.makeInverse()" << endl;
+		oEU_b.makeInverse();
+		oEU_b.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "p5 *= o2" << endl;
+		p3D_i *= oEU_b;
+		p3D_i.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+
+
+		cout << "----------------- Point 3D - Orientation<QUATERNION> Local:" << endl;
+
+		cout << "p1" << endl;
+		p3D_a.print();
+		VectorXs VectorF10(4);
+		VectorF10 = Quaternions(Matrix3s(oEU_a.getRotationMatrix())).coeffs();
+		StateOrientation<QUATERNION> oQU_a(VectorF10);
+		cout << "o1" << endl;
+		oQU_a.print();
+
+		cout << "p2 = o1 * p1" << endl;
+		StatePoint p3D_j = oQU_a * p3D_a;
+		p3D_j.print();
+
+		cout << "p3 = o1.inverse() * (o1 * p1)" << endl;
+		StatePoint p3D_k = oQU_a.inverse() * (oQU_a * p3D_a);
+		p3D_k.print();
+
+		cout << "p4 = (o1.inverse() * o1) * p1" << endl;
+		StatePoint p3D_l = (oQU_a.inverse() * oQU_a) * p3D_a;
+		p3D_l.print();
+
+		cout << "----------------- Point 3D - Orientation<QUATERNION> - Remote:" << endl;
+		storage << 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+		cout << "storage   : " << storage.transpose() << endl << endl;
+		cout << "p5" << endl;
+		StatePoint p3D_m(storage, 0, 3);
+		p3D_m.print();
+
+		cout << "o2 from vector" << endl;
+		StateOrientation<QUATERNION> oQU_b(storage, 3, VectorF10);
+		oQU_b.print();
+
+		cout << "p5 *= o2" << endl;
+		p3D_m *= oQU_b;
+		p3D_m.print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "o2" << endl;
+		oQU_b.print();
+		cout << "o2.makeInverse()" << endl;
+		oQU_b.makeInverse();
+		oQU_b.print();
+		cout << "o2.Inverse()" << endl;
+		oQU_b.inverse().print();
+		cout << "storage   : " << storage.transpose() << endl;
+
+		cout << "p5 *= o2" << endl;
+		p3D_m *= oQU_b;
+		p3D_m.print();
+		cout << "storage   : " << storage.transpose() << endl;
+    }
     cout << "end" << endl;
     if (test_po2)
 	{
@@ -718,133 +988,6 @@ int main()
 
 		cout << "storage   : " << storage.transpose() << endl;
 	}
-
-    //cout << "------ StatePose<3> CONSTRUCTORS:" << endl;
-    //StatePose<3> pose3D_a;
-    //cout << "Default local constructor,    size : " << pose3D_a.size() << endl;
-    // VectorXs pqvstate(StatePQV::SIZE_);
-    // pqvstate << 20, 21, 22, 23, 24, 25, 26, 27, 28, 29;
-    // VectorXs imustate(StateIMU::SIZE_);
-    // imustate << 50, 51, 52, 53, 54, 55;
-    // StatePQV pqv(storage, index + bsize, pqvstate);
-    // StateIMU imu(storage, index + bsize + StatePQV::SIZE_, imustate);
-    // cout << "storage   : " << storage.transpose() << endl;
-    // cout << "pqv  state: " << pqv.x().transpose() << endl;
-    // cout << "pqv  pos  : " << pqv.p().transpose() << endl;
-    // cout << "pqv  vel  : " << pqv.v().transpose() << endl;
-    // cout << "pqv  quat : " << pqv.q().coeffs().transpose() << endl;
-    // cout << "imu  state: " << imu.x().transpose() << endl;
-    // cout << "imu  abias: " << imu.ab().transpose() << endl;
-    // cout << "imu  wbias: " << imu.wb().transpose() << endl;
-    // cout << "doing 'base.x() *= 2'" << endl;
-
-//     cout << "doing 'pqv.x() *= 3'" << endl;
-//     pqv.x() *= 3;
-//     cout << "pqv  state: " << pqv.x().transpose() << endl;
-//     cout << "pqv  pos  : " << pqv.p().transpose() << endl;
-//     cout << "pqv  vel  : " << pqv.v().transpose() << endl;
-//     cout << "pqv  quat : " << pqv.q().coeffs().transpose() << endl;
-//     cout << "doing 'pqv.p().array() += 2' ; 'pqv.v() *= 2' ; 'pqv.q().normalize()'" << endl;
-//     pqv.p().array() += 2;
-//     pqv.v() *= 2;
-//     pqv.q().normalize();
-//     cout << "pqv  pos  : " << pqv.p().transpose() << endl;
-//     cout << "pqv  vel  : " << pqv.v().transpose() << endl;
-//     cout << "pqv  quat : " << pqv.q().coeffs().transpose() << endl;
-//     cout << "pqv  R    : \n" << pqv.q().matrix() << endl;
-//     cout << "pqv  R*vel: " << (pqv.q().matrix() * pqv.v()).transpose() << endl;
-//     cout << "pqv  q*vel: " << (pqv.q() * pqv.v()).transpose() << endl;
-//     cout << "pqv  state: " << pqv.x().transpose() << endl;
-//     cout << "storage   : " << storage.transpose() << endl;
-//     cout << "doing 'storage *= 2'" << endl;
-//     storage *= 2;
-//     cout << "quat norm : " << pqv.q().norm() << endl;
-//     cout << "doing 'pqv.q().setIdentity()'" << endl;
-//     pqv.q().setIdentity();
-//     cout << "pqv  quat : " << pqv.q().coeffs().transpose();
-//     cout << endl;
-
-//     cout << "\n---Testing local and remote states---" << endl;
-//     cout << "imustate  : " << imustate.transpose() << endl;
-//     StateIMU imulocal(imustate);
-//     cout << "imulocal  : " << imulocal.x().transpose() << endl;
-//     cout << "imulocal ab, wb: " << imulocal.ab().transpose() << " , " << imulocal.wb().transpose() << endl;
-//     cout << "imu       : " << imu.x().transpose() << endl;
-//     cout << "doing 'imulocal.abias() *= 3'" << endl;
-//     imulocal.ab() *= 3;
-//     cout << "imulocal  : " << imulocal.x().transpose() << endl;
-//     cout << "imu       : " << imu.x().transpose() << endl;
-//     cout << "doing imu = imulocal" << endl;
-//     imu = imulocal;
-//     cout << "imu       : " << imu.x().transpose() << endl;
-//     cout << "storage   : " << storage.transpose() << endl;
-//     StatePQV pqvlocal(pqvstate);
-//     cout << "pqvlocal  : " << pqvlocal.x().transpose() << endl;
-//     cout << "pqvlocal p, v, q: " << pqvlocal.p().transpose() << " , " << pqvlocal.v().transpose() << " , "
-//             << pqvlocal.q().coeffs().transpose() << endl;
-//     cout << "pqv       : " << pqv.x().transpose() << endl;
-//     cout << "doing 'pqvlocal.v() *= 2'" << endl;
-//     pqvlocal.v() *= 2;
-//     cout << "pqvlocal  : " << pqvlocal.x().transpose() << endl;
-//     cout << "pqv       : " << pqv.x().transpose() << endl;
-//     cout << "doing pqv = pqvlocal" << endl;
-//     pqv = pqvlocal;
-//     cout << "pqv       : " << pqv.x().transpose() << endl;
-//     cout << "storage   : " << storage.transpose() << endl;
-
-//     // Miscelaneous
-//     Quaternions q(1, 2, 3, 4);
-//     cout << "\nAttention!!! constructing Quaternions q(1,2,3,4) gives coeffs order: " << q.coeffs().transpose();
-//     cout << endl;
-
-// //    cout << "\n--- Test composite state StatePQVBB, with PQV and IMU ---" << endl;
-// //
-// //    cout << "--- 1. With local states ---" << endl;
-// //    StateCompPQVBB pqvbblocal(pqvstate, imustate);
-// //    cout << "storage   : " << storage.transpose() << endl;
-// //    cout << "pqvbblocal p  : " << pqvbblocal.p().transpose() << endl;
-// //    cout << "pqvbblocal v  : " << pqvbblocal.v().transpose() << endl;
-// //    cout << "pqvbblocal q  : " << pqvbblocal.q().coeffs().transpose() << endl;
-// //    cout << "pqvbblocal ab : " << pqvbblocal.abias().transpose() << endl;
-// //    cout << "pqvbblocal wb : " << pqvbblocal.wbias().transpose() << endl;
-// //    cout << "pqvbblocal pqv: " << pqvbblocal.StatePQV::x().transpose() << endl;
-// //    cout << "pqvbblocal bb : " << pqvbblocal.StateIMU::x().transpose() << endl;
-// //
-// //    cout << "--- 2. With remote states ---" << endl;
-// //    StateCompPQVBB pqvbb(storage, index + bsize, index + bsize + StatePQV::SIZE_, pqvstate, imustate);
-// //    cout << "storage   : " << storage.transpose() << endl;
-// //    cout << "doing 'storage *= 2'" << endl;
-// //    storage *= 2;
-// //    cout << "storage   : " << storage.transpose() << endl;
-// //    cout << "pqvbb p  : " << pqvbb.p().transpose() << endl;
-// //    cout << "pqvbb v  : " << pqvbb.v().transpose() << endl;
-// //    cout << "pqvbb q  : " << pqvbb.q().coeffs().transpose() << endl;
-// //    cout << "pqvbb ab : " << pqvbb.abias().transpose() << endl;
-// //    cout << "pqvbb wb : " << pqvbb.wbias().transpose() << endl;
-// //    cout << "pqvbb pqv: " << pqvbb.StatePQV::x().transpose() << endl;
-// //    cout << "pqvbb bb : " << pqvbb.StateIMU::x().transpose() << endl;
-// //
-// //    cout << "pqvbb     SIZE_ : " << pqvbb.SIZE_ << endl;
-// //    cout << "pqvbb pqv SIZE_ : " << pqvbb.StatePQV::SIZE_ << endl;
-// //    cout << "pqvbb bb  SIZE_ : " << pqvbb.StateIMU::SIZE_ << endl;
-
-//     cout << "\n---Testing local error states---" << endl;
-//     VectorXs pvqerror;
-//     pvqerror = VectorXs::Constant(StateErrorPQV::SIZE_ERROR_, 0.001);
-//     StateErrorPQV epqv( pqvstate );
-//     epqv.qn().normalize();
-//     epqv.xe() = pvqerror;
-//     cout << "epvq pn: " << epqv.pn().transpose() << endl;
-//     cout << "epvq qn: " << epqv.qn().coeffs().transpose() << endl;
-//     cout << "epvq vn: " << epqv.vn().transpose() << endl;
-//     cout << "epvq pe: " << epqv.pe().transpose() << endl;
-//     cout << "epvq qe: " << epqv.qe().transpose() << endl;
-//     cout << "epvq ve: " << epqv.ve().transpose() << endl;
-//     cout << "epvq pc: " << epqv.pc().transpose() << endl;
-//     cout << "epvq qc: " << epqv.qc().coeffs().transpose() << endl;
-//     cout << "epvq vc: " << epqv.vc().transpose() << endl;
-
-//     cout << "----------------------------" << endl;
     return 0;
 }
 

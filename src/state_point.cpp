@@ -19,6 +19,11 @@ StatePoint::StatePoint(const VectorXs& _p) :
 {
 }
 
+StatePoint::StatePoint(const StatePoint& _x) :
+		StateBase(_x.x()) //
+{
+}
+
 StatePoint::StatePoint(VectorXs& _st_remote, const unsigned int _idx, const unsigned int _dim) :
         StateBase(_st_remote,_idx, _dim) //
 {
