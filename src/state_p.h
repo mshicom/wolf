@@ -108,57 +108,57 @@ class StateP : public StateBase
          * \param _s_local the frame in local reference
          * \return the given frame in the global reference (reference of *this)
 		 */
-		virtual StateP concatenate(const StateP& _s_local) const;
+		StateP concatenate(const StateP& _s_local) const;
 
         /**
 		 * Concatenate a frame (in local reference) to the current frame.
          * \param _s_local the frame in local reference
          * \param _s_out output parameter, the given frame in the reference of *this
 		 */
-		virtual void concatenate(const StateP& _s_local, StateP& _s_out) const;
+		void concatenate(const StateP& _s_local, StateP& _s_out) const;
 
         /**
 		 * Concatenate a frame (in local reference) to the current frame and store it in *this
          * \param _s_local the frame in local reference
 		 */
-		virtual void concatenateInPlace(const StateP& _s_local);
+		void concatenateInPlace(const StateP& _s_local);
 
         /**
 		 * Inverse the current frame
          * \return the inverse frame
 		 */
-		virtual StateP inverse() const;
+		StateP inverse() const;
 
         /**
 		 * Inverse the current frame
          * \param _s_out output parameter, the inverse frame
 		 */
-		virtual void inverse(StateP& _s_out) const;
+		void inverse(StateP& _s_out) const;
 
         /**
 		 * Inverse the current frame and store it in *this
 		 */
-		virtual void makeInverse();
+		void makeInverse();
 
         /**
 		 * The given frame expressed in the current frame local reference.
          * \param _s_reference the frame in global reference (same reference of *this)
          * \return the given frame in local reference
 		 */
-		virtual StateP relativeTo(const StateP& _s_reference) const;
+		StateP relativeTo(const StateP& _s_reference) const;
 
         /**
 		 * The given frame expressed in the current frame local reference.
          * \param _s_reference the frame in global reference (same reference of *this)
          * \param _s_out output parameter, the given frame in local reference
 		 */
-		virtual void relativeTo(const StateP& _s_reference, StateP& _s_out) const;
+		void relativeTo(const StateP& _s_reference, StateP& _s_out) const;
 
         /**
 		 * The given frame expressed in the current frame local reference and store it in *this
          * \param _s_reference the frame in global reference (same reference of *this)
 		 */
-		virtual void makeRelativeTo(const StateP& _s_reference);
+		void makeRelativeTo(const StateP& _s_reference);
 
 };
 
