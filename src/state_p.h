@@ -60,6 +60,12 @@ class StateP : public StateBase
 		StateP(const Eigen::VectorXs& _x, const unsigned int _size);
 
 		/**
+		 * Local constructor from StatePoint. Map member will map local vector.
+		 * \param _p the StatePoint
+		 */
+		StateP(const StatePoint& _p);
+
+		/**
 		 * Local copy constructor. Map member will map local vector.
 		 * \param _state_p the state
 		 */
@@ -97,6 +103,63 @@ class StateP : public StateBase
 		 */
 		virtual void print() const;
 
+        /**
+		 * Concatenate a frame (in local reference) to the current frame.
+         * \param _s_local the frame in local reference
+         * \return the given frame in the global reference (reference of *this)
+		 */
+		virtual StateP concatenate(const StateP& _s_local) const;
+
+        /**
+		 * Concatenate a frame (in local reference) to the current frame.
+         * \param _s_local the frame in local reference
+         * \param _s_out output parameter, the given frame in the reference of *this
+		 */
+		virtual void concatenate(const StateP& _s_local, StateP& _s_out) const;
+
+        /**
+		 * Concatenate a frame (in local reference) to the current frame and store it in *this
+         * \param _s_local the frame in local reference
+		 */
+		virtual void concatenateInPlace(const StateP& _s_local);
+
+        /**
+		 * Inverse the current frame
+         * \return the inverse frame
+		 */
+		virtual StateP inverse() const;
+
+        /**
+		 * Inverse the current frame
+         * \param _s_out output parameter, the inverse frame
+		 */
+		virtual void inverse(StateP& _s_out) const;
+
+        /**
+		 * Inverse the current frame and store it in *this
+		 */
+		virtual void makeInverse();
+
+        /**
+		 * The given frame expressed in the current frame local reference.
+         * \param _s_reference the frame in global reference (same reference of *this)
+         * \return the given frame in local reference
+		 */
+		virtual StateP relativeTo(const StateP& _s_reference) const;
+
+        /**
+		 * The given frame expressed in the current frame local reference.
+         * \param _s_reference the frame in global reference (same reference of *this)
+         * \param _s_out output parameter, the given frame in local reference
+		 */
+		virtual void relativeTo(const StateP& _s_reference, StateP& _s_out) const;
+
+        /**
+		 * The given frame expressed in the current frame local reference and store it in *this
+         * \param _s_reference the frame in global reference (same reference of *this)
+		 */
+		virtual void makeRelativeTo(const StateP& _s_reference);
+
 };
 
 /////////////////////////////////
@@ -106,6 +169,8 @@ class StateP : public StateBase
 
 using namespace Eigen;
 
+//#################################################################
+// Local empty constructor
 template<unsigned int DIM>
 StateP<DIM>::StateP() :
         StateBase(DIM), //
@@ -113,6 +178,8 @@ StateP<DIM>::StateP() :
 {
 }
 
+//#################################################################
+// Local constructor from size
 template<unsigned int DIM>
 StateP<DIM>::StateP(const unsigned int _size) :
         StateBase(_size), //
@@ -120,6 +187,8 @@ StateP<DIM>::StateP(const unsigned int _size) :
 {
 }
 
+//#################################################################
+// Local constructor from vector
 template<unsigned int DIM>
 StateP<DIM>::StateP(const VectorXs& _x) :
 		StateBase(_x), //
@@ -127,21 +196,38 @@ StateP<DIM>::StateP(const VectorXs& _x) :
 {
 }
 
+//#################################################################
+// Local constructor from vector and size
+//TODO: Check if it has sense
 template<unsigned int DIM>
-StateP<DIM>::StateP(const Eigen::VectorXs& _x, const unsigned int _size) :
+StateP<DIM>::StateP(const VectorXs& _x, const unsigned int _size) :
 		StateBase(_size), //
 		p_(state_estimated_local_, 0, _x)
 {
 	assert(_x.size() == DIM);
 }
 
+//#################################################################
+// Local constructor from StatePoint
+template<unsigned int DIM>
+StateP<DIM>::StateP(const StatePoint& _p) :
+		StateBase(_p.stateEstimatedMap()), //
+		p_(state_estimated_local_, 0, DIM)
+{
+	assert(_p.size() == DIM);
+}
+
+//#################################################################
+// Local copy constructor
 template<unsigned int DIM>
 StateP<DIM>::StateP(const StateP& _state_p) :
-		StateBase(_state_p.x()), //
+		StateBase(_state_p.stateEstimatedMap()), //
 		p_(state_estimated_local_, 0, DIM)
 {
 }
 
+//#################################################################
+// Remote constructor from index and size
 template<unsigned int DIM>
 StateP<DIM>::StateP(VectorXs& _st_remote, const unsigned int _idx, const unsigned int _size) :
         StateBase(_st_remote,_idx, _size), //
@@ -149,6 +235,8 @@ StateP<DIM>::StateP(VectorXs& _st_remote, const unsigned int _idx, const unsigne
 {
 }
 
+//#################################################################
+// Remote constructor from index and vector
 template<unsigned int DIM>
 StateP<DIM>::StateP(VectorXs& _st_remote, const unsigned int _idx, const VectorXs& _x) :
 		StateBase(_st_remote,_idx, _x), //
@@ -156,11 +244,15 @@ StateP<DIM>::StateP(VectorXs& _st_remote, const unsigned int _idx, const VectorX
 {
 }
 
+//#################################################################
+// Destructor
 template<unsigned int DIM>
 StateP<DIM>::~StateP()
 {
 }
 
+//#################################################################
+// remap
 template<unsigned int DIM>
 inline void StateP<DIM>::remap(VectorXs& _st_remote, const unsigned int _idx)
 {
@@ -168,10 +260,72 @@ inline void StateP<DIM>::remap(VectorXs& _st_remote, const unsigned int _idx)
 	p_.remap(_st_remote, _idx);
 }
 
+//#################################################################
+// print
 template<unsigned int DIM>
 inline void StateP<DIM>::print() const
 {
 	p_.print();
+}
+
+//#################################################################
+// concatenate
+template<unsigned int DIM>
+StateP<DIM> StateP<DIM>::concatenate(const StateP<DIM>& _s_local) const
+{
+	return StateP<DIM>(this->p_+_s_local.p_);
+}
+
+template<unsigned int DIM>
+void StateP<DIM>::concatenate(const StateP<DIM>& _s_local, StateP<DIM>& _s_out) const
+{
+	_s_out.p_ = this->p_+_s_local.p_;
+}
+
+template<unsigned int DIM>
+void StateP<DIM>::concatenateInPlace(const StateP<DIM>& _s_local)
+{
+	this->p_ = this->p_+_s_local.p_;
+}
+
+//#################################################################
+// inverse
+template<unsigned int DIM>
+StateP<DIM> StateP<DIM>::inverse() const
+{
+	return StateP<DIM>(-this->p_);
+}
+
+template<unsigned int DIM>
+void StateP<DIM>::inverse(StateP<DIM>& _s_out) const
+{
+	_s_out.p_ = -this->p_;
+}
+
+template<unsigned int DIM>
+void StateP<DIM>::makeInverse()
+{
+	this->p_.makeOpposite();
+}
+
+//#################################################################
+// relative to
+template<unsigned int DIM>
+StateP<DIM> StateP<DIM>::relativeTo(const StateP<DIM>& _s_reference) const
+{
+	return StateP<DIM>(this->p_-_s_reference.p_);
+}
+
+template<unsigned int DIM>
+void StateP<DIM>::relativeTo(const StateP<DIM>& _s_reference, StateP<DIM>& _s_out) const
+{
+	_s_out.p_ = this->p_-_s_reference.p_;
+}
+
+template<unsigned int DIM>
+void StateP<DIM>::makeRelativeTo(const StateP<DIM>& _s_reference)
+{
+	this->p_-=_s_reference.p_;
 }
 
 #endif /* STATE_P_H_ */
