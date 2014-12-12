@@ -17,10 +17,12 @@ ENDIF(Ceres_FOUND)
 
 #headers
 SET(HDRS
+    node.h
     wolf.h)
     
 #sources
-#SET(SRCS)
+SET(SRCS
+    node.cpp)
 
 #optional HDRS and SRCS
 #IF (Ceres_FOUND)
