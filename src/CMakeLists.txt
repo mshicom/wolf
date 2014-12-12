@@ -17,12 +17,14 @@ ENDIF(Ceres_FOUND)
 
 #headers
 SET(HDRS
-    node.h
+    node_base.h
+    node_terminus.h
+    node_linked.h
     wolf.h)
     
 #sources
 SET(SRCS
-    node.cpp)
+    node_base.cpp)
 
 #optional HDRS and SRCS
 #IF (Ceres_FOUND)
@@ -31,25 +33,22 @@ SET(SRCS
 #ENDIF(Ceres_FOUND)
 
 # create the shared library
-#ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRCS})
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRCS})
 
 #install library
-#INSTALL(TARGETS ${PROJECT_NAME}
-#       RUNTIME DESTINATION bin
-#       LIBRARY DESTINATION lib/iri-algorithms
-#       ARCHIVE DESTINATION lib/iri-algorithms)
+INSTALL(TARGETS ${PROJECT_NAME}
+      RUNTIME DESTINATION bin
+      LIBRARY DESTINATION lib/iri-algorithms
+      ARCHIVE DESTINATION lib/iri-algorithms)
         
 #install headers         
-#INSTALL(FILES ${HDRS} 
-#       DESTINATION include/iri-algorithms)
+INSTALL(FILES ${HDRS} 
+      DESTINATION include/iri-algorithms)
 
-#INSTALL(FILES ../Findwolf.cmake DESTINATION ${CMAKE_ROOT}/Modules/)
+INSTALL(FILES ../Findwolf.cmake DESTINATION ${CMAKE_ROOT}/Modules/)
 
 #Build examples & tests
 MESSAGE("Building examples and tests.")
 ADD_SUBDIRECTORY(examples)
-#IF (Ceres_FOUND)
- #   ADD_SUBDIRECTORY(ceres_wrapper/examples)
-#ENDIF(Ceres_FOUND)
 
 

@@ -1,3 +1,7 @@
+# NodeLinked class test
+ADD_EXECUTABLE(test_node_linked test_node_linked.cpp)
+TARGET_LINK_LIBRARIES(test_node_linked ${CERES_LIBRARIES} ${PROJECT_NAME})
+
 # numeric test
 ADD_EXECUTABLE(test_ceres_wrapper_numeric test_ceres_wrapper_numeric.cpp)
 TARGET_LINK_LIBRARIES(test_ceres_wrapper_numeric ${CERES_LIBRARIES} ${PROJECT_NAME})
@@ -15,5 +19,5 @@ ADD_EXECUTABLE(test_ceres_wrapper_jet_2_sensors test_ceres_wrapper_jet_2_sensors
 TARGET_LINK_LIBRARIES(test_ceres_wrapper_jet_2_sensors ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test with 2 sensors and wrapper
-ADD_EXECUTABLE(test_ceres_wrapper test_ceres_wrapper.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper ${CERES_LIBRARIES} ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_ceres_wrapper test_ceres_wrapper.cpp)
+# TARGET_LINK_LIBRARIES(test_ceres_wrapper ${CERES_LIBRARIES} ${PROJECT_NAME})

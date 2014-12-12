@@ -76,7 +76,7 @@ class NodeBase
          * \param _ost output stream
 		 * 
          */
-        void printNTabs(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const
+        void printTabs(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const
         {
                 for (unsigned int i = 0; i < _ntabs; i++) _ost << "\t";
         }
