@@ -11,12 +11,12 @@
  **/
 class NodeBase
 {
-    private:
+    protected:
         std::string label_; ///< Text label identifying the node
         unsigned int node_id_; ///< Node id. It is unique over the whole Wolf Tree
         static unsigned int node_id_count_; ///< Object counter (acts as simple ID factory)
 
-    protected:
+    public: 
 
         /** \brief Constructor from label.
          *
@@ -32,7 +32,7 @@ class NodeBase
          */		
         virtual ~NodeBase();
 
-    public:
+    //public:
         /** \brief Gets node ID
          *
          * Gets node ID. Inline function.
@@ -52,6 +52,13 @@ class NodeBase
         {
             return label_;  
         };
+        
+        /** \brief Inherited classes should implement that method
+         * 
+         * Inherited classes should implement that method. It is required to implement a getTop() at NodeLinked level
+         * 
+         **/
+        virtual NodeBase* getTop() = 0;
 
         /** \brief Print node information
          * 

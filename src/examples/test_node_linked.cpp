@@ -131,12 +131,17 @@ int main()
     trajectory_->print();
     cout << "========================================================" << endl;    
     
-//     cout << endl << "TEST 5. getTop()" << endl;
-//     shared_ptr<NodeBase> sptr(sensor_data_radar_->getTop());
-//     cout << "TOP node: " << sptr->nodeId() << endl;
-//     cout << "========================================================" << endl;        
+    cout << endl << "TEST 5. getTop()" << endl;
+    NodeBase* nb_ptr = sensor_data_radar_->getTop();
+    //shared_ptr<TrajectoryN> nb_shptr((TrajectoryN*)nb_ptr);
+    cout << "TOP node is: " << nb_ptr->nodeId() << endl;
+    //cout << "nb_shptr.use_count(): " << nb_shptr.use_count() << "; value: " << nb_shptr.get() << endl;
+    //cout << "trajectory_.use_count(): " << trajectory_.use_count() << "; value: " << trajectory_.get() << endl;
+    //nb_shptr.reset();
+    //COMMENTS: It seems that if shared pointer is used here, since type is NodeBase, there is no sharing ownership with trajectory_, which has type TrajectoryN, so the program crashes at the end: two shared pointers, pointing to the same object but each one with use_count()=1"
+    cout << "========================================================" << endl;        
     
-    cout << endl << "End Node class test" << endl;
+    cout << endl << "End NodeLinked test" << endl;
     return 0;
 }
 

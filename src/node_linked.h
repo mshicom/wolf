@@ -33,18 +33,19 @@
 template<class UpperType, class LowerType>
 class NodeLinked : public NodeBase
 {
-    protected:
+    public: 
         typedef UpperType* UpperNodePtr;
+        
+    protected:        
         typedef LowerType* LowerNodePtr;
         typedef std::shared_ptr<UpperType> UpperNodeShPtr;		
         typedef std::shared_ptr<LowerType> LowerNodeShPtr;
         typedef std::list<LowerNodeShPtr> LowerNodeList;
         typedef typename LowerNodeList::iterator LowerNodeIter;
 
-    private:
+    protected:
         NodeLocation location_;
-        //UpperNodePtr up_node_ptr_; //TODO: why is it not a shared_ptr ??
-        UpperNodeShPtr up_node_sh_ptr_; 
+        UpperNodePtr up_node_ptr_; //it is not a shared pointer because the ownership of upper node should not be shared by lower nodes
         LowerNodeList down_node_list_;
 
     public:
@@ -61,14 +62,14 @@ class NodeLinked : public NodeBase
          * Constructor specifying up node
 		 * 
          */		
-        NodeLinked(const NodeLocation _loc, const std::string& _label, const UpperNodeShPtr& _up_node_sh_ptr);
+        NodeLinked(const NodeLocation _loc, const std::string& _label, const UpperNodePtr& _up_node_ptr);
 
         /** \brief Default destructor
          *
          * Default destructor
 		 * 
          */		
-        ~NodeLinked();
+        virtual ~NodeLinked();
 
         /** \brief Checks if node is on the top of Wolf tree
          *
@@ -89,7 +90,7 @@ class NodeLinked : public NodeBase
          * Sets link to up node
          *
          */
-        void linkToUpperNode(const UpperNodeShPtr& _pptr);
+        void linkToUpperNode(UpperNodePtr _pptr);
 
         /** \brief Clears link to up node
          *
@@ -104,7 +105,7 @@ class NodeLinked : public NodeBase
          * Throw if parent nullptr.
          *
          */
-        const UpperNodeShPtr upperNodePtr() const;
+        const UpperNodePtr upperNodePtr() const;
 
         /** \brief Gets a reference to parent.
          *
@@ -119,7 +120,7 @@ class NodeLinked : public NodeBase
          * Adds a down node 
          *
          */		
-        void addDownNode(const LowerNodeShPtr& _ptr);
+        void addDownNode(LowerNodeShPtr& _ptr);
 		
         /** \brief Gets a reference to down node list
          *
@@ -154,6 +155,7 @@ class NodeLinked : public NodeBase
         /** \brief Gets a pointer to the tree top node
          * 
          * Gets a pointer to the tree top node
+         * TODO: Review if it could return a pointer to a derived class instead of NodeBase
          * 
          **/
         NodeBase* getTop();
@@ -181,10 +183,19 @@ class NodeLinked : public NodeBase
          */
         virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
 
+        /** \brief Prints upper node info
+         *
+         * Prints upper node info
+         * 
+         **/
         void printUpper(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
 
+        /** \brief Prints recursively lower node info
+         *
+         * Prints recursively lower node info
+         * 
+         **/        
         void printLower(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
-
 };
 
 //////////////////////////////////////////
@@ -194,22 +205,23 @@ template<class UpperType, class LowerType>
 NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _label) :
         NodeBase(_label), //
         location_(_loc), //
-        up_node_sh_ptr_(nullptr)
+        up_node_ptr_(nullptr)
 {
 }
 
 template<class UpperType, class LowerType>
-NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _label, const UpperNodeShPtr& _up_node_sh_ptr) :
+NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _label, const UpperNodePtr& _up_node_ptr) :
         NodeBase(_label), //
         location_(_loc)
 {
-    linkToUpperNode(_up_node_sh_ptr);
+    linkToUpperNode(_up_node_ptr);
 }
 
 template<class UpperType, class LowerType>
 NodeLinked<UpperType, LowerType>::~NodeLinked()
 {
-    //
+    up_node_ptr_ = nullptr;
+    down_node_list_.clear();
 }
 
 template<class UpperType, class LowerType>
@@ -231,40 +243,42 @@ inline bool NodeLinked<UpperType, LowerType>::isBottom() const
 }
 
 template<class UpperType, class LowerType>
-inline void NodeLinked<UpperType, LowerType>::linkToUpperNode(const UpperNodeShPtr& _pptr)
+inline void NodeLinked<UpperType, LowerType>::linkToUpperNode(UpperNodePtr _pptr)
 {
     if (isTop())
-        up_node_sh_ptr_ = nullptr;
+        up_node_ptr_ = nullptr;
     else
-        //up_node_sh_ptr_ = _pptr.get();
-        up_node_sh_ptr_ = _pptr;
+        up_node_ptr_ = _pptr;
 }
 
 template<class UpperType, class LowerType>
 inline void NodeLinked<UpperType, LowerType>::unlinkFromUpperNode()
 {
-    up_node_sh_ptr_ = nullptr;
+    up_node_ptr_ = nullptr;
 }
 
 template<class UpperType, class LowerType>
-inline const typename NodeLinked<UpperType, LowerType>::UpperNodeShPtr NodeLinked<UpperType, LowerType>::upperNodePtr() const
+inline const typename NodeLinked<UpperType, LowerType>::UpperNodePtr NodeLinked<UpperType, LowerType>::upperNodePtr() const
 {
-    assert(up_node_sh_ptr_ != nullptr);
-    return up_node_sh_ptr_;
+    assert(up_node_ptr_ != nullptr);
+    return up_node_ptr_;
 }
 
 template<class UpperType, class LowerType>
 inline const UpperType& NodeLinked<UpperType, LowerType>::upperNode() const
 {
-    assert(up_node_sh_ptr_ != nullptr);
-    return *up_node_sh_ptr_;
+    assert(up_node_ptr_ != nullptr);
+    return *up_node_ptr_;
 }
 
 template<class UpperType, class LowerType>
-inline void NodeLinked<UpperType, LowerType>::addDownNode(const LowerNodeShPtr& _ptr)
+inline void NodeLinked<UpperType, LowerType>::addDownNode(LowerNodeShPtr& _ptr)
 {
     if (!isBottom())
+    {
         down_node_list_.push_back(_ptr);
+        down_node_list_.back()->linkToUpperNode( (typename LowerType::UpperNodePtr)(this) );
+    }
 }
 
 template<class UpperType, class LowerType>
@@ -302,9 +316,10 @@ inline void NodeLinked<UpperType, LowerType>::removeDownNode(const LowerNodeIter
 template<class UpperType, class LowerType>
 NodeBase* NodeLinked<UpperType, LowerType>::getTop()
 {
-    if (location_ == TOP) return (NodeBase*)this;
+    if (location_ == TOP) 
+        return this;
     else
-        return up_node_sh_ptr_->getTop();
+        return up_node_ptr_->getTop();
 }
 
 template<class UpperType, class LowerType>
@@ -312,7 +327,7 @@ void NodeLinked<UpperType, LowerType>::print(unsigned int _ntabs, std::ostream& 
 {
     printSelf(_ntabs, _ost); //one line
     
-    if ((location_ != TOP) && (up_node_sh_ptr_ != nullptr))
+    if ((location_ != TOP) && (up_node_ptr_ != nullptr))
     {
         printUpper(_ntabs, _ost); 
     }
@@ -348,7 +363,7 @@ template<class UpperType, class LowerType>
 void NodeLinked<UpperType, LowerType>::printUpper(unsigned int _ntabs, std::ostream& _ost) const
 {
     printTabs(_ntabs);
-    _ost << "\tUpper Node   --> " << up_node_sh_ptr_->nodeId() << std::endl;
+    _ost << "\tUpper Node   --> " << up_node_ptr_->nodeId() << std::endl;
 }
 
 template<class UpperType, class LowerType>
