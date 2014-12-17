@@ -1030,11 +1030,10 @@ int main(int argc, char** argv)
     ceres_options.max_num_iterations = 100;
     CeresWrapper ceres_wrapper(ceres_options);
 
-    VectorXs state_(4);
-    VectorXs actualState_(4);
-    actualState_ << 0, 0, 0, 1; // initial pose
+    VectorXs state_(3);
+    VectorXs actualState_(3);
+    actualState_ << 1,2,3; // initial pose
 	std::vector<WolfScalar*> frame_ptr_vector_;
-	//std::vector<StateUnitBase*> state_unit_ptr_vector_;
 	for (uint st=0; st < N_STATES; st++)
 	{
 		Vector2s actualDisplacement;
@@ -1043,78 +1042,39 @@ int main(int argc, char** argv)
 		if (st>0)
 		{
 			// NEW STATE
-			// Actual odometry
-			actualDisplacement << 1 + distribution_odometry(generator), 0.1 + distribution_odometry(generator);
-			actualRotation = 0.1 * M_PI + distribution_odometry(generator);
-			std::cout << "lastActualState : " << actualState_.tail(4).transpose() << std::endl << std::endl;
-			std::cout << "actualDisplacement : " << actualDisplacement.transpose() << std::endl << std::endl;
-			std::cout << "actualRotation : " << actualRotation << std::endl << std::endl;
 			// Actual state
-			Vector4s newActualState;
-			Vector4s lastActualState = actualState_.tail(4);
-			Matrix2s R; // Rotation matrix of the angle of the first pose
-			R << lastActualState(2), lastActualState(3), -lastActualState(3), lastActualState(2);
-			newActualState.head(2) = lastActualState.head(2) + R * actualDisplacement;
-			newActualState(2) = lastActualState(2) * cos(actualRotation) - lastActualState(3) * sin(actualRotation);
-		    newActualState(3) = lastActualState(2) * sin(actualRotation) + lastActualState(3) * cos(actualRotation);
-			actualState_.resize(state_.size()+4);
-			actualState_.tail(4) = newActualState;
-			actualState_.tail(2) /= state_.tail(2).norm(); //normalize
+			Vector3s newActualState;
+			newActualState = actualState_.tail(3) + Vector3s::Ones();
 			std::cout << "newActualState : " << newActualState.transpose() << std::endl << std::endl;
 		}
 		// state resize
 		if (st>0)
 			state_.resize(state_.size()+4);
-		state_.tail(4).setRandom(); // initialize with random values
-		state_.tail(2) /= state_.tail(2).norm(); //normalize
+		state_.tail(3).setRandom(); // initialize with random values
 		std::cout << "resized state_ : " << std::endl << state_.transpose() << std::endl << std::endl;
 
 		// FRAME
-		frame_ptr_vector_.push_back(state_.data() + state_.size() - 4);
+		frame_ptr_vector_.push_back(state_.data() + state_.size() - 3);
 		std::cout << "frame added, size = " << frame_ptr_vector_.size() << std::endl;
 
 		// STATE UNITS
 		// position
-		StateUnitBase* pPrt = new StateUnitPoint2D(frame_ptr_vector_.back());
+		StateUnitBase* pPrt = new StateUnitPoint3D(frame_ptr_vector_.back());
 		ceres_wrapper.addStateUnit(pPrt);
-		// orientation
-		StateUnitBase* caPrt = new StateUnitComplexAngle(frame_ptr_vector_.back());
-		ceres_wrapper.addStateUnit(caPrt);
 
-		// CORRESPONDENCE ODOMETRY
-		if (st > 0)
-		{
-			Correspondence2DOdometry* corrOdomPtr = new Correspondence2DOdometry(frame_ptr_vector_.at(st-1),frame_ptr_vector_.back());
-			// Invent measurement
-			Vector3s actualMeasurement;
-			actualMeasurement.head(2) = actualDisplacement;
-			actualMeasurement(2) = actualRotation;
-			corrOdomPtr->inventMeasurement(actualMeasurement,generator,distribution_odometry);
-			// Add correspondence
-			ceres_wrapper.addCorrespondence(corrOdomPtr);
-		}
+		// CORRESPONDENCE GPS (2D)
+		CorrespondenceGPS2D* corrGPSPtr = new CorrespondenceGPS2D(frame_ptr_vector_.back());
+		// Invent measurement
+		corrGPSPtr->inventMeasurement(actualState_.tail(3).head(2),generator,distribution_GPS);
+		// Add correspondence
+		ceres_wrapper.addCorrespondence(corrGPSPtr);
 
-//		// CORRESPONDENCE RANGE ONLY
-//		for (uint st_from=0; st_from < st; st_from++)
-//		{
-//			//std::cout << "Range only from " << st_from << " (" << st_from*DIM << "-" << st_from*DIM+DIM-1 << ")";
-//			//std::cout << " to " << st_to << " (" << st_to*DIM << "-" << st_to*DIM+DIM-1 << ")" << std::endl;
-//			Correspondence2DRange* corrRangeOnlyPtr = new Correspondence2DRange(frame_ptr_vector_.at(st_from),frame_ptr_vector_.back());
-//			// Invent measurement
-//			Map<Vector2s> actualFrom(frame_ptr_vector_.at(st_from));
-//			Map<Vector2s> actualTo(frame_ptr_vector_.back());
-//			VectorXs actualMeasurement = ((actualFrom - actualTo).transpose() * (actualFrom - actualTo)).cwiseSqrt();
-//			corrRangeOnlyPtr->inventMeasurement(actualMeasurement,generator,distribution_range_only);
-//			// Add correspondence
-//			ceres_wrapper.addCorrespondence(corrRangeOnlyPtr);
-//		}
-//
-//		// CORRESPONDENCE GPS (2D)
-//		CorrespondenceGPS2D* corrGPSPtr = new CorrespondenceGPS2D(frame_ptr_vector_.back());
-//		// Invent measurement
-//		corrGPSPtr->inventMeasurement(actualState_.tail(4).head(2),generator,distribution_GPS);
-//		// Add correspondence
-//		ceres_wrapper.addCorrespondence(corrGPSPtr);
+		// CORRESPONDENCE GPS (2D)
+		CorrespondenceGPS3D* corrGPS3Ptr = new CorrespondenceGPS3D(frame_ptr_vector_.back());
+		// Invent measurement
+		corrGPS3Ptr->inventMeasurement(actualState_.tail(3),generator,distribution_GPS);
+		// Add correspondence
+		ceres_wrapper.addCorrespondence(corrGPS3Ptr);
 
 		// SOLVE CERES PROBLEM
 		if (st > 0)
