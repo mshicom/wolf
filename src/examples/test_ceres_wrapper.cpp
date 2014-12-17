@@ -50,12 +50,21 @@ class StateUnitBase
 		StateUnitBase(VectorXs& _st_remote, const unsigned int _idx) :
 			state_ptr_(_st_remote.data() + _idx)
 		{
+			std::cout << "StateUnitBase created!" << std::endl;
 		}
 
 		StateUnitBase(WolfScalar* _st_ptr) :
 			state_ptr_(_st_ptr)
 		{
+			std::cout << "StateUnitBase created!" << std::endl;
 		}
+
+		StateUnitBase(StateUnitBase& _st) :
+			state_ptr_(_st.state_ptr_)
+		{
+			std::cout << "StateUnitBase copied!" << std::endl;
+		}
+
 
 		virtual ~StateUnitBase()
 		{
@@ -77,7 +86,7 @@ class StateUnitPoint2D: public StateUnitBase
 		{
 		}
 
-	StateUnitPoint2D(WolfScalar* _st_ptr) :
+		StateUnitPoint2D(WolfScalar* _st_ptr) :
 			StateUnitBase(_st_ptr)
 		{
 		}
@@ -121,11 +130,13 @@ class StateUnitComplexAngle: public StateUnitBase
 		StateUnitComplexAngle(VectorXs& _st_remote, const unsigned int _idx) :
 			StateUnitBase(_st_remote, _idx)
 		{
+			std::cout << "StateUnitComplexAngle created!" << std::endl;
 		}
 
 		StateUnitComplexAngle(WolfScalar* _st_ptr) :
 			StateUnitBase(_st_ptr)
 		{
+			std::cout << "StateUnitComplexAngle created!" << std::endl;
 		}
 
 		virtual ~StateUnitComplexAngle()
@@ -754,20 +765,17 @@ class Correspondence2DOdometry : public CorrespondenceSparse<3,4,4>
 class WolfProblem
 {
     protected:
-        //Map<VectorXs> state_; //state storage
-        std::list<StateUnitBase*> state_units_;
+        std::vector<StateUnitBase*> state_units_;
         std::list<CorrespondenceBase*> correspondences_;
 
     public: 
         WolfProblem(WolfScalar* _st_ptr, unsigned int _size) :
-        //	state_(_st_ptr,_size),
 			state_units_(0),
 			correspondences_(0)
         {
         }
 
         WolfProblem(VectorXs& _st) :
-        //	state_(_st),
 			state_units_(0),
 			correspondences_(0)
         {
@@ -782,11 +790,6 @@ class WolfProblem
         virtual ~WolfProblem()
         {
         }
-        
-        //WolfScalar *getPrior()
-		//{
-		//	return state_.data();
-		//}
 
         std::list<CorrespondenceBase*> getCorrespondenceList()
         {
@@ -810,23 +813,21 @@ class WolfProblem
 
         void addStateUnit(StateUnitBase* _stUnitPtr)
         {
+        	std::cout << "Adding state unit to the wolf list..." << std::endl;
         	state_units_.push_back(_stUnitPtr);
+        	std::cout << "Added!" << std::endl;
         }
 
-        void removeStateUnit(StateUnitBase* _stUnitPtr)
-        {
-        	state_units_.remove(_stUnitPtr);
-        }
-
-        //void print()
-        //{
-        //    std::cout << "state_ : " << std::endl << state_.transpose() << std::endl << std::endl;
-        //}
+//        void removeStateUnit(StateUnitBase* _stUnitPtr)
+//        {
+//        	state_units_.remove(_stUnitPtr);
+//        }
 };
 
 class CeresWrapper
 {
 	protected:
+		WolfProblem* wolf_problem_;
 		struct CorrespondenceWrapper
 		{
 			CorrespondenceBase* corr_ptr_;
@@ -847,6 +848,13 @@ class CeresWrapper
 
 	public:
 		CeresWrapper(const ceres::Solver::Options& _ceres_options) :
+			ceres_options_(_ceres_options)
+		{
+			wolf_problem_= new WolfProblem;
+		}
+
+		CeresWrapper(const ceres::Solver::Options& _ceres_options, WolfProblem* _wolf_problem) :
+			wolf_problem_(_wolf_problem),
 			ceres_options_(_ceres_options)
 		{
 		}
@@ -878,6 +886,8 @@ class CeresWrapper
 
 		void addCorrespondence(CorrespondenceBase* _corr_ptr)
 		{
+			std::cout << "Adding a Correspondence to wolf_problem..." << std::endl;
+			wolf_problem_->addCorrespondence(_corr_ptr);
 			std::cout << "Adding a Correspondence to the List..." << std::endl;
 			ceres::CostFunction* cost_function_ptr;
 			switch (_corr_ptr->getType())
@@ -918,31 +928,33 @@ class CeresWrapper
 			correspondence_list_.push_back(CorrespondenceWrapper{_corr_ptr, cost_function_ptr, _corr_ptr->getBlockPtrVector()});
 		}
 
-		void addLocalParametrization(StateUnitBase* _st_ptr)
+		void addStateUnit(StateUnitBase* _st_ptr)
 		{
-			std::cout << "Adding a Local Parametrization to the List..." << std::endl;
-			ceres::LocalParameterization* local_parametrization_ptr;
+			std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
+			//wolf_problem_->addStateUnit(_st_ptr);
 			switch (_st_ptr->getParametrizationType())
 			{
 				case COMPLEX_ANGLE:
 				{
-					local_parametrization_ptr = new ComplexAngleParameterization;
+					std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
+					local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, new ComplexAngleParameterization});
 					break;
 				}
 				case QUATERNION:
 				{
-					local_parametrization_ptr = new EigenQuaternionParameterization;
+					std::cout << "Adding Quaternion Local Parametrization to the List... " << std::endl;
+					local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, new EigenQuaternionParameterization});
 					break;
 				}
 				case NONE:
 				{
-					std::cout << "None" << std::endl;
+					std::cout << "No Local Parametrization to be added" << std::endl;
 					break;
 				}
 				default:
-					std::cout << "Unknown correspondence type!" << std::endl;
+					std::cout << "Unknown  Local Parametrization type!" << std::endl;
 			}
-			local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, local_parametrization_ptr});
+
 		}
 
 		void addResidualBlocks()
@@ -977,12 +989,17 @@ class CeresWrapper
 		void applyLocalParametrizations()
 		{
 			std::cout << "Applying local parametrizations..." << std::endl;
-			//int i = 0;
+			int i = 0;
 			for (std::list<LocalParametrizationWrapper>::iterator it=local_parametrization_list_.begin(); it!=local_parametrization_list_.end(); ++it)
 			{
-				//std::cout << i++ << " block" << std::endl;
-				ceres_problem_.SetParameterization(it->st_ptr_->getPtr(), it->local_parametrization_ptr_);
+				if (it->st_ptr_->getParametrizationType() != NONE)
+				{
+					ceres_problem_.SetParameterization(it->st_ptr_->getPtr(), it->local_parametrization_ptr_);
+					std::cout << i << "th parametrization" << std::endl;
+				}
+				i++;
 			}
+			std::cout << "Local parametrizations applied!" << std::endl;
 		}
 };
 
@@ -992,12 +1009,7 @@ int main(int argc, char** argv)
 {
     std::cout << " ========= 2D Robot with odometry, GPS and Range only between poses ===========" << std::endl << std::endl;
     
-    //dimension 
-    const unsigned int DIM = 3;
     const unsigned int N_STATES = 20;
-    const unsigned int STATE_DIM = DIM * N_STATES;
-    const unsigned int N_MEAS_A = 10;
-    const unsigned int N_MEAS_B = 1;
     // TODO: incorporar weights a les funcions residu (via LossFunction o directament a operador())
     //const double w_A = 1;
     //const double w_B = 10;
@@ -1018,25 +1030,25 @@ int main(int argc, char** argv)
     ceres_options.max_num_iterations = 100;
     CeresWrapper ceres_wrapper(ceres_options);
 
-    //wolf problem
-	WolfProblem* wolf_problem = new WolfProblem();
-
     VectorXs state_(4);
     VectorXs actualState_(4);
-    state_ << 0, 0, 0, 1; // initial pose
+    actualState_ << 0, 0, 0, 1; // initial pose
 	std::vector<WolfScalar*> frame_ptr_vector_;
-	std::vector<StateUnitBase*> state_unit_ptr_vector_;
+	//std::vector<StateUnitBase*> state_unit_ptr_vector_;
 	for (uint st=0; st < N_STATES; st++)
 	{
 		Vector2s actualDisplacement;
-		double actualRotation;
+		WolfScalar actualRotation;
 		std::cout << " ========= STEP " << st << "===========" << std::endl << std::endl;
 		if (st>0)
 		{
 			// NEW STATE
 			// Actual odometry
-			actualDisplacement << rand(), rand()*0.1;
-			actualRotation = (rand()-0.5) * M_PI;
+			actualDisplacement << 1 + distribution_odometry(generator), 0.1 + distribution_odometry(generator);
+			actualRotation = 0.1 * M_PI + distribution_odometry(generator);
+			std::cout << "lastActualState : " << actualState_.tail(4).transpose() << std::endl << std::endl;
+			std::cout << "actualDisplacement : " << actualDisplacement.transpose() << std::endl << std::endl;
+			std::cout << "actualRotation : " << actualRotation << std::endl << std::endl;
 			// Actual state
 			Vector4s newActualState;
 			Vector4s lastActualState = actualState_.tail(4);
@@ -1048,7 +1060,7 @@ int main(int argc, char** argv)
 			actualState_.resize(state_.size()+4);
 			actualState_.tail(4) = newActualState;
 			actualState_.tail(2) /= state_.tail(2).norm(); //normalize
-
+			std::cout << "newActualState : " << newActualState.transpose() << std::endl << std::endl;
 		}
 		// state resize
 		if (st>0)
@@ -1059,23 +1071,21 @@ int main(int argc, char** argv)
 
 		// FRAME
 		frame_ptr_vector_.push_back(state_.data() + state_.size() - 4);
+		std::cout << "frame added, size = " << frame_ptr_vector_.size() << std::endl;
 
 		// STATE UNITS
 		// position
-		state_unit_ptr_vector_.push_back(new StateUnitPoint2D(frame_ptr_vector_.back()));
-		wolf_problem->addStateUnit(state_unit_ptr_vector_.back());
-		ceres_wrapper.addLocalParametrization(state_unit_ptr_vector_.back());
+		StateUnitBase* pPrt = new StateUnitPoint2D(frame_ptr_vector_.back());
+		ceres_wrapper.addStateUnit(pPrt);
 		// orientation
-		state_unit_ptr_vector_.push_back(new StateUnitComplexAngle(frame_ptr_vector_.back() + 2));
-		wolf_problem->addStateUnit(state_unit_ptr_vector_.back());
-		ceres_wrapper.addLocalParametrization(state_unit_ptr_vector_.back());
+		StateUnitBase* caPrt = new StateUnitComplexAngle(frame_ptr_vector_.back());
+		ceres_wrapper.addStateUnit(caPrt);
 
 		// CORRESPONDENCE GPS (2D)
 		CorrespondenceGPS2D* corrGPSPtr = new CorrespondenceGPS2D(frame_ptr_vector_.back());
 		// Invent measurement
 		corrGPSPtr->inventMeasurement(actualState_.tail(4).head(2),generator,distribution_GPS);
 		// Add correspondence
-		wolf_problem->addCorrespondence(corrGPSPtr);
 		ceres_wrapper.addCorrespondence(corrGPSPtr);
 
 		// CORRESPONDENCE ODOMETRY
@@ -1088,7 +1098,6 @@ int main(int argc, char** argv)
 			actualMeasurement(2) = actualRotation;
 			corrOdomPtr->inventMeasurement(actualMeasurement,generator,distribution_odometry);
 			// Add correspondence
-			wolf_problem->addCorrespondence(corrOdomPtr);
 			ceres_wrapper.addCorrespondence(corrOdomPtr);
 		}
 
@@ -1104,15 +1113,17 @@ int main(int argc, char** argv)
 			VectorXs actualMeasurement = ((actualFrom - actualTo).transpose() * (actualFrom - actualTo)).cwiseSqrt();
 			corrRangeOnlyPtr->inventMeasurement(actualMeasurement,generator,distribution_range_only);
 			// Add correspondence
-			wolf_problem->addCorrespondence(corrRangeOnlyPtr);
 			ceres_wrapper.addCorrespondence(corrRangeOnlyPtr);
 		}
 
 		// SOLVE CERES PROBLEM
-		ceres_wrapper.solve(true);
-		std::cout << "state_ : " << std::endl << state_.transpose() << std::endl;
-		std::cout << "actualState_ : " << std::endl << actualState_.transpose() << std::endl;
-		std::cout << "error : " << std::endl << (actualState_ - state_).transpose() << std::endl << std::endl;
+		if (st > 0)
+		{
+			ceres_wrapper.solve(true);
+			std::cout << "state_ : " << std::endl << state_.transpose() << std::endl;
+			std::cout << "actualState_ : " << std::endl << actualState_.transpose() << std::endl;
+			std::cout << "error : " << std::endl << (actualState_ - state_).transpose() << std::endl << std::endl;
+		}
 	}
 
 //    // CORRESPONDENCES
@@ -1153,9 +1164,6 @@ int main(int argc, char** argv)
 //
 //	// run Ceres Solver
 //	ceres_wrapper.solve(true);
-
-    //clean
-    delete wolf_problem;
     
     //end Wolf iteration
     std::cout << " ========= END ===========" << std::endl << std::endl;
