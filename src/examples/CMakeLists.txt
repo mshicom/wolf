@@ -22,6 +22,14 @@ TARGET_LINK_LIBRARIES(test_ceres_wrapper_jet_2_sensors ${CERES_LIBRARIES} ${PROJ
 ADD_EXECUTABLE(test_ceres_wrapper test_ceres_wrapper.cpp)
 TARGET_LINK_LIBRARIES(test_ceres_wrapper ${CERES_LIBRARIES} ${PROJECT_NAME})
 
-# jet test different block sizes
+# jet test different residual block sizes
 ADD_EXECUTABLE(test_ceres_wrapper_block_sizes test_ceres_wrapper_block_sizes.cpp)
 TARGET_LINK_LIBRARIES(test_ceres_wrapper_block_sizes ${CERES_LIBRARIES} ${PROJECT_NAME})
+
+# jet test different residual block and local parametrization sizes
+ADD_EXECUTABLE(test_ceres_wrapper_residual_parametrization test_ceres_wrapper_residual_parametrization.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_wrapper_residual_parametrization ${CERES_LIBRARIES} ${PROJECT_NAME})
+
+# jet test different bla
+ADD_EXECUTABLE(test_ceres_wrapper_states test_ceres_wrapper_states.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})

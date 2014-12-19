@@ -124,139 +124,6 @@ class StateUnitPoint3D: public StateUnitBase
 		}
 };
 
-class StateUnitComplexAngle: public StateUnitBase
-{
-	public:
-		StateUnitComplexAngle(VectorXs& _st_remote, const unsigned int _idx) :
-			StateUnitBase(_st_remote, _idx)
-		{
-			std::cout << "StateUnitComplexAngle created!" << std::endl;
-		}
-
-		StateUnitComplexAngle(WolfScalar* _st_ptr) :
-			StateUnitBase(_st_ptr)
-		{
-			std::cout << "StateUnitComplexAngle created!" << std::endl;
-		}
-
-		virtual ~StateUnitComplexAngle()
-		{
-		}
-
-		virtual parametrizationType getParametrizationType() const
-		{
-			return COMPLEX_ANGLE;
-		}
-};
-
-class StateUnitQuaternion: public StateUnitBase
-{
-	public:
-		StateUnitQuaternion(VectorXs& _st_remote, const unsigned int _idx) :
-			StateUnitBase(_st_remote, _idx)
-		{
-		}
-
-		StateUnitQuaternion(WolfScalar* _st_ptr) :
-			StateUnitBase(_st_ptr)
-		{
-		}
-
-		virtual ~StateUnitQuaternion()
-		{
-		}
-
-		virtual parametrizationType getParametrizationType() const
-		{
-			return QUATERNION;
-		}
-};
-
-class ComplexAngleParameterization : public ceres::LocalParameterization
-{
-	public:
-		virtual ~ComplexAngleParameterization()
-		{
-		}
-
-		virtual bool Plus(const double* x_raw, const double* delta_raw, double* x_plus_delta_raw) const
-		{
-			x_plus_delta_raw[0] = x_raw[0] * cos(delta_raw[0]) - x_raw[1] * sin(delta_raw[0]);
-			x_plus_delta_raw[1] = x_raw[1] * cos(delta_raw[0]) + x_raw[0] * sin(delta_raw[0]);
-
-			//normalize
-			double norm = sqrt(x_plus_delta_raw[0] * x_plus_delta_raw[0] + x_plus_delta_raw[1] * x_plus_delta_raw[1]);
-			std::cout << "(before normalization) norm = " << norm << std::endl;
-			x_plus_delta_raw[0] /= norm;
-			x_plus_delta_raw[1] /= norm;
-
-			return true;
-		}
-
-		virtual bool ComputeJacobian(const double* x, double* jacobian) const
-		{
-			jacobian[0] = -x[1];
-			jacobian[1] =  x[0];
-			return true;
-		}
-
-		virtual int GlobalSize() const
-		{
-			return 2;
-		}
-
-		virtual int LocalSize() const
-		{
-			return 1;
-		}
-};
-
-class EigenQuaternionParameterization : public ceres::LocalParameterization
-{
-	public:
-		virtual ~EigenQuaternionParameterization()
-		{
-		}
-
-		virtual bool Plus(const double* x_raw, const double* delta_raw, double* x_plus_delta_raw) const
-		{
-			const Eigen::Map<const Eigen::Quaterniond> x(x_raw);
-			const Eigen::Map<const Eigen::Vector3d > delta(delta_raw);
-			Eigen::Map<Eigen::Quaterniond> x_plus_delta(x_plus_delta_raw);
-			const double delta_norm = delta.norm();
-			if ( delta_norm > 0.0 )
-			{
-				const double sin_delta_by_delta = sin(delta_norm) / delta_norm;
-				Eigen::Quaterniond tmp( cos(delta_norm), sin_delta_by_delta*delta[0], sin_delta_by_delta*delta[1], sin_delta_by_delta*delta[2] );
-				x_plus_delta = tmp*x;
-			}
-			else
-			{
-				x_plus_delta = x;
-			}
-			return true;
-		}
-
-		virtual bool ComputeJacobian(const double* x, double* jacobian) const
-		{
-			jacobian[0] = x[3]; jacobian[1] = x[2]; jacobian[2] = -x[1]; // NOLINT x
-			jacobian[3] = -x[2]; jacobian[4] = x[3]; jacobian[5] = x[0]; // NOLINT y
-			jacobian[6] = x[1]; jacobian[7] = -x[0]; jacobian[8] = x[3]; // NOLINT z
-			jacobian[9] = -x[0]; jacobian[10] = -x[1]; jacobian[11] = -x[2]; // NOLINT w
-			return true;
-		}
-
-		virtual int GlobalSize() const
-		{
-			return 4;
-		}
-
-		virtual int LocalSize() const
-		{
-			return 3;
-		}
-};
-
 class CorrespondenceBase
 {
 	protected:
@@ -537,235 +404,10 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 		}
 };
 
-class Correspondence2DRange : public CorrespondenceSparse<1,2,2>
-{
-	public:
-		static const unsigned int N_BLOCKS = 2;
-
-		Correspondence2DRange(WolfScalar** _blockPtrs) :
-			CorrespondenceSparse(_blockPtrs)
-		{
-		}
-
-		Correspondence2DRange(WolfScalar* _block1Ptr, WolfScalar* _block2Ptr) :
-			CorrespondenceSparse(_block1Ptr, _block2Ptr)
-		{
-		}
-
-		Correspondence2DRange(StateUnitBase* _state1Ptr, StateUnitBase* _state2Ptr) :
-			CorrespondenceSparse(_state1Ptr, _state2Ptr)
-		{
-		}
-
-		~Correspondence2DRange()
-		{
-		}
-
-        template <typename T>
-        bool operator()(const T* const _x1, const T* const _x2, T* _residuals) const
-        {
-        	// print inputs
-        	// std::cout << "_x1 = ";
-        	// for (int i=0; i < this->block1Size; i++)
-        	// 	std::cout << _x1[i] << " ";
-        	// std::cout << std::endl;
-        	// std::cout << "_x2 = ";
-        	// for (int i=0; i < this->block2Size; i++)
-        	// 	std::cout << _x2[i] << " ";
-        	// std::cout << std::endl;
-        	// std::cout << "measurement = ";
-        	// for (int i=0; i < this->measurementSize; i++)
-        	// 	std::cout << this->measurement_(i) << " ";
-        	// std::cout << std::endl;
-
-        	// Remap the vehicle state to the const evaluation point
-			Map<const Matrix<T,Dynamic,1>> x1_map_const(_x1, this->block1Size);
-			Map<const Matrix<T,Dynamic,1>> x2_map_const(_x2, this->block2Size);
-
-			// Map residuals vector to matrix (with sizes of the measurements matrix)
-			Map<Matrix<T,Dynamic,1>> mapped_residuals(_residuals, this->measurementSize);
-
-			// Compute error or residuals
-			Matrix<T,Dynamic,1> expected_measurement = ((x1_map_const - x2_map_const).transpose() * (x1_map_const - x2_map_const)).cwiseSqrt();
-			VectorXd meas = this->measurement_;
-			mapped_residuals = (meas).cast<T>() - expected_measurement;
-
-			// print outputs
-			// std::cout << "expected    = ";
-			// for (int i=0; i < this->measurementSize; i++)
-			// 	std::cout << expected_measurement(i) << " ";
-			// std::cout << std::endl;
-			// std::cout << "_residuals  = ";
-			// for (int i=0; i < this->measurementSize; i++)
-			// 	std::cout << _residuals[i] << " ";
-			// std::cout << std::endl << std::endl;
-
-			return true;
-        }
-
-        virtual correspondenceType getType() const
-        {
-        	return CORR_2D_RANGE;
-        }
-};
-
-class Correspondence3DRange : public CorrespondenceSparse<1,3,3>
-{
-	public:
-		static const unsigned int N_BLOCKS = 2;
-
-		Correspondence3DRange(WolfScalar** _blockPtrs) :
-			CorrespondenceSparse(_blockPtrs)
-		{
-		}
-
-		Correspondence3DRange(WolfScalar* _block1Ptr, WolfScalar* _block2Ptr) :
-			CorrespondenceSparse(_block1Ptr, _block2Ptr)
-		{
-		}
-
-		Correspondence3DRange(StateUnitBase* _state1Ptr, StateUnitBase* _state2Ptr) :
-			CorrespondenceSparse(_state1Ptr, _state2Ptr)
-		{
-		}
-
-		~Correspondence3DRange()
-		{
-		}
-
-        template <typename T>
-        bool operator()(const T* const _x1, const T* const _x2, T* _residuals) const
-        {
-        	// print inputs
-        	// std::cout << "_x1 = ";
-        	// for (int i=0; i < this->block1Size; i++)
-        	// 	std::cout << _x1[i] << " ";
-        	// std::cout << std::endl;
-        	// std::cout << "_x2 = ";
-        	// for (int i=0; i < this->block2Size; i++)
-        	// 	std::cout << _x2[i] << " ";
-        	// std::cout << std::endl;
-        	// std::cout << "measurement = ";
-        	// for (int i=0; i < this->measurementSize; i++)
-        	// 	std::cout << this->measurement_(i) << " ";
-        	// std::cout << std::endl;
-
-        	// Remap the vehicle state to the const evaluation point
-			Map<const Matrix<T,Dynamic,1>> x1_map_const(_x1, this->block1Size);
-			Map<const Matrix<T,Dynamic,1>> x2_map_const(_x2, this->block2Size);
-
-			// Map residuals vector to matrix (with sizes of the measurements matrix)
-			Map<Matrix<T,Dynamic,1>> mapped_residuals(_residuals, this->measurementSize);
-
-			// Compute error or residuals
-			Matrix<T,Dynamic,1> expected_measurement = ((x1_map_const - x2_map_const).transpose() * (x1_map_const - x2_map_const)).cwiseSqrt();
-			VectorXd meas = this->measurement_;
-			mapped_residuals = (meas).cast<T>() - expected_measurement;
-
-			// print outputs
-			// std::cout << "expected    = ";
-			// for (int i=0; i < this->measurementSize; i++)
-			// 	std::cout << expected_measurement(i) << " ";
-			// std::cout << std::endl;
-			// std::cout << "_residuals  = ";
-			// for (int i=0; i < this->measurementSize; i++)
-			// 	std::cout << _residuals[i] << " ";
-			// std::cout << std::endl << std::endl;
-
-			return true;
-        }
-
-        virtual correspondenceType getType() const
-        {
-        	return CORR_3D_RANGE;
-        }
-};
-
-class Correspondence2DOdometry : public CorrespondenceSparse<3,4,4>
-{
-	public:
-		static const unsigned int N_BLOCKS = 2;
-
-		Correspondence2DOdometry(WolfScalar** _blockPtrs) :
-			CorrespondenceSparse(_blockPtrs)
-		{
-		}
-
-		Correspondence2DOdometry(WolfScalar* _block1Ptr, WolfScalar* _block2Ptr) :
-			CorrespondenceSparse(_block1Ptr, _block2Ptr)
-		{
-		}
-
-		Correspondence2DOdometry(StateUnitBase* _state1Ptr, StateUnitBase* _state2Ptr) :
-			CorrespondenceSparse(_state1Ptr, _state2Ptr)
-		{
-		}
-
-		~Correspondence2DOdometry()
-		{
-		}
-
-        template <typename T>
-        bool operator()(const T* const _x1, const T* const _x2, T* _residuals) const
-        {
-        	// print inputs
-        	// std::cout << "_x1 = ";
-        	// for (int i=0; i < this->block1Size; i++)
-        	// 	std::cout << _x1[i] << " ";
-        	// std::cout << std::endl;
-        	// std::cout << "_x2 = ";
-        	// for (int i=0; i < this->block2Size; i++)
-        	// 	std::cout << _x2[i] << " ";
-        	// std::cout << std::endl;
-        	// std::cout << "measurement = ";
-        	// for (int i=0; i < this->measurementSize; i++)
-        	// 	std::cout << this->measurement_(i) << " ";
-        	// std::cout << std::endl;
-
-        	// LONGITUDINAL AND TRANVERSAL ERROR
-        	// Remap the vehicle state to the const evaluation point
-			Map<const Matrix<T,2,1>> x1_map(_x1,2);
-			Map<const Matrix<T,2,1>> x2_map(_x2,2);
-
-			// Expected measurement
-			Matrix<T,2,2> Rinv1; // Rotation matrix of the negative angle of the first pose
-			Rinv1 << _x1[2], _x1[3], -_x1[3], _x1[2];
-			Matrix<T,2,1> expected_meas = Rinv1 * (x1_map - x2_map);
-
-			// Map residuals
-			Map<Matrix<T,2,1>> x_residual(_residuals,2);
-
-			// Compute residuals
-			Vector2s x_meas = this->measurement_.head(2);
-			x_residual = (x_meas).cast<T>() - expected_meas;
-
-			// ORIENTATION ERROR
-			_residuals[2] = T(this->measurement_(2)) - atan2(-_x1[2]*_x2[3] + _x1[3]*_x2[2],
-															  _x1[2]*_x2[2] + _x1[3]*_x2[3]);
-
-			// print outputs
-			// std::cout << "expected    = ";
-			// for (int i=0; i < this->measurementSize; i++)
-			// 	std::cout << expected_measurement(i) << " ";
-			// std::cout << std::endl;
-			// std::cout << "_residuals  = ";
-			// for (int i=0; i < this->measurementSize; i++)
-			// 	std::cout << _residuals[i] << " ";
-			// std::cout << std::endl << std::endl;
-
-			return true;
-        }
-
-        virtual correspondenceType getType() const
-        {
-        	return CORR_2D_ODOMETRY;
-        }
-};
-
 class WolfProblem
 {
     protected:
-        std::vector<StateUnitBase*> state_units_;
+        std::list<StateUnitBase*> state_units_;
         std::list<CorrespondenceBase*> correspondences_;
 
     public: 
@@ -818,10 +460,10 @@ class WolfProblem
         	std::cout << "Added!" << std::endl;
         }
 
-//        void removeStateUnit(StateUnitBase* _stUnitPtr)
-//        {
-//        	state_units_.remove(_stUnitPtr);
-//        }
+        void removeStateUnit(StateUnitBase* _stUnitPtr)
+        {
+        	state_units_.remove(_stUnitPtr);
+        }
 };
 
 class CeresWrapper
@@ -902,21 +544,6 @@ class CeresWrapper
 					cost_function_ptr = createCostFunction<CorrespondenceGPS2D>(_corr_ptr);
 					break;
 				}
-				case CORR_3D_RANGE:
-				{
-					cost_function_ptr = createCostFunction<Correspondence3DRange>(_corr_ptr);
-					break;
-				}
-				case CORR_2D_RANGE:
-				{
-					cost_function_ptr = createCostFunction<Correspondence2DRange>(_corr_ptr);
-					break;
-				}
-				case CORR_2D_ODOMETRY:
-				{
-					cost_function_ptr = createCostFunction<Correspondence2DOdometry>(_corr_ptr);
-					break;
-				}
 				case CORR_N_BLOCKS:
 				{
 					std::cout << "CORR_N_BLOCK" << std::endl;
@@ -934,18 +561,6 @@ class CeresWrapper
 			//wolf_problem_->addStateUnit(_st_ptr);
 			switch (_st_ptr->getParametrizationType())
 			{
-				case COMPLEX_ANGLE:
-				{
-					std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
-					local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, new ComplexAngleParameterization});
-					break;
-				}
-				case QUATERNION:
-				{
-					std::cout << "Adding Quaternion Local Parametrization to the List... " << std::endl;
-					local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, new EigenQuaternionParameterization});
-					break;
-				}
 				case NONE:
 				{
 					std::cout << "No Local Parametrization to be added" << std::endl;
@@ -1086,45 +701,6 @@ int main(int argc, char** argv)
 		}
 	}
 
-//    // CORRESPONDENCES
-//    // SENSOR A: Absolute measurements of the whole state
-//    for(uint mA=0; mA < N_MEAS_A; mA++)
-//    {
-//    	std::cout << "Correspondences A set: " << mA << std::endl;
-//    	std::cout << "state_unit_ptr_vector_.size() = " << state_unit_ptr_vector_.size() << std::endl;
-//    	for (uint st=0; st < N_STATES; st++)
-//		{
-//        	CorrespondenceGPS2D* corrAPtr = new CorrespondenceGPS2D(state_unit_ptr_vector_.at(st));
-//			VectorXs actualMeasurement = actualState.segment(st*DIM,DIM);
-//        	std::cout << "State = " << actualMeasurement.transpose() << std::endl;
-//			corrAPtr->inventMeasurement(actualMeasurement,generator,distribution_A);
-//			wolf_problem->addCorrespondence(corrAPtr);
-//			ceres_wrapper.addCorrespondence(corrAPtr);
-//		}
-//    }
-//    std::cout << "Correspondences A created!" << std::endl;
-//
-//	// SENSOR B: Relative distances between points
-//    for(uint mB=0; mB < N_MEAS_B; mB++)
-//	{
-//    	for (uint st_from=0; st_from < N_STATES-1; st_from++)
-//    	{
-//    		for (uint st_to=st_from+1; st_to < N_STATES; st_to++)
-//			{
-//    			//std::cout << "Range only from " << st_from << " (" << st_from*DIM << "-" << st_from*DIM+DIM-1 << ")";
-//    			//std::cout << " to " << st_to << " (" << st_to*DIM << "-" << st_to*DIM+DIM-1 << ")" << std::endl;
-//    			Correspondence3DRange* corrBPtr = new Correspondence3DRange(state_unit_ptr_vector_[st_from],state_unit_ptr_vector_[st_to]);
-//				VectorXs actualMeasurement = ((actualState.segment(st_from*DIM,DIM) - actualState.segment(st_to*DIM,DIM)).transpose() * (actualState.segment(st_from*DIM,DIM) - actualState.segment(st_to*DIM,DIM))).cwiseSqrt();
-//				corrBPtr->inventMeasurement(actualMeasurement,generator,distribution_B);
-//				wolf_problem->addCorrespondence(corrBPtr);
-//				ceres_wrapper.addCorrespondence(corrBPtr);
-//			}
-//    	}
-//	}
-//
-//	// run Ceres Solver
-//	ceres_wrapper.solve(true);
-    
     //end Wolf iteration
     std::cout << " ========= END ===========" << std::endl << std::endl;
        
