@@ -13,9 +13,12 @@
 #ifndef WOLF_H_
 #define WOLF_H_
 
+//includes from std lib
 #include <memory>
 #include <list>
 #include <map>
+
+//includes from Eigen lib
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 

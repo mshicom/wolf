@@ -27,9 +27,14 @@ ADD_EXECUTABLE(test_ceres_wrapper_block_sizes test_ceres_wrapper_block_sizes.cpp
 TARGET_LINK_LIBRARIES(test_ceres_wrapper_block_sizes ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test different residual block and local parametrization sizes
-ADD_EXECUTABLE(test_ceres_wrapper_residual_parametrization test_ceres_wrapper_residual_parametrization.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper_residual_parametrization ${CERES_LIBRARIES} ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_ceres_wrapper_residual_parametrization test_ceres_wrapper_residual_parametrization.cpp)
+# TARGET_LINK_LIBRARIES(test_ceres_wrapper_residual_parametrization ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test different bla
-ADD_EXECUTABLE(test_ceres_wrapper_states test_ceres_wrapper_states.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_ceres_wrapper_states test_ceres_wrapper_states.cpp)
+# TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})
+
+# Testing a full wolf tree avoiding template classes for NodeLinked derived classes
+ADD_EXECUTABLE(test_ceres_wrapper_non_template test_ceres_wrapper_non_template.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_wrapper_non_template ${CERES_LIBRARIES} ${PROJECT_NAME})
+
