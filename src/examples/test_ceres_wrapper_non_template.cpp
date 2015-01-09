@@ -108,12 +108,12 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         std::vector<unsigned int> block_indexes_; //state vector indexes indicating start of each state block. This vector has nblocks_ size. 
         std::vector<unsigned int> block_sizes_; //sizes of each state block. This vector has nblocks_ size. 
         
-        
     public:
-        CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _szs) :
+        CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _bindexes, const std::vector<unsigned int> & _bsizes) :
             NodeLinked(BOTTOM, "CORRESPONDENCE"),
             nblocks_(_nb),
-            block_sizes_(_szs)
+            block_indexes_(_bindexes),
+            block_sizes_(_bsizes)
         {
             assert(block_sizes_.size() == nblocks_);
         };
@@ -122,6 +122,18 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         {
             //
         };
+	
+	void display() const
+	{
+            unsigned int ii; 
+            std::cout << "number of blocks: " << nblocks_ << std::endl;
+            std::cout << "block indexes: ";
+            for (ii=0; ii<block_indexes_.size(); ii++) std::cout << block_indexes_.at(ii) << " ";
+            std::cout << std::endl;
+            std::cout << "block sizes: ";
+            for (ii=0; ii<block_sizes_.size(); ii++) std::cout << block_sizes_.at(ii) << " ";
+            std::cout << std::endl;
+	};
 };
 
 //an example of a specialized corrspondence class
@@ -133,8 +145,8 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
         ceres::CostFunction* cost_function_ptr_;
         
     public:
-        CorrespondenceOdom2D(const std::vector<unsigned int> & _idx, double * _st) :
-            CorrespondenceBaseX(2,std::vector<unsigned int>{3,3}),
+        CorrespondenceOdom2D(double * _st) :
+            CorrespondenceBaseX(2,{0,3},{3,3}),
             pose_previous_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
             pose_current_(_st + block_indexes_.at(1) , block_sizes_.at(1))
         {
@@ -160,20 +172,24 @@ int main(int argc, char** argv)
     std::cout << " ========= WOLF-CERES test with non-template classes ===========" << std::endl << std::endl;
 
     //variables
-    Eigen::VectorXs state;
-    std::vector<unsigned int> indexes;
+    Eigen::VectorXs state(6);
+//     CorrespondenceBaseX *base_corresp;
     CorrespondenceOdom2D *odom_corresp;
         
     //set state
-    indexes = {0,3};
     state << 1,2,3,4,5,6;
     
-    //create odom correspondence
-    odom_corresp = new CorrespondenceOdom2D(indexes, state.data());
-//     odom_corresp->init();
+    //create base correspondence
+//     base_corresp = new CorrespondenceBaseX(2,{0,3},{3,3});
+//     base_corresp->display();
     
+    //create odom correspondence
+    odom_corresp = new CorrespondenceOdom2D(state.data());
+    odom_corresp->display();
+    odom_corresp->init();
 
     //free memory
+//     delete base_corresp;
     delete odom_corresp;
     
     //End message
