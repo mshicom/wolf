@@ -165,11 +165,11 @@ class Odom2DFunctor
         template <typename T>
         bool operator()(const T* const _x0, const T* const _x1, T* _residual) const
         {
-            double dr, dth;
+            T dr, dth;
             
             //expected range and theta increments, given the state points
-            dr = sqrt( (_x0(0)-_x1(0))*(_x0(0)-_x1(0)) + (_x0(1)-_x1(1))*(_x0(1)-_x1(1)) ); //sqrt could be avoided
-            dth = _x1(2) - _x0(2);
+            dr = sqrt( (_x0[0]-_x1[0])*(_x0[0]-_x1[0]) + (_x0[1]-_x1[1])*(_x0[1]-_x1[1]) ); //sqrt could be avoided
+            dth = _x1[2] - _x0[2];
             
             //residuals in range and theta components 
             _residual[0] = T(dr) - T(odom_inc_(0));
@@ -186,14 +186,14 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
     protected:
         Eigen::Map<Eigen::Vector3s> pose_previous_;
         Eigen::Map<Eigen::Vector3s> pose_current_; 
-        Eigen::Map<Eigen::Vector2s> odom_inc_; 
+        Eigen::Map<const Eigen::Vector2s> odom_inc_; 
         
     public:
-        CorrespondenceOdom2D(double * _st, const Eigen::Vector2s & _odom) :
+        CorrespondenceOdom2D(WolfScalar * _st, const Eigen::Vector2s & _odom) :
             CorrespondenceBaseX(2,{0,3},{3,3}),
-            pose_previous_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
-            pose_current_(_st + block_indexes_.at(1) , block_sizes_.at(1)),
-            odom_inc_(_odom)
+            pose_previous_(_st, block_indexes_.at(0) , block_sizes_.at(0)),
+            pose_current_(_st, block_indexes_.at(1) , block_sizes_.at(1)),
+            odom_inc_(_odom.data())
         {
             cost_function_ptr_ = new ceres::AutoDiffCostFunction<Odom2DFunctor,2,3,3>(new Odom2DFunctor(_odom));
         };
@@ -264,13 +264,13 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
 {
     protected:
         Eigen::Map<Eigen::Vector3s> location_;
-        Eigen::Map<Eigen::Vector3s> gps_fix_;
+        Eigen::Map<const Eigen::Vector3s> gps_fix_;
 
     public:
-        CorrespondenceGPSFix(double * _st, const Eigen::Vector3s & _gps_fix) :
+        CorrespondenceGPSFix(WolfScalar * _st, const Eigen::Vector3s & _gps_fix) :
             CorrespondenceBaseX(1,{0},{3}), 
             location_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
-            gps_fix_(_gps_fix)
+            gps_fix_(_gps_fix.data(),3)
         {
             cost_function_ptr_ = new ceres::AutoDiffCostFunction<GPSFixFunctor,3,3>(new GPSFixFunctor(_gps_fix));
         };
@@ -279,6 +279,11 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
         {
             //delete cost_function_ptr_;
         };
+        
+        double * getLocation()
+        {
+            return location_.data();
+        }
                 
 //         ceres::CostFunction * getCostFunctionPtr()
 //         {
@@ -303,21 +308,30 @@ int main(int argc, char** argv)
     google::InitGoogleLogging(argv[0]);
 
     //variables
+    Eigen::Vector3s odom_inc_true(20);
+    Eigen::Vector3s pose_true(3);
     Eigen::VectorXs state1(6);
     Eigen::VectorXs state2(30);
+    Eigen::Vector2s odom_data;
     Eigen::Vector3s gps_fix_data;
     CorrespondenceOdom2D *odom_corresp;
     CorrespondenceGPSFix *gps_fix_corresp;
     ceres::Problem problem;
     ceres::Solver::Options options;
     ceres::Solver::Summary summary;
-    ceres::ResidualBlockId block_id;
+    //ceres::ResidualBlockId block_id;
+    
+    //init true odom and true pose
+    odom_inc_true << 0.2,0, 0.3,0.1, 0.3,0.2, 0.3,0, 0.4,0.1, 0.3,0.1, 0.2,0., 0.1,0.1, 0.1,0., 0.05,0.05;
+    pose_true << 0,0,0;
     
     //random generators
     std::default_random_engine generator;
-    std::normal_distribution<WolfScalar> distribution_gps(0.0,0.01);    
+    std::normal_distribution<WolfScalar> distribution_odom(0.0,0.01);    
+    std::normal_distribution<WolfScalar> distribution_gps(0.0,0.02);
         
     //TEST 1
+/* 
     std::cout << std::endl << "***** TEST 1. Simple optimizer through a derived class" << std::endl;
     
     //set state
@@ -337,29 +351,40 @@ int main(int argc, char** argv)
     
     //display result
     std::cout << "RESULT IS: " << state1.transpose() << std::endl;
-    
+ */  
 
     //TEST 2
     std::cout << std::endl << "***** TEST 2. GPS fix problem" << std::endl;
     
     //clear previous blocks
-    problem.RemoveResidualBlock(block_id);
+    //problem.RemoveResidualBlock(block_id);
    
     //test loop
     for (unsigned int ii = 0; ii<10; ii++)
     {
-        //just inventing a sort of noise measurements
-        gps_fix_data << ii + distribution_gps(generator), ii + distribution_gps(generator), ii + distribution_gps(generator);
+        //just inventing a simple motion and the corresponding noise measurements for odometry and GPS
+        pose_true(0) = pose_true(0) + odom_inc_true(ii*2) * cos(pose_true(2)+odom_inc_true(ii*2+1)); 
+        pose_true(1) = pose_true(1) + odom_inc_true(ii*2) * sin(pose_true(2)+odom_inc_true(ii*2+1)); 
+        odom_data << odom_inc_true(ii*2)+distribution_odom(generator), odom_inc_true(ii*2+1)+distribution_odom(generator);
+        gps_fix_data << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
+        std::cout << "pose_true(" << ii << ") = " << pose_true.transpose() << std::endl;
         
-        //setting intial guess. State prediction
-        state2.middleRows(ii*3,3) << ii,ii,ii;
+        //setting intial guess. State prediction. TODO: use noisy odom for state prediction
+        state2.middleRows(ii*3,3) << 0,0,0;
         
-        //creating correspondence
+        //creating odom correspondence, exceptuating first iteration
+        if ( ii !=0 )
+        {
+            odom_corresp = new CorrespondenceOdom2D(state2.data()+(ii-1)*3, odom_data);
+        }
+        
+        //creating gps correspondence
         gps_fix_corresp = new CorrespondenceGPSFix(state2.data()+ii*3, gps_fix_data);
         gps_fix_corresp->display();
         
         //build problem 
-        block_id = problem.AddResidualBlock(gps_fix_corresp->getCostFunctionPtr(),nullptr, state2.data()+ii*3);
+        problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
+        problem.AddResidualBlock(gps_fix_corresp->getCostFunctionPtr(),nullptr, gps_fix_corresp->getLocation());
     }
     
     //display initial guess
