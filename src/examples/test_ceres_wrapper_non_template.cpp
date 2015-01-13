@@ -123,7 +123,7 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
             //
         };
 	
-	void display() const
+	virtual void display() const
 	{
             unsigned int ii; 
             std::cout << "number of blocks: " << nblocks_ << std::endl;
@@ -136,7 +136,34 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
 	};
 };
 
-//an example of a specialized corrspondence class
+class Odom2DFunctor
+{
+    protected:
+        //
+    
+    public:
+        //constructor
+        Odom2DFunctor()
+        {
+            //
+        }
+        
+        //destructor
+        ~Odom2DFunctor()
+        {
+            //
+        }
+        
+        //cost function
+        template <typename T>
+        bool operator()(const T* const _x0, const T* const _x1, T* _residual) const
+        {
+            _residual[0] = T(1.0) - _x0[0] -_x1[0];
+            return true;
+        }
+};
+
+//an example of a specialized correspondence class
 class CorrespondenceOdom2D : public CorrespondenceBaseX
 {
     protected:
@@ -150,46 +177,56 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
             pose_previous_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
             pose_current_(_st + block_indexes_.at(1) , block_sizes_.at(1))
         {
-            //
+            cost_function_ptr_ = new ceres::AutoDiffCostFunction<Odom2DFunctor,1,3,3>(new Odom2DFunctor);
         };
         
         ~CorrespondenceOdom2D()
         {
-            //
+            delete cost_function_ptr_;
         };
         
-        void init()
+        ceres::CostFunction * getCostFunctionPtr()
         {
-            std::cout << "pose_previous_ = " << pose_previous_.transpose() << std::endl;
-            std::cout << "pose_current_ = " << pose_current_.transpose() << std::endl;
+            return cost_function_ptr_;
         };
-    
+                
+        virtual void display() const
+        {
+            CorrespondenceBaseX::display();
+            std::cout << "pose_previous_: " << pose_previous_.transpose() << std::endl;
+            std::cout << "pose_current_: " << pose_current_.transpose() << std::endl;
+        };
+        
 };
 
 int main(int argc, char** argv) 
-{
+{    
     //Welcome message
     std::cout << " ========= WOLF-CERES test with non-template classes ===========" << std::endl << std::endl;
+    
+    //init google log
+    google::InitGoogleLogging(argv[0]);
 
     //variables
     Eigen::VectorXs state(6);
-//     CorrespondenceBaseX *base_corresp;
     CorrespondenceOdom2D *odom_corresp;
+    ceres::Problem problem;
+    ceres::Solver::Options options;
+    ceres::Solver::Summary summary;
         
     //set state
     state << 1,2,3,4,5,6;
     
-    //create base correspondence
-//     base_corresp = new CorrespondenceBaseX(2,{0,3},{3,3});
-//     base_corresp->display();
-    
     //create odom correspondence
     odom_corresp = new CorrespondenceOdom2D(state.data());
     odom_corresp->display();
-    odom_corresp->init();
+    
+    //build problem
+    problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, state.data());
+    options.minimizer_progress_to_stdout = true;
+    ceres::Solve(options, &problem, &summary);
 
     //free memory
-//     delete base_corresp;
     delete odom_corresp;
     
     //End message
