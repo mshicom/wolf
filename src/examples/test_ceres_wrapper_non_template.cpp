@@ -36,7 +36,7 @@ class TrajectoryBaseX : public NodeLinked<NodeTerminus,FrameBaseX>
             //
         };
         
-        ~TrajectoryBaseX()
+        virtual ~TrajectoryBaseX()
         {
             
         };
@@ -56,7 +56,7 @@ class FrameBaseX : public NodeLinked<TrajectoryBaseX,CaptureBaseX>
             //
         };
         
-        ~FrameBaseX()
+        virtual ~FrameBaseX()
         {
             
         };
@@ -76,7 +76,7 @@ class CaptureBaseX : public NodeLinked<FrameBaseX,FeatureBaseX>
             //
         };
         
-        ~CaptureBaseX()
+        virtual ~CaptureBaseX()
         {
             
         };
@@ -94,7 +94,7 @@ class FeatureBaseX : public NodeLinked<CaptureBaseX,CorrespondenceBaseX>
             //
         };
         
-        ~FeatureBaseX()
+        virtual ~FeatureBaseX()
         {
             //
         };
@@ -119,7 +119,7 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
             assert(block_sizes_.size() == nblocks_);
         };
         
-        ~CorrespondenceBaseX()
+        virtual ~CorrespondenceBaseX()
         {
             //
         };
@@ -156,7 +156,7 @@ class Odom2DFunctor
         };
         
         //destructor
-        ~Odom2DFunctor()
+        virtual ~Odom2DFunctor()
         {
             //
         };
@@ -165,14 +165,14 @@ class Odom2DFunctor
         template <typename T>
         bool operator()(const T* const _x0, const T* const _x1, T* _residual) const
         {
-            T dr, dth;
+            T dr2, dth;
             
             //expected range and theta increments, given the state points
-            dr = sqrt( (_x0[0]-_x1[0])*(_x0[0]-_x1[0]) + (_x0[1]-_x1[1])*(_x0[1]-_x1[1]) ); //sqrt could be avoided
-            dth = _x1[2] - _x0[2];
+            dr2 = (_x0[0]-_x1[0])*(_x0[0]-_x1[0]) + (_x0[1]-_x1[1])*(_x0[1]-_x1[1]); //square of the range
+            dth = _x1[2] - _x0[2]; //
             
             //residuals in range and theta components 
-            _residual[0] = T(dr) - T(odom_inc_(0));
+            _residual[0] = T(dr2) - T(odom_inc_(0)*odom_inc_(0));
             _residual[1] = T(dth) - T(odom_inc_(1));
             
             //return 
@@ -191,14 +191,14 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
     public:
         CorrespondenceOdom2D(WolfScalar * _st, const Eigen::Vector2s & _odom) :
             CorrespondenceBaseX(2,{0,3},{3,3}),
-            pose_previous_(_st, block_indexes_.at(0) , block_sizes_.at(0)),
-            pose_current_(_st, block_indexes_.at(1) , block_sizes_.at(1)),
+            pose_previous_(_st + block_indexes_.at(0), block_sizes_.at(0)),
+            pose_current_(_st + block_indexes_.at(1), block_sizes_.at(1)),
             odom_inc_(_odom.data())
         {
             cost_function_ptr_ = new ceres::AutoDiffCostFunction<Odom2DFunctor,2,3,3>(new Odom2DFunctor(_odom));
         };
         
-        ~CorrespondenceOdom2D()
+        virtual ~CorrespondenceOdom2D()
         {
             //delete cost_function_ptr_;
         };
@@ -215,12 +215,12 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
         
         virtual void display() const
         {
+            std::cout << "---- Odom Correspondence ----" << std::endl;
             CorrespondenceBaseX::display();
             std::cout << "pose_previous_: " << pose_previous_.transpose() << std::endl;
             std::cout << "pose_current_: " << pose_current_.transpose() << std::endl;
             std::cout << "odom_inc_: " << odom_inc_.transpose() << std::endl;
-        };
-        
+        };      
 };
 
 class GPSFixFunctor
@@ -237,16 +237,10 @@ class GPSFixFunctor
         };
         
         //destructor
-        ~GPSFixFunctor()
+        virtual ~GPSFixFunctor()
         {
             //
         };
-        
-        //sets GPS fix
-//         void setGPSFix(const Eigen::Vector3s & _fix)
-//         {
-//             gps_fix_ = _fix;
-//         };
         
         //cost function
         template <typename T>
@@ -254,7 +248,7 @@ class GPSFixFunctor
         {
             _residual[0] = T( gps_fix_(0) ) - _x0[0];
             _residual[1] = T( gps_fix_(1) ) - _x0[1];
-            _residual[2] = T( gps_fix_(2) ) - _x0[2];            
+            _residual[2] = T(0.); //T( gps_fix_(2) ) - _x0[2]; //in this case, third component of the state is heading, not Z, so it is ignored
             return true;
         };
 };
@@ -270,12 +264,12 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
         CorrespondenceGPSFix(WolfScalar * _st, const Eigen::Vector3s & _gps_fix) :
             CorrespondenceBaseX(1,{0},{3}), 
             location_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
-            gps_fix_(_gps_fix.data(),3)
+            gps_fix_(_gps_fix.data())
         {
             cost_function_ptr_ = new ceres::AutoDiffCostFunction<GPSFixFunctor,3,3>(new GPSFixFunctor(_gps_fix));
         };
         
-        ~CorrespondenceGPSFix()
+        virtual ~CorrespondenceGPSFix()
         {
             //delete cost_function_ptr_;
         };
@@ -285,13 +279,9 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
             return location_.data();
         }
                 
-//         ceres::CostFunction * getCostFunctionPtr()
-//         {
-//             return cost_function_ptr_;
-//         };
-        
         virtual void display() const
         {
+            std::cout << "---- GPS Fix Correspondence ----" << std::endl;
             CorrespondenceBaseX::display();
             std::cout << "location_: " << location_.transpose() << std::endl;
             std::cout << "gps_fix_: " << gps_fix_.transpose() << std::endl;            
@@ -302,104 +292,86 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
 int main(int argc, char** argv) 
 {    
     //Welcome message
-    std::cout << " ========= WOLF-CERES test with non-template classes ===========" << std::endl << std::endl;
+    std::cout << " ========= WOLF-CERES test. Simple Odometry + GPS fix problem (with non-template classes) ===========" << std::endl << std::endl;
     
     //init google log
     google::InitGoogleLogging(argv[0]);
 
     //variables
-    Eigen::Vector3s odom_inc_true(20);
-    Eigen::Vector3s pose_true(3);
-    Eigen::VectorXs state1(6);
-    Eigen::VectorXs state2(30);
-    Eigen::Vector2s odom_data;
-    Eigen::Vector3s gps_fix_data;
-    CorrespondenceOdom2D *odom_corresp;
-    CorrespondenceGPSFix *gps_fix_corresp;
-    ceres::Problem problem;
-    ceres::Solver::Options options;
-    ceres::Solver::Summary summary;
-    //ceres::ResidualBlockId block_id;
-    
+    Eigen::VectorXs odom_inc_true(20);//invented motion
+    Eigen::Vector3s pose_true; //current true pose
+    Eigen::VectorXs ground_truth(30); //accumulated true poses
+    Eigen::Vector3s pose_predicted; // current predicted pose
+    Eigen::VectorXs state(30); //accumulated predicted poses
+    Eigen::Vector2s odom_reading; //current odometry reading
+    Eigen::Vector3s gps_fix_reading; //current GPS fix reading
+    CorrespondenceOdom2D *odom_corresp; //pointer to odometry correspondence
+    CorrespondenceGPSFix *gps_fix_corresp; //pointer to GPS fix correspondence
+    ceres::Problem problem; //ceres problem 
+    ceres::Solver::Options options; //ceres solver options
+    ceres::Solver::Summary summary; //ceres solver summary
+
     //init true odom and true pose
     odom_inc_true << 0.2,0, 0.3,0.1, 0.3,0.2, 0.3,0, 0.4,0.1, 0.3,0.1, 0.2,0., 0.1,0.1, 0.1,0., 0.05,0.05;
     pose_true << 0,0,0;
+    pose_predicted << 0,0,0;
     
     //random generators
     std::default_random_engine generator;
-    std::normal_distribution<WolfScalar> distribution_odom(0.0,0.01);    
-    std::normal_distribution<WolfScalar> distribution_gps(0.0,0.02);
+    std::normal_distribution<WolfScalar> distribution_odom(0.0,0.01); //odometry noise
+    std::normal_distribution<WolfScalar> distribution_gps(0.0,0.02); //GPS noise
         
-    //TEST 1
-/* 
-    std::cout << std::endl << "***** TEST 1. Simple optimizer through a derived class" << std::endl;
-    
-    //set state
-    state1 << 1,2,3,4,5,6;
-    std::cout << "INITIAL GUESS IS: " << state1.transpose() << std::endl;
-    
-    //create odom correspondence
-    odom_corresp = new CorrespondenceOdom2D(state1.data());
-    odom_corresp->display();
-    
-    //build problem
-    block_id = problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
-        
-    //set options and solve
-    options.minimizer_progress_to_stdout = true;
-    ceres::Solve(options, &problem, &summary);
-    
-    //display result
-    std::cout << "RESULT IS: " << state1.transpose() << std::endl;
- */  
-
-    //TEST 2
-    std::cout << std::endl << "***** TEST 2. GPS fix problem" << std::endl;
-    
-    //clear previous blocks
-    //problem.RemoveResidualBlock(block_id);
-   
     //test loop
     for (unsigned int ii = 0; ii<10; ii++)
     {
-        //just inventing a simple motion and the corresponding noise measurements for odometry and GPS
+        //inventing a simple motion
         pose_true(0) = pose_true(0) + odom_inc_true(ii*2) * cos(pose_true(2)+odom_inc_true(ii*2+1)); 
         pose_true(1) = pose_true(1) + odom_inc_true(ii*2) * sin(pose_true(2)+odom_inc_true(ii*2+1)); 
-        odom_data << odom_inc_true(ii*2)+distribution_odom(generator), odom_inc_true(ii*2+1)+distribution_odom(generator);
-        gps_fix_data << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
+        pose_true(2) = pose_true(2) + odom_inc_true(ii*2+1);
+        ground_truth.middleRows(ii*3,3) << pose_true;
+        
+        //inventing sensor readings for odometry and GPS
+        odom_reading << odom_inc_true(ii*2)+distribution_odom(generator), odom_inc_true(ii*2+1)+distribution_odom(generator); //true range and theta with noise
+        gps_fix_reading << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
         std::cout << "pose_true(" << ii << ") = " << pose_true.transpose() << std::endl;
         
-        //setting intial guess. State prediction. TODO: use noisy odom for state prediction
-        state2.middleRows(ii*3,3) << 0,0,0;
+        //setting initial guess as an odometry prediction, using noisy odometry
+        pose_predicted(0) = pose_predicted(0) + odom_reading(0) * cos(pose_predicted(2)+odom_reading(1)); 
+        pose_predicted(1) = pose_predicted(1) + odom_reading(0) * sin(pose_predicted(2)+odom_reading(1)); 
+        pose_predicted(2) = pose_predicted(2) + odom_reading(1);
+        state.middleRows(ii*3,3) << pose_predicted;
         
-        //creating odom correspondence, exceptuating first iteration
+        //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
         if ( ii !=0 )
         {
-            odom_corresp = new CorrespondenceOdom2D(state2.data()+(ii-1)*3, odom_data);
+            odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
+            //odom_corresp->display();
+            problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
+            delete odom_corresp;
         }
         
-        //creating gps correspondence
-        gps_fix_corresp = new CorrespondenceGPSFix(state2.data()+ii*3, gps_fix_data);
-        gps_fix_corresp->display();
-        
-        //build problem 
-        problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
+        //creating gps correspondence and adding it to the problem 
+        gps_fix_corresp = new CorrespondenceGPSFix(state.data()+ii*3, gps_fix_reading);
+        //gps_fix_corresp->display();
         problem.AddResidualBlock(gps_fix_corresp->getCostFunctionPtr(),nullptr, gps_fix_corresp->getLocation());
+        delete gps_fix_corresp;
     }
     
     //display initial guess
-    std::cout << "INITIAL GUESS IS: " << state2.transpose() << std::endl;
+    std::cout << "INITIAL GUESS IS: " << state.transpose() << std::endl;
     
     //set options and solve
     options.minimizer_progress_to_stdout = true;
     ceres::Solve(options, &problem, &summary);
     
-    //display result
-    std::cout << "RESULT IS: " << state2.transpose() << std::endl;    
+    //display results
+    std::cout << "RESULT IS: " << state.transpose() << std::endl;
+    std::cout << "GROUND TRUTH IS: " << ground_truth.transpose() << std::endl;
+    std::cout << "ERROR IS: " << (state-ground_truth).transpose() << std::endl;        
   
-    //free memory
-    delete odom_corresp;
-    delete gps_fix_corresp;
+    //free memory (not necessary since ceres::problem holds their ownership)
+//     delete odom_corresp;
+//     delete gps_fix_corresp;
     
     //End message
     std::cout << " =========================== END ===============================" << std::endl << std::endl;
@@ -407,4 +379,3 @@ int main(int argc, char** argv)
     //exit
     return 0;
 }
-
