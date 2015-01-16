@@ -1,9 +1,11 @@
 // Testing a full wolf tree avoiding template classes for NodeLinked derived classes
 
 //std includes
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 #include <random>
+#include <cmath>
 // #include <memory>
 // #include <typeinfo>
 
@@ -292,17 +294,27 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
 int main(int argc, char** argv) 
 {    
     //Welcome message
-    std::cout << " ========= WOLF-CERES test. Simple Odometry + GPS fix problem (with non-template classes) ===========" << std::endl << std::endl;
+    std::cout << std::endl << " ========= WOLF-CERES test. Simple Odometry + GPS fix problem (with non-template classes) ===========" << std::endl << std::endl;
+
+    //user input
+    if (argc!=2)
+    {
+        std::cout << "Please call me with: [test_ceres_wrapper_non_template N], where N is the number of iterations" << std::endl;
+        std::cout << "EXIT due to bad user input" << std::endl << std::endl;
+        return -1;
+    }
+    unsigned int n_execution = (unsigned int) atoi(argv[1]); //number of iterations of the whole execution
     
     //init google log
     google::InitGoogleLogging(argv[0]);
 
-    //variables
-    Eigen::VectorXs odom_inc_true(20);//invented motion
+    //variables    
+    std::vector<unsigned int> block_ids; //id of each added block to ceres problem 
+    Eigen::VectorXs odom_inc_true;//invented motion
     Eigen::Vector3s pose_true; //current true pose
-    Eigen::VectorXs ground_truth(30); //accumulated true poses
+    Eigen::VectorXs ground_truth; //accumulated true poses
     Eigen::Vector3s pose_predicted; // current predicted pose
-    Eigen::VectorXs state(30); //accumulated predicted poses
+    Eigen::VectorXs state; //running window winth solver result
     Eigen::Vector2s odom_reading; //current odometry reading
     Eigen::Vector3s gps_fix_reading; //current GPS fix reading
     CorrespondenceOdom2D *odom_corresp; //pointer to odometry correspondence
@@ -311,10 +323,23 @@ int main(int argc, char** argv)
     ceres::Solver::Options options; //ceres solver options
     ceres::Solver::Summary summary; //ceres solver summary
 
+    //resize vectors according user input number of iterations
+    odom_inc_true.resize(n_execution*2); //2 odometry components per iteration
+    ground_truth.resize(n_execution*3);// 3 components per iteration
+    state.resize(n_execution*3); //3 components per window element (up to now n_window = n_execution)
+    block_ids.resize(n_execution); //TODO: it will be n_window, 
+    
+    
     //init true odom and true pose
-    odom_inc_true << 0.2,0, 0.3,0.1, 0.3,0.2, 0.3,0, 0.4,0.1, 0.3,0.1, 0.2,0., 0.1,0.1, 0.1,0., 0.05,0.05;
+    for (unsigned int ii = 0; ii<n_execution; ii++)
+    {
+        odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , fabs(sin(ii/1000.)); //invented motion increments. 
+    }
+    //odom_inc_true << 0.2,0, 0.3,0.1, 0.3,0.2, 0.3,0, 0.4,0.1, 0.3,0.1, 0.2,0., 0.1,0.1, 0.1,0., 0.05,0.05;
     pose_true << 0,0,0;
     pose_predicted << 0,0,0;
+    ground_truth.middleRows(0,3) << pose_true; //init point pushed to ground truth
+    state.middleRows(0,3) << 0,0,0; //init state at origin
     
     //random generators
     std::default_random_engine generator;
@@ -322,18 +347,18 @@ int main(int argc, char** argv)
     std::normal_distribution<WolfScalar> distribution_gps(0.0,0.02); //GPS noise
         
     //test loop
-    for (unsigned int ii = 0; ii<10; ii++)
+    for (unsigned int ii = 1; ii<n_execution; ii++)
     {
         //inventing a simple motion
         pose_true(0) = pose_true(0) + odom_inc_true(ii*2) * cos(pose_true(2)+odom_inc_true(ii*2+1)); 
         pose_true(1) = pose_true(1) + odom_inc_true(ii*2) * sin(pose_true(2)+odom_inc_true(ii*2+1)); 
         pose_true(2) = pose_true(2) + odom_inc_true(ii*2+1);
         ground_truth.middleRows(ii*3,3) << pose_true;
+        //std::cout << "pose_true(" << ii << ") = " << pose_true.transpose() << std::endl;
         
         //inventing sensor readings for odometry and GPS
         odom_reading << odom_inc_true(ii*2)+distribution_odom(generator), odom_inc_true(ii*2+1)+distribution_odom(generator); //true range and theta with noise
         gps_fix_reading << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
-        std::cout << "pose_true(" << ii << ") = " << pose_true.transpose() << std::endl;
         
         //setting initial guess as an odometry prediction, using noisy odometry
         pose_predicted(0) = pose_predicted(0) + odom_reading(0) * cos(pose_predicted(2)+odom_reading(1)); 
@@ -342,32 +367,46 @@ int main(int argc, char** argv)
         state.middleRows(ii*3,3) << pose_predicted;
         
         //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
-        if ( ii !=0 )
-        {
-            odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
-            //odom_corresp->display();
-            problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
-            delete odom_corresp;
-        }
+        odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
+        //odom_corresp->display();
+        problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
+        delete odom_corresp;
         
         //creating gps correspondence and adding it to the problem 
         gps_fix_corresp = new CorrespondenceGPSFix(state.data()+ii*3, gps_fix_reading);
         //gps_fix_corresp->display();
         problem.AddResidualBlock(gps_fix_corresp->getCostFunctionPtr(),nullptr, gps_fix_corresp->getLocation());
         delete gps_fix_corresp;
+        
+        //set options and solve (sliding window)
+//         options.minimizer_progress_to_stdout = true;
+//         ceres::Solve(options, &problem, &summary);
     }
     
     //display initial guess
-    std::cout << "INITIAL GUESS IS: " << state.transpose() << std::endl;
+    //std::cout << "INITIAL GUESS IS: " << state.transpose() << std::endl;
     
-    //set options and solve
-    options.minimizer_progress_to_stdout = true;
+    //set options and solve (batch mode)
+    //options.minimizer_progress_to_stdout = true;
     ceres::Solve(options, &problem, &summary);
     
-    //display results
-    std::cout << "RESULT IS: " << state.transpose() << std::endl;
-    std::cout << "GROUND TRUTH IS: " << ground_truth.transpose() << std::endl;
-    std::cout << "ERROR IS: " << (state-ground_truth).transpose() << std::endl;        
+    //display results, by setting cout flags properly
+    std::cout << std::endl << "   RESULT  |  GROUND TRUTH  |  ERROR" << std::endl;
+    std::streamsize n_precision;
+    std::ios_base::fmtflags fmtfl;
+    fmtfl = std::cout.flags(); //keep the current flags
+    std::cout.setf(std::ios::fixed, std::ios::floatfield);
+    std::cout.setf(std::ios::left, std::ios::adjustfield);
+    n_precision = std::cout.precision(4);
+    for (unsigned int ii = 0; ii<n_execution; ii++)
+    {
+        std::cout   << "[" << state(ii*3) << " " << state(ii*3+1) << " "  << state(ii*3+2) << "]   \t"
+                    << "[" << ground_truth(ii*3) << " " << ground_truth(ii*3+1) << " "  << ground_truth(ii*3+2) << "]   \t"
+                    << "[" << state(ii*3)-ground_truth(ii*3) << " " << state(ii*3+1)-ground_truth(ii*3+1) << " "  << state(ii*3+2)-ground_truth(ii*3+2) << "]" << std::endl;
+//         std::cout   << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << std::endl;
+    }
+    std::cout.flags(fmtfl); //restore flags
+    std::cout.precision(n_precision); //restore precision
   
     //free memory (not necessary since ceres::problem holds their ownership)
 //     delete odom_corresp;
