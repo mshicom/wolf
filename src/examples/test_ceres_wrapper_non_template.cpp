@@ -3,6 +3,7 @@
 //std includes
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <random>
 #include <cmath>
@@ -148,6 +149,7 @@ class Odom2DFunctor
 {
     protected:
         Eigen::Vector2s odom_inc_; //incremental odometry measurements (range, theta). Could be a map to data hold by capture or feature
+        const double odom_stdev_ = 0.01; //model parameters
     
     public:
         //constructor
@@ -174,8 +176,8 @@ class Odom2DFunctor
             dth = _x1[2] - _x0[2]; //
             
             //residuals in range and theta components 
-            _residual[0] = T(dr2) - T(odom_inc_(0)*odom_inc_(0));
-            _residual[1] = T(dth) - T(odom_inc_(1));
+            _residual[0] = (T(dr2) - T(odom_inc_(0)*odom_inc_(0))) / T(odom_stdev_);
+            _residual[1] = (T(dth) - T(odom_inc_(1))) / T(odom_stdev_);
             
             //return 
             return true;
@@ -229,6 +231,7 @@ class GPSFixFunctor
 {
     protected:
         Eigen::Vector3s gps_fix_; //GPS fix XYZ. Could be a map to data hold by capture or feature
+        const double gps_stdev_ = 1; //model parameters
     
     public:
         //constructor
@@ -248,8 +251,10 @@ class GPSFixFunctor
         template <typename T>
         bool operator()(const T* const _x0, T* _residual) const
         {
-            _residual[0] = T( gps_fix_(0) ) - _x0[0];
-            _residual[1] = T( gps_fix_(1) ) - _x0[1];
+            T dist_x = T( gps_fix_(0) ) - _x0[0];
+            T dist_y = T( gps_fix_(1) ) - _x0[1];
+            _residual[0] = dist_x / T(gps_stdev_);
+            _residual[1] = dist_y / T(gps_stdev_);
             _residual[2] = T(0.); //T( gps_fix_(2) ) - _x0[2]; //in this case, third component of the state is heading, not Z, so it is ignored
             return true;
         };
@@ -261,6 +266,7 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
     protected:
         Eigen::Map<Eigen::Vector3s> location_;
         Eigen::Map<const Eigen::Vector3s> gps_fix_;
+        //TODO: add ceres_residual_block_id_ to manage add/remove block
 
     public:
         CorrespondenceGPSFix(WolfScalar * _st, const Eigen::Vector3s & _gps_fix) :
@@ -317,25 +323,29 @@ int main(int argc, char** argv)
     Eigen::VectorXs state; //running window winth solver result
     Eigen::Vector2s odom_reading; //current odometry reading
     Eigen::Vector3s gps_fix_reading; //current GPS fix reading
+    Eigen::VectorXs gps_log; //log of all gps readings
     CorrespondenceOdom2D *odom_corresp; //pointer to odometry correspondence
     CorrespondenceGPSFix *gps_fix_corresp; //pointer to GPS fix correspondence
     ceres::Problem problem; //ceres problem 
     ceres::Solver::Options options; //ceres solver options
     ceres::Solver::Summary summary; //ceres solver summary
+    std::ofstream log_file;  //output file
 
     //resize vectors according user input number of iterations
     odom_inc_true.resize(n_execution*2); //2 odometry components per iteration
     ground_truth.resize(n_execution*3);// 3 components per iteration
     state.resize(n_execution*3); //3 components per window element (up to now n_window = n_execution)
+    gps_log.resize(n_execution*3);
     block_ids.resize(n_execution); //TODO: it will be n_window, 
-    
     
     //init true odom and true pose
     for (unsigned int ii = 0; ii<n_execution; ii++)
     {
-        odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , fabs(sin(ii/1000.)); //invented motion increments. 
+        if ( ii < (unsigned int)floor(n_execution/2) )
+            odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , fabs(sin(ii/2000.)); //invented motion increments. 
+        else
+            odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , -fabs(sin((ii-floor(n_execution/2))/2000.)); //invented motion increments. 
     }
-    //odom_inc_true << 0.2,0, 0.3,0.1, 0.3,0.2, 0.3,0, 0.4,0.1, 0.3,0.1, 0.2,0., 0.1,0.1, 0.1,0., 0.05,0.05;
     pose_true << 0,0,0;
     pose_predicted << 0,0,0;
     ground_truth.middleRows(0,3) << pose_true; //init point pushed to ground truth
@@ -343,9 +353,9 @@ int main(int argc, char** argv)
     
     //random generators
     std::default_random_engine generator;
-    std::normal_distribution<WolfScalar> distribution_odom(0.0,0.01); //odometry noise
-    std::normal_distribution<WolfScalar> distribution_gps(0.0,0.02); //GPS noise
-        
+    std::normal_distribution<WolfScalar> distribution_odom(0.001,0.01); //odometry noise
+    std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
+    
     //test loop
     for (unsigned int ii = 1; ii<n_execution; ii++)
     {
@@ -359,6 +369,7 @@ int main(int argc, char** argv)
         //inventing sensor readings for odometry and GPS
         odom_reading << odom_inc_true(ii*2)+distribution_odom(generator), odom_inc_true(ii*2+1)+distribution_odom(generator); //true range and theta with noise
         gps_fix_reading << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
+        gps_log.middleRows(ii*3,3) << gps_fix_reading;//log the reading
         
         //setting initial guess as an odometry prediction, using noisy odometry
         pose_predicted(0) = pose_predicted(0) + odom_reading(0) * cos(pose_predicted(2)+odom_reading(1)); 
@@ -390,23 +401,11 @@ int main(int argc, char** argv)
     //options.minimizer_progress_to_stdout = true;
     ceres::Solve(options, &problem, &summary);
     
-    //display results, by setting cout flags properly
-    std::cout << std::endl << "   RESULT  |  GROUND TRUTH  |  ERROR" << std::endl;
-    std::streamsize n_precision;
-    std::ios_base::fmtflags fmtfl;
-    fmtfl = std::cout.flags(); //keep the current flags
-    std::cout.setf(std::ios::fixed, std::ios::floatfield);
-    std::cout.setf(std::ios::left, std::ios::adjustfield);
-    n_precision = std::cout.precision(4);
-    for (unsigned int ii = 0; ii<n_execution; ii++)
-    {
-        std::cout   << "[" << state(ii*3) << " " << state(ii*3+1) << " "  << state(ii*3+2) << "]   \t"
-                    << "[" << ground_truth(ii*3) << " " << ground_truth(ii*3+1) << " "  << ground_truth(ii*3+2) << "]   \t"
-                    << "[" << state(ii*3)-ground_truth(ii*3) << " " << state(ii*3+1)-ground_truth(ii*3+1) << " "  << state(ii*3+2)-ground_truth(ii*3+2) << "]" << std::endl;
-//         std::cout   << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << std::endl;
-    }
-    std::cout.flags(fmtfl); //restore flags
-    std::cout.precision(n_precision); //restore precision
+    //display/log results, by setting cout flags properly
+    std::cout << std::endl << " Result to file ~/Desktop/log_data.txt" << std::endl;
+    log_file.open("/home/acoromin/Desktop/log_file.txt", std::ofstream::out); //open log file
+    for (unsigned int ii = 0; ii<n_execution; ii++) log_file << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << " " << gps_log.middleRows(ii*3,3).transpose() << std::endl;        
+    log_file.close(); //close log file
   
     //free memory (not necessary since ceres::problem holds their ownership)
 //     delete odom_corresp;
