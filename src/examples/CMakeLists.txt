@@ -35,6 +35,6 @@ TARGET_LINK_LIBRARIES(test_ceres_wrapper_block_sizes ${CERES_LIBRARIES} ${PROJEC
 # TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # Testing a full wolf tree avoiding template classes for NodeLinked derived classes
-ADD_EXECUTABLE(test_ceres_wrapper_non_template test_ceres_wrapper_non_template.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper_non_template ${CERES_LIBRARIES} ${PROJECT_NAME})
+ADD_EXECUTABLE(test_ceres_odom_batch test_ceres_odom_batch.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_odom_batch ${CERES_LIBRARIES} ${PROJECT_NAME})
 

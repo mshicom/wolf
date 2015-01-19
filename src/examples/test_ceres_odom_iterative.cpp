@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <list>
 #include <random>
 #include <cmath>
 // #include <memory>
@@ -303,19 +304,22 @@ int main(int argc, char** argv)
     std::cout << std::endl << " ========= WOLF-CERES test. Simple Odometry + GPS fix problem (with non-template classes) ===========" << std::endl << std::endl;
 
     //user input
-    if (argc!=2)
+    if (argc!=3)
     {
-        std::cout << "Please call me with: [test_ceres_wrapper_non_template N], where N is the number of iterations" << std::endl;
+        std::cout << "Please call me with: [./test_ceres_wrapper_non_template NI NW], where:" << std::endl;
+        std::cout << "       - NI is the number of iterations" << std::endl;
+        std::cout << "       - NW is the size of the window" << std::endl;
         std::cout << "EXIT due to bad user input" << std::endl << std::endl;
         return -1;
     }
     unsigned int n_execution = (unsigned int) atoi(argv[1]); //number of iterations of the whole execution
+    unsigned int n_window = (unsigned int) atoi(argv[2]); //size of the window.
     
     //init google log
     google::InitGoogleLogging(argv[0]);
 
     //variables    
-    std::vector<unsigned int> block_ids; //id of each added block to ceres problem 
+    std::list<unsigned int> block_ids; //id of each added block to ceres problem 
     Eigen::VectorXs odom_inc_true;//invented motion
     Eigen::Vector3s pose_true; //current true pose
     Eigen::VectorXs ground_truth; //accumulated true poses
@@ -324,6 +328,7 @@ int main(int argc, char** argv)
     Eigen::Vector2s odom_reading; //current odometry reading
     Eigen::Vector3s gps_fix_reading; //current GPS fix reading
     Eigen::VectorXs gps_log; //log of all gps readings
+    Eigen::VectorXs results_log; //log of optimized poses
     CorrespondenceOdom2D *odom_corresp; //pointer to odometry correspondence
     CorrespondenceGPSFix *gps_fix_corresp; //pointer to GPS fix correspondence
     ceres::Problem problem; //ceres problem 
@@ -334,9 +339,10 @@ int main(int argc, char** argv)
     //resize vectors according user input number of iterations
     odom_inc_true.resize(n_execution*2); //2 odometry components per iteration
     ground_truth.resize(n_execution*3);// 3 components per iteration
-    state.resize(n_execution*3); //3 components per window element (up to now n_window = n_execution)
-    gps_log.resize(n_execution*3);
-    block_ids.resize(n_execution); //TODO: it will be n_window, 
+    gps_log.resize(n_execution*3); //3 components per iteration
+    results_log.resize(n_execution*3); //3 components per iteration
+    state.resize(n_window*3); //3 components per window element
+    //block_ids.resize(n_window); //TODO: it will be n_window, 
     
     //init true odom and true pose
     for (unsigned int ii = 0; ii<n_execution; ii++)
@@ -351,13 +357,13 @@ int main(int argc, char** argv)
     ground_truth.middleRows(0,3) << pose_true; //init point pushed to ground truth
     state.middleRows(0,3) << 0,0,0; //init state at origin
     
-    //random generators
+    //init random generators
     std::default_random_engine generator;
     std::normal_distribution<WolfScalar> distribution_odom(0.001,0.01); //odometry noise
     std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
     
     //test loop
-    for (unsigned int ii = 1; ii<n_execution; ii++)
+    for (unsigned int ii = 1, jj=1; ii<n_execution; ii++) //ii over iterations, jj over the window
     {
         //inventing a simple motion
         pose_true(0) = pose_true(0) + odom_inc_true(ii*2) * cos(pose_true(2)+odom_inc_true(ii*2+1)); 
@@ -371,10 +377,10 @@ int main(int argc, char** argv)
         gps_fix_reading << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
         gps_log.middleRows(ii*3,3) << gps_fix_reading;//log the reading
         
-        //setting initial guess as an odometry prediction, using noisy odometry
-        pose_predicted(0) = pose_predicted(0) + odom_reading(0) * cos(pose_predicted(2)+odom_reading(1)); 
-        pose_predicted(1) = pose_predicted(1) + odom_reading(0) * sin(pose_predicted(2)+odom_reading(1)); 
-        pose_predicted(2) = pose_predicted(2) + odom_reading(1);
+        //setting initial guess from the last optimized pose, using noisy odometry
+        pose_predicted(0) = state((jj-1)*3) + odom_reading(0) * cos(pose_predicted(2)+odom_reading(1)); 
+        pose_predicted(1) = state((jj-1)*3+1) + odom_reading(0) * sin(pose_predicted(2)+odom_reading(1)); 
+        pose_predicted(2) = state((jj-1)*3+2) + odom_reading(1);
         state.middleRows(ii*3,3) << pose_predicted;
         
         //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
@@ -399,6 +405,8 @@ int main(int argc, char** argv)
     
     //set options and solve (batch mode)
     //options.minimizer_progress_to_stdout = true;
+    options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;
+    options.max_line_search_step_contraction = 1e-3;
     ceres::Solve(options, &problem, &summary);
     
     //display/log results, by setting cout flags properly
