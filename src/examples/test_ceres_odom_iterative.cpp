@@ -378,10 +378,12 @@ int main(int argc, char** argv)
         gps_log.middleRows(ii*3,3) << gps_fix_reading;//log the reading
         
         //setting initial guess from the last optimized pose, using noisy odometry
-        pose_predicted(0) = state((jj-1)*3) + odom_reading(0) * cos(pose_predicted(2)+odom_reading(1)); 
-        pose_predicted(1) = state((jj-1)*3+1) + odom_reading(0) * sin(pose_predicted(2)+odom_reading(1)); 
+        pose_predicted(0) = state((jj-1)*3) + odom_reading(0) * cos(state((jj-1)*3+2)+odom_reading(1)); 
+        pose_predicted(1) = state((jj-1)*3+1) + odom_reading(0) * sin(state((jj-1)*3+2)+odom_reading(1)); 
         pose_predicted(2) = state((jj-1)*3+2) + odom_reading(1);
-        state.middleRows(ii*3,3) << pose_predicted;
+        
+        //window management. TODO !!! HERE !!!
+        state.middleRows(jj*3,3) << pose_predicted;
         
         //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
         odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
