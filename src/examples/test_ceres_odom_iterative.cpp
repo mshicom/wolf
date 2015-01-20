@@ -2,8 +2,10 @@
 
 //std includes
 #include <cstdlib>
+#include <stdlib.h> //getenv
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <vector>
 #include <list>
 #include <random>
@@ -112,6 +114,7 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         std::vector<unsigned int> block_indexes_; //state vector indexes indicating start of each state block. This vector has nblocks_ size. 
         std::vector<unsigned int> block_sizes_; //sizes of each state block. This vector has nblocks_ size. 
         ceres::CostFunction* cost_function_ptr_;
+        unsigned int ceres_residual_block_id_;
         
     public:
         CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _bindexes, const std::vector<unsigned int> & _bsizes) :
@@ -132,17 +135,23 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         {
             return cost_function_ptr_;
         };
+        
+        void setCeresResidualBlockId(const unsigned int &_bid)
+        {
+            ceres_residual_block_id_ = _bid;
+        }
         	
         virtual void display() const
         {
                 unsigned int ii; 
-                std::cout << "number of blocks: " << nblocks_ << std::endl;
-                std::cout << "block indexes: ";
+                std::cout << "number of state blocks: " << nblocks_ << std::endl;
+                std::cout << "state block indexes: ";
                 for (ii=0; ii<block_indexes_.size(); ii++) std::cout << block_indexes_.at(ii) << " ";
                 std::cout << std::endl;
-                std::cout << "block sizes: ";
+                std::cout << "state block sizes: ";
                 for (ii=0; ii<block_sizes_.size(); ii++) std::cout << block_sizes_.at(ii) << " ";
                 std::cout << std::endl;
+                std::cout << "ceres residual block id: " << ceres_residual_block_id_ << std::endl;
         };
 };
 
@@ -267,7 +276,6 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
     protected:
         Eigen::Map<Eigen::Vector3s> location_;
         Eigen::Map<const Eigen::Vector3s> gps_fix_;
-        //TODO: add ceres_residual_block_id_ to manage add/remove block
 
     public:
         CorrespondenceGPSFix(WolfScalar * _st, const Eigen::Vector3s & _gps_fix) :
@@ -306,7 +314,7 @@ int main(int argc, char** argv)
     //user input
     if (argc!=3)
     {
-        std::cout << "Please call me with: [./test_ceres_wrapper_non_template NI NW], where:" << std::endl;
+        std::cout << "Please call me with: [./test_ceres_odom_iterative NI NW], where:" << std::endl;
         std::cout << "       - NI is the number of iterations" << std::endl;
         std::cout << "       - NW is the size of the window" << std::endl;
         std::cout << "EXIT due to bad user input" << std::endl << std::endl;
@@ -319,7 +327,8 @@ int main(int argc, char** argv)
     google::InitGoogleLogging(argv[0]);
 
     //variables    
-    std::list<unsigned int> block_ids; //id of each added block to ceres problem 
+    unsigned int block_id;
+//     std::list<unsigned in> block_ids; //id of each added block to ceres problem 
     Eigen::VectorXs odom_inc_true;//invented motion
     Eigen::Vector3s pose_true; //current true pose
     Eigen::VectorXs ground_truth; //accumulated true poses
@@ -387,8 +396,9 @@ int main(int argc, char** argv)
         
         //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
         odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
-        //odom_corresp->display();
-        problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
+        block_id = problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
+        odom_corresp->setCeresResidualBlockId(block_id);
+        odom_corresp->display();
         delete odom_corresp;
         
         //creating gps correspondence and adding it to the problem 

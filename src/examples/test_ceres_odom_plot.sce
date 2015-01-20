@@ -5,7 +5,9 @@ xdel(winsid());
 clear;
 
 //load log file
-data = read('/home/acoromin/Desktop/log_file.txt',-1,12);
+filename = getenv('HOME');
+filename = filename + '/Desktop/log_data.txt';
+data = read(filename,-1,12);
 
 //plot
 fig1 = figure();

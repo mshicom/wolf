@@ -2,8 +2,10 @@
 
 //std includes
 #include <cstdlib>
+#include <stdlib.h> //getenv
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <vector>
 #include <list>
 #include <random>
@@ -306,7 +308,7 @@ int main(int argc, char** argv)
     //user input
     if (argc!=2)
     {
-        std::cout << "Please call me with: [./test_ceres_wrapper_non_template NI NW], where:" << std::endl;
+        std::cout << "Please call me with: [./test_ceres_odom_batch NI], where:" << std::endl;
         std::cout << "       - NI is the number of iterations" << std::endl;
         std::cout << "EXIT due to bad user input" << std::endl << std::endl;
         return -1;
@@ -405,8 +407,10 @@ int main(int argc, char** argv)
     ceres::Solve(options, &problem, &summary);
     
     //display/log results, by setting cout flags properly
-    std::cout << std::endl << " Result to file ~/Desktop/log_data.txt" << std::endl;
-    log_file.open("/home/acoromin/Desktop/log_file.txt", std::ofstream::out); //open log file
+    std::string filename( getenv("HOME") );
+    filename += "/Desktop/log_data.txt";
+    std::cout << std::endl << " Result to file " << filename << std::endl;
+    log_file.open(filename, std::ofstream::out); //open log file
     for (unsigned int ii = 0; ii<n_execution; ii++) log_file << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << " " << gps_log.middleRows(ii*3,3).transpose() << std::endl;        
     log_file.close(); //close log file
   
