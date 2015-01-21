@@ -111,16 +111,17 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
 {
     protected:
         unsigned int nblocks_; //number of state blocks in which the correspondence depends on.
-        std::vector<unsigned int> block_indexes_; //state vector indexes indicating start of each state block. This vector has nblocks_ size. 
+        //std::vector<unsigned int> block_indexes_; //state vector indexes indicating start of each state block. This vector has nblocks_ size. 
         std::vector<unsigned int> block_sizes_; //sizes of each state block. This vector has nblocks_ size. 
         ceres::CostFunction* cost_function_ptr_;
         unsigned int ceres_residual_block_id_;
         
     public:
-        CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _bindexes, const std::vector<unsigned int> & _bsizes) :
+        //CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _bindexes, const std::vector<unsigned int> & _bsizes) :
+        CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _bsizes) :
             NodeLinked(BOTTOM, "CORRESPONDENCE"),
             nblocks_(_nb),
-            block_indexes_(_bindexes),
+            //block_indexes_(_bindexes),
             block_sizes_(_bsizes)
         {
             assert(block_sizes_.size() == nblocks_);
@@ -147,8 +148,8 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         {
                 unsigned int ii; 
                 std::cout << "number of state blocks: " << nblocks_ << std::endl;
-                std::cout << "state block indexes: ";
-                for (ii=0; ii<block_indexes_.size(); ii++) std::cout << block_indexes_.at(ii) << " ";
+                //std::cout << "state block indexes: ";
+                //for (ii=0; ii<block_indexes_.size(); ii++) std::cout << block_indexes_.at(ii) << " ";
                 std::cout << std::endl;
                 std::cout << "state block sizes: ";
                 for (ii=0; ii<block_sizes_.size(); ii++) std::cout << block_sizes_.at(ii) << " ";
@@ -205,10 +206,10 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
         Eigen::Map<const Eigen::Vector2s> odom_inc_; 
         
     public:
-        CorrespondenceOdom2D(WolfScalar * _st, const Eigen::Vector2s & _odom) :
-            CorrespondenceBaseX(2,{0,3},{3,3}),
-            pose_previous_(_st + block_indexes_.at(0), block_sizes_.at(0)),
-            pose_current_(_st + block_indexes_.at(1), block_sizes_.at(1)),
+        CorrespondenceOdom2D(WolfScalar * _st_prev, WolfScalar * _st_curr, const Eigen::Vector2s & _odom) :
+            CorrespondenceBaseX(2,{3,3}),
+            pose_previous_(_st_prev),//, block_sizes_.at(0)), //size 3 is already defined at declaration
+            pose_current_(_st_curr),//, block_sizes_.at(1)), //size 3 is already defined at declaration
             odom_inc_(_odom.data())
         {
             cost_function_ptr_ = new ceres::AutoDiffCostFunction<Odom2DFunctor,2,3,3>(new Odom2DFunctor(_odom));
@@ -384,8 +385,12 @@ int main(int argc, char** argv)
     std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
     
     //test loop
-    for (unsigned int ii = 1, jj=1; ii<n_execution; ii++) //ii over iterations, jj over the window
+    for (unsigned int ii = 1; ii<n_execution; ii++) //ii over iterations, jj over the window
     {
+        //set jj index (over the window)
+        jj = ii%n_window;
+        jj_previous = (ii-1)%n_window;
+        
         //inventing a simple motion
         pose_true(0) = pose_true(0) + odom_inc_true(ii*2) * cos(pose_true(2)+odom_inc_true(ii*2+1)); 
         pose_true(1) = pose_true(1) + odom_inc_true(ii*2) * sin(pose_true(2)+odom_inc_true(ii*2+1)); 
@@ -399,14 +404,14 @@ int main(int argc, char** argv)
         gps_log.middleRows(ii*3,3) << gps_fix_reading;//log the reading
         
         //setting initial guess from the last optimized pose, using noisy odometry
-        pose_predicted(0) = state((jj-1)*3) + odom_reading(0) * cos(state((jj-1)*3+2)+odom_reading(1)); 
-        pose_predicted(1) = state((jj-1)*3+1) + odom_reading(0) * sin(state((jj-1)*3+2)+odom_reading(1)); 
-        pose_predicted(2) = state((jj-1)*3+2) + odom_reading(1);
+        pose_predicted(0) = state(jj_previous*3) + odom_reading(0) * cos(state(jj_previous*3+2)+odom_reading(1)); 
+        pose_predicted(1) = state(jj_previous*3+1) + odom_reading(0) * sin(state(jj_previous*3+2)+odom_reading(1)); 
+        pose_predicted(2) = state(jj_previous*3+2) + odom_reading(1);
         
         //window management. TODO !!! HERE !!!
         state.middleRows(jj*3,3) << pose_predicted;
         
-        //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
+        //creating odom correspondence. Adding it to the problem 
         odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
         block_id = problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
         odom_corresp->setCeresResidualBlockId(block_id);
