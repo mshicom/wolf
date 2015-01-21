@@ -31,8 +31,12 @@ TARGET_LINK_LIBRARIES(test_ceres_wrapper_block_sizes ${CERES_LIBRARIES} ${PROJEC
 # TARGET_LINK_LIBRARIES(test_ceres_wrapper_residual_parametrization ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test different bla
-# ADD_EXECUTABLE(test_ceres_wrapper_states test_ceres_wrapper_states.cpp)
-# TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})
+ADD_EXECUTABLE(test_ceres_wrapper_states test_ceres_wrapper_states.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})
+
+# jet test different bla
+ADD_EXECUTABLE(test_ceres_wrapper_state_units test_ceres_wrapper_state_units.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_wrapper_state_units ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # Testing a full wolf tree avoiding template classes for NodeLinked derived classes
 ADD_EXECUTABLE(test_ceres_odom_batch test_ceres_odom_batch.cpp)
