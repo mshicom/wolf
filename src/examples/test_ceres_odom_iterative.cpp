@@ -131,15 +131,17 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
             //
         };
         
-        ceres::CostFunction * getCostFunctionPtr()
-        {
-            return cost_function_ptr_;
-        };
+//         ceres::CostFunction * getCostFunctionPtr()
+//         {
+//             return cost_function_ptr_;
+//         };
         
         void setCeresResidualBlockId(const unsigned int &_bid)
         {
             ceres_residual_block_id_ = _bid;
         }
+        
+        virtual void addToProblem(ceres::Problem & _problem) = 0;
         	
         virtual void display() const
         {
@@ -217,15 +219,20 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
             //delete cost_function_ptr_;
         };
                 
-        double * getPosePreviousPtr()
-        {
-            return pose_previous_.data();
-        };
+//         double * getPosePreviousPtr()
+//         {
+//             return pose_previous_.data();
+//         };
+//         
+//         double * getPoseCurrentPtr()
+//         {
+//             return pose_current_.data();
+//         };        
         
-        double * getPoseCurrentPtr()
+        virtual void addToProblem(ceres::Problem & _problem)
         {
-            return pose_current_.data();
-        };        
+            ceres_residual_block_id_ = _problem.AddResidualBlock(cost_function_ptr_,nullptr, pose_previous_.data(), pose_current_.data());
+        }
         
         virtual void display() const
         {
@@ -274,13 +281,13 @@ class GPSFixFunctor
 class CorrespondenceGPSFix : public CorrespondenceBaseX
 {
     protected:
-        Eigen::Map<Eigen::Vector3s> location_;
+        Eigen::Map<Eigen::Vector3s> state_position_;
         Eigen::Map<const Eigen::Vector3s> gps_fix_;
 
     public:
         CorrespondenceGPSFix(WolfScalar * _st, const Eigen::Vector3s & _gps_fix) :
             CorrespondenceBaseX(1,{0},{3}), 
-            location_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
+            state_position_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
             gps_fix_(_gps_fix.data())
         {
             cost_function_ptr_ = new ceres::AutoDiffCostFunction<GPSFixFunctor,3,3>(new GPSFixFunctor(_gps_fix));
@@ -291,9 +298,14 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
             //delete cost_function_ptr_;
         };
         
-        double * getLocation()
+//         double * getLocation()
+//         {
+//             return location_.data();
+//         }
+        
+        virtual void addToProblem(ceres::Problem & _problem)
         {
-            return location_.data();
+            ceres_residual_block_id_ = _problem.AddResidualBlock(cost_function_ptr_,nullptr,state_position_.data()); 
         }
                 
         virtual void display() const
