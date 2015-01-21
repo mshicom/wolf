@@ -113,7 +113,8 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         unsigned int nblocks_; //number of state blocks in which the correspondence depends on.
         std::vector<unsigned int> block_indexes_; //state vector indexes indicating start of each state block. This vector has nblocks_ size. 
         std::vector<unsigned int> block_sizes_; //sizes of each state block. This vector has nblocks_ size. 
-        std::shared_ptr<ceres::CostFunction> cost_function_ptr_;
+        ceres::CostFunction * cost_function_ptr_;
+        //std::shared_ptr<ceres::CostFunction> cost_function_ptr_;
         
     public:
         CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _bindexes, const std::vector<unsigned int> & _bsizes) :
@@ -132,7 +133,8 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         
         ceres::CostFunction * getCostFunctionPtr()
         {
-            return cost_function_ptr_.get();
+            return cost_function_ptr_;
+            //return cost_function_ptr_.get();
         };
         	
         virtual void display() const
@@ -202,7 +204,8 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
             pose_current_(_st + block_indexes_.at(1), block_sizes_.at(1)),
             odom_inc_(_odom.data())
         {
-            cost_function_ptr_.reset( new ceres::AutoDiffCostFunction<Odom2DFunctor,2,3,3>(new Odom2DFunctor(_odom)) );
+            cost_function_ptr_ = new ceres::AutoDiffCostFunction<Odom2DFunctor,2,3,3>(new Odom2DFunctor(_odom));
+            //cost_function_ptr_.reset( new ceres::AutoDiffCostFunction<Odom2DFunctor,2,3,3>(new Odom2DFunctor(_odom)) );
         };
         
         virtual ~CorrespondenceOdom2D()
@@ -277,7 +280,8 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
             location_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
             gps_fix_(_gps_fix.data())
         {
-            cost_function_ptr_.reset( new ceres::AutoDiffCostFunction<GPSFixFunctor,3,3>(new GPSFixFunctor(_gps_fix)) );
+            cost_function_ptr_ = new ceres::AutoDiffCostFunction<GPSFixFunctor,3,3>(new GPSFixFunctor(_gps_fix));
+            //cost_function_ptr_.reset( new ceres::AutoDiffCostFunction<GPSFixFunctor,3,3>(new GPSFixFunctor(_gps_fix)) );
         };
         
         virtual ~CorrespondenceGPSFix()
@@ -319,18 +323,19 @@ int main(int argc, char** argv)
     google::InitGoogleLogging(argv[0]);
 
     //variables    
-    std::list<unsigned int> block_ids; //id of each added block to ceres problem 
     Eigen::VectorXs odom_inc_true;//invented motion
     Eigen::Vector3s pose_true; //current true pose
     Eigen::VectorXs ground_truth; //accumulated true poses
     Eigen::Vector3s pose_predicted; // current predicted pose
     Eigen::VectorXs state; //running window winth solver result
-    Eigen::VectorXs state_copy; //a copy of the state
+    Eigen::VectorXs state_prior; //state prior, just before solving the problem
     Eigen::Vector2s odom_reading; //current odometry reading
     Eigen::Vector3s gps_fix_reading; //current GPS fix reading
     Eigen::VectorXs gps_log; //log of all gps readings
-    std::shared_ptr<CorrespondenceOdom2D> odom_corresp_ptr; //pointer to odometry correspondence
-    std::shared_ptr<CorrespondenceGPSFix> gps_fix_corresp_ptr; //pointer to GPS fix correspondence
+//     std::shared_ptr<CorrespondenceOdom2D> odom_corresp_ptr; //pointer to odometry correspondence
+//     std::shared_ptr<CorrespondenceGPSFix> gps_fix_corresp_ptr; //pointer to GPS fix correspondence
+    CorrespondenceOdom2D * odom_corresp_ptr; //pointer to odometry correspondence
+    CorrespondenceGPSFix * gps_fix_corresp_ptr; //pointer to GPS fix correspondence    
     ceres::Problem problem; //ceres problem 
     ceres::Solver::Options options; //ceres solver options
     ceres::Solver::Summary summary; //ceres solver summary
@@ -341,7 +346,7 @@ int main(int argc, char** argv)
     ground_truth.resize(n_execution*3);// 3 components per iteration
     gps_log.resize(n_execution*3); //3 components per iteration
     state.resize(n_execution*3); //3 components per window element
-    state_copy.resize(n_execution*3); //3 components per window element
+    state_prior.resize(n_execution*3); //3 components per window element
     
     //init true odom and true pose
     for (unsigned int ii = 0; ii<n_execution; ii++)
@@ -383,19 +388,22 @@ int main(int argc, char** argv)
         state.middleRows(ii*3,3) << pose_predicted;
         
         //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
-        odom_corresp_ptr.reset( new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading) );
+        odom_corresp_ptr = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
+        //odom_corresp_ptr.reset( new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading) );
         //odom_corresp->display();
         problem.AddResidualBlock(odom_corresp_ptr->getCostFunctionPtr(),nullptr, odom_corresp_ptr->getPosePreviousPtr(), odom_corresp_ptr->getPoseCurrentPtr());
-        odom_corresp_ptr.reset();
+        delete odom_corresp_ptr;
+        //odom_corresp_ptr.reset();
         
         //creating gps correspondence and adding it to the problem 
         if ( ii%1 == 0 )
         {
-            gps_fix_corresp_ptr.reset( new CorrespondenceGPSFix(state.data()+ii*3, gps_fix_reading) );
+            gps_fix_corresp_ptr =  new CorrespondenceGPSFix(state.data()+ii*3, gps_fix_reading);
+            //gps_fix_corresp_ptr.reset( new CorrespondenceGPSFix(state.data()+ii*3, gps_fix_reading) );
             //gps_fix_corresp->display();
             problem.AddResidualBlock(gps_fix_corresp_ptr->getCostFunctionPtr(),nullptr, gps_fix_corresp_ptr->getLocation());
-            //delete gps_fix_corresp_ptr;
-            gps_fix_corresp_ptr.reset();
+            delete gps_fix_corresp_ptr;
+            //gps_fix_corresp_ptr.reset();
         }
         //set options and solve (sliding window)
 //         options.minimizer_progress_to_stdout = true;
@@ -407,13 +415,13 @@ int main(int argc, char** argv)
     
     //set options and solve (batch mode)
     //options.minimizer_progress_to_stdout = true;
-    state_copy << state;
+    state_prior << state;
     options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;
     options.max_line_search_step_contraction = 1e-3;
     ceres::Solve(options, &problem, &summary);
     
     //solve again, just to check if the problem set-up is still there
-    state = state_copy;
+    state = state_prior;
     ceres::Solve(options, &problem, &summary);
     
     //display/log results, by setting cout flags properly
@@ -422,7 +430,7 @@ int main(int argc, char** argv)
     std::cout << std::endl << " Result to file " << filename << std::endl;
     log_file.open(filename, std::ofstream::out); //open log file
     for (unsigned int ii = 0; ii<n_execution; ii++) 
-        log_file << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << " " << gps_log.middleRows(ii*3,3).transpose() << " " <<  state_copy.middleRows(ii*3,3).transpose() <<std::endl;        
+        log_file << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << " " << gps_log.middleRows(ii*3,3).transpose() << " " <<  state_prior.middleRows(ii*3,3).transpose() <<std::endl;        
     log_file.close(); //close log file
   
     //free memory (not necessary since ceres::problem holds their ownership)

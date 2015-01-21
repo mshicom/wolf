@@ -114,7 +114,7 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
         //std::vector<unsigned int> block_indexes_; //state vector indexes indicating start of each state block. This vector has nblocks_ size. 
         std::vector<unsigned int> block_sizes_; //sizes of each state block. This vector has nblocks_ size. 
         ceres::CostFunction* cost_function_ptr_;
-        unsigned int ceres_residual_block_id_;
+        ceres::ResidualBlockId ceres_residual_block_id_;
         
     public:
         //CorrespondenceBaseX(const unsigned int _nb, const std::vector<unsigned int> & _bindexes, const std::vector<unsigned int> & _bsizes) :
@@ -137,12 +137,12 @@ class CorrespondenceBaseX : public NodeLinked<FeatureBaseX,NodeTerminus>
 //             return cost_function_ptr_;
 //         };
         
-        void setCeresResidualBlockId(const unsigned int &_bid)
-        {
-            ceres_residual_block_id_ = _bid;
-        }
-        
         virtual void addToProblem(ceres::Problem & _problem) = 0;
+        
+        virtual void removeFromProblem(ceres::Problem & _problem)
+        {
+            _problem.RemoveResidualBlock(ceres_residual_block_id_);
+        }
         	
         virtual void display() const
         {
@@ -234,7 +234,7 @@ class CorrespondenceOdom2D : public CorrespondenceBaseX
         {
             ceres_residual_block_id_ = _problem.AddResidualBlock(cost_function_ptr_,nullptr, pose_previous_.data(), pose_current_.data());
         }
-        
+
         virtual void display() const
         {
             std::cout << "---- Odom Correspondence ----" << std::endl;
@@ -287,8 +287,8 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
 
     public:
         CorrespondenceGPSFix(WolfScalar * _st, const Eigen::Vector3s & _gps_fix) :
-            CorrespondenceBaseX(1,{0},{3}), 
-            state_position_(_st + block_indexes_.at(0) , block_sizes_.at(0)),
+            CorrespondenceBaseX(1,{3}), 
+            state_position_(_st),// block_sizes_.at(0)), //size 3 is already defined at declaration
             gps_fix_(_gps_fix.data())
         {
             cost_function_ptr_ = new ceres::AutoDiffCostFunction<GPSFixFunctor,3,3>(new GPSFixFunctor(_gps_fix));
@@ -313,7 +313,7 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
         {
             std::cout << "---- GPS Fix Correspondence ----" << std::endl;
             CorrespondenceBaseX::display();
-            std::cout << "location_: " << location_.transpose() << std::endl;
+            std::cout << "state_position_: " << state_position_.transpose() << std::endl;
             std::cout << "gps_fix_: " << gps_fix_.transpose() << std::endl;            
         };        
 };
@@ -340,13 +340,13 @@ int main(int argc, char** argv)
     google::InitGoogleLogging(argv[0]);
 
     //variables    
-    unsigned int block_id;
-//     std::list<unsigned in> block_ids; //id of each added block to ceres problem 
+    unsigned int ii, jj, jj_previous; //iterators
     Eigen::VectorXs odom_inc_true;//invented motion
     Eigen::Vector3s pose_true; //current true pose
     Eigen::VectorXs ground_truth; //accumulated true poses
     Eigen::Vector3s pose_predicted; // current predicted pose
     Eigen::VectorXs state; //running window winth solver result
+    Eigen::VectorXs state_prior; //state prior, just before solving the problem
     Eigen::Vector2s odom_reading; //current odometry reading
     Eigen::Vector3s gps_fix_reading; //current GPS fix reading
     Eigen::VectorXs gps_log; //log of all gps readings
@@ -364,10 +364,10 @@ int main(int argc, char** argv)
     gps_log.resize(n_execution*3); //3 components per iteration
     results_log.resize(n_execution*3); //3 components per iteration
     state.resize(n_window*3); //3 components per window element
-    //block_ids.resize(n_window); //TODO: it will be n_window, 
+    state_prior.resize(n_execution*3); //3 components per window element
     
     //init true odom and true pose
-    for (unsigned int ii = 0; ii<n_execution; ii++)
+    for (ii = 0; ii<n_execution; ii++)
     {
         if ( ii < (unsigned int)floor(n_execution/2) )
             odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , fabs(sin(ii/2000.)); //invented motion increments. 
@@ -385,7 +385,7 @@ int main(int argc, char** argv)
     std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
     
     //test loop
-    for (unsigned int ii = 1; ii<n_execution; ii++) //ii over iterations, jj over the window
+    for (ii = 1; ii<n_execution; ii++) //ii over iterations, jj over the window
     {
         //set jj index (over the window)
         jj = ii%n_window;
@@ -408,20 +408,19 @@ int main(int argc, char** argv)
         pose_predicted(1) = state(jj_previous*3+1) + odom_reading(0) * sin(state(jj_previous*3+2)+odom_reading(1)); 
         pose_predicted(2) = state(jj_previous*3+2) + odom_reading(1);
         
-        //window management. TODO !!! HERE !!!
+        //window management
         state.middleRows(jj*3,3) << pose_predicted;
         
         //creating odom correspondence. Adding it to the problem 
-        odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
-        block_id = problem.AddResidualBlock(odom_corresp->getCostFunctionPtr(),nullptr, odom_corresp->getPosePreviousPtr(), odom_corresp->getPoseCurrentPtr());
-        odom_corresp->setCeresResidualBlockId(block_id);
-        odom_corresp->display();
+        odom_corresp = new CorrespondenceOdom2D(state.data()+jj_previous*3, state.data()+jj*3, odom_reading);
+        odom_corresp->addToProblem(problem);
+        //odom_corresp->display();
         delete odom_corresp;
         
         //creating gps correspondence and adding it to the problem 
         gps_fix_corresp = new CorrespondenceGPSFix(state.data()+ii*3, gps_fix_reading);
+        gps_fix_corresp->addToProblem(problem);
         //gps_fix_corresp->display();
-        problem.AddResidualBlock(gps_fix_corresp->getCostFunctionPtr(),nullptr, gps_fix_corresp->getLocation());
         delete gps_fix_corresp;
         
         //set options and solve (sliding window)
@@ -434,14 +433,18 @@ int main(int argc, char** argv)
     
     //set options and solve (batch mode)
     //options.minimizer_progress_to_stdout = true;
+    state_prior = state;
     options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;
     options.max_line_search_step_contraction = 1e-3;
     ceres::Solve(options, &problem, &summary);
     
     //display/log results, by setting cout flags properly
-    std::cout << std::endl << " Result to file ~/Desktop/log_data.txt" << std::endl;
-    log_file.open("/home/acoromin/Desktop/log_file.txt", std::ofstream::out); //open log file
-    for (unsigned int ii = 0; ii<n_execution; ii++) log_file << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << " " << gps_log.middleRows(ii*3,3).transpose() << std::endl;        
+    std::string filename( getenv("HOME") );
+    filename += "/Desktop/log_data.txt";
+    std::cout << std::endl << " Result to file " << filename << std::endl;
+    log_file.open(filename, std::ofstream::out); //open log file
+    for (unsigned int ii = 0; ii<n_execution; ii++) 
+        log_file << state.middleRows(ii*3,3).transpose() << " " << ground_truth.middleRows(ii*3,3).transpose() << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() << " " << gps_log.middleRows(ii*3,3).transpose() << " " <<  state_prior.middleRows(ii*3,3).transpose() <<std::endl;        
     log_file.close(); //close log file
   
     //free memory (not necessary since ceres::problem holds their ownership)
