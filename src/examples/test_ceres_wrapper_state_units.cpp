@@ -5,6 +5,7 @@
 #include <memory>
 #include <random>
 #include <typeinfo>
+#include <ctime>
 
 // Eigen includes
 #include <eigen3/Eigen/Dense>
@@ -420,19 +421,6 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 //        template <typename T>
 //        bool operator()(const T* const _x1, const T* const _x2, T* _residuals) const
 //        {
-//        	// print inputs
-//        	// std::cout << "_x1 = ";
-//        	// for (int i=0; i < this->block1Size; i++)
-//        	// 	std::cout << _x1[i] << " ";
-//        	// std::cout << std::endl;
-//        	// std::cout << "_x2 = ";
-//        	// for (int i=0; i < this->block2Size; i++)
-//        	// 	std::cout << _x2[i] << " ";
-//        	// std::cout << std::endl;
-//        	// std::cout << "measurement = ";
-//        	// for (int i=0; i < this->measurementSize; i++)
-//        	// 	std::cout << this->measurement_(i) << " ";
-//        	// std::cout << std::endl;
 //
 //        	// Remap the vehicle state to the const evaluation point
 //			Map<const Matrix<T,Dynamic,1>> x1_map_const(_x1, this->block1Size);
@@ -445,16 +433,6 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 //			Matrix<T,Dynamic,1> expected_measurement = ((x1_map_const - x2_map_const).transpose() * (x1_map_const - x2_map_const)).cwiseSqrt();
 //			VectorXd meas = this->measurement_;
 //			mapped_residuals = (meas).cast<T>() - expected_measurement;
-//
-//			// print outputs
-//			// std::cout << "expected    = ";
-//			// for (int i=0; i < this->measurementSize; i++)
-//			// 	std::cout << expected_measurement(i) << " ";
-//			// std::cout << std::endl;
-//			// std::cout << "_residuals  = ";
-//			// for (int i=0; i < this->measurementSize; i++)
-//			// 	std::cout << _residuals[i] << " ";
-//			// std::cout << std::endl << std::endl;
 //
 //			return true;
 //        }
@@ -561,12 +539,12 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
         bool operator()(const T* const _p1, const T* const _o1, const T* const _p2, const T* const _o2, T* _residuals) const
         {
 			// Expected measurement
-			T expected_range = (_p1[0]-_p2[0])*(_p1[0]-_p2[0]) + (_p1[1]-_p2[1])*(_p1[1]-_p2[1]); //square of the range
+			T expected_range = (_p2[0]-_p1[0])*(_p2[0]-_p1[0]) + (_p2[1]-_p1[1])*(_p2[1]-_p1[1]); //square of the range
 			T expected_rotation = _o2[0]-_o1[0];
 
 			// Residuals
 			_residuals[0] = (expected_range - T((*this->measurement_ptr_)*(*this->measurement_ptr_))) / T(stdev_);
-			_residuals[1] = (expected_rotation - T(*this->measurement_ptr_+1)) / T(stdev_);
+			_residuals[1] = (expected_rotation - T(*(this->measurement_ptr_+1))) / T(stdev_);
 
 			return true;
         }
@@ -731,7 +709,6 @@ class CeresWrapper
 			//std::cout << "Local Parametrization List... " << std::endl;
 			//for (std::list<LocalParametrizationWrapper>::iterator it=local_parametrization_list_.begin(); it!=local_parametrization_list_.end(); ++it)
 			//	it->st_ptr_->print();
-
 		}
 
 		void addResidualBlocks()
@@ -767,6 +744,9 @@ class CeresWrapper
 
 int main(int argc, char** argv) 
 {
+	clock_t t1, t2;
+	t1=clock();
+
     std::cout << " ========= 2D Robot with odometry and GPS ===========" << std::endl << std::endl;
     
     //user input
@@ -793,6 +773,7 @@ int main(int argc, char** argv)
 	Eigen::VectorXs pose_true(dim); //current true pose
 	Eigen::VectorXs ground_truth(n_execution*dim); //all true poses
 	Eigen::VectorXs pose_predicted(dim); // current predicted pose
+	Eigen::VectorXs predicted_trajectory(n_execution*dim); // current predicted pose
 	Eigen::VectorXs state(n_execution*dim); //running window winth solver result
 	Eigen::VectorXs odom_readings(n_execution*2); // all odometry readings
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
@@ -819,6 +800,7 @@ int main(int argc, char** argv)
 	}
 	ground_truth.head(dim) << pose_true; //init point pushed to ground truth
 	state.head(dim) << pose_predicted; //init state at origin
+	predicted_trajectory.head(dim) << pose_predicted;
 
 	//init random generators
 	std::default_random_engine generator(1);
@@ -829,10 +811,11 @@ int main(int argc, char** argv)
 
     // Ceres problem initialization
     ceres::Solver::Options ceres_options;
-    ceres_options.minimizer_progress_to_stdout = false;
-    ceres_options.minimizer_type = ceres::TRUST_REGION;
-    ceres_options.line_search_direction_type = ceres::LBFGS;
-    ceres_options.max_num_iterations = 100;
+    ceres_options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;
+    ceres_options.max_line_search_step_contraction = 1e-3;
+//    ceres_options.minimizer_progress_to_stdout = false;
+//    ceres_options.line_search_direction_type = ceres::LBFGS;
+//    ceres_options.max_num_iterations = 100;
     CeresWrapper ceres_wrapper(ceres_options);
     std::ofstream log_file;  //output file
 
@@ -892,9 +875,7 @@ int main(int argc, char** argv)
 			pose_predicted(1) = pose_predicted(1) + odom_readings(step*2) * sin(new_pose_predicted_2);
 			pose_predicted(2) = new_pose_predicted_2;
 		}
-		// //setting initial guess randomly
-		//state.segment(4*step, 4).setRandom(); // initialize with random values
-		//state.segment(4*step+2, 2) /= state.segment(4*step+2, 2).norm(); //normalize
+		predicted_trajectory.segment(step*dim,dim) = pose_predicted;
 
 		// store
 		state.segment(step*dim,dim) << pose_predicted;
@@ -915,39 +896,33 @@ int main(int argc, char** argv)
 			ceres_wrapper.addStateUnit<StateThetaAngle>(new StateThetaAngle(state.data() + step * dim + 2));
 			state_ptr_vector_.push_back(new StateThetaAngle(state.data() + step * dim + 2));
 		}
-		//std::cout << "New state ptr in the vector: " << std::endl;
-		//for (int j = 0; j < state_ptr_vector_.size(); j++)
-		//{
-		//	std::cout << j << ":" <<  std::endl;
-		//	state_ptr_vector_.at(j)->print();
-		//}
+//		std::cout << "New state ptr in the vector: " << std::endl;
+//		for (int j = 0; j < state_ptr_vector_.size(); j++)
+//		{
+//			std::cout << j << ":" <<  std::endl;
+//			state_ptr_vector_.at(j)->print();
+//		}
 
 		// CORRESPONDENCE ODOMETRY
 		if (complex_angle)
 		{
-			Correspondence2DOdometry* corrOdomPtr = new Correspondence2DOdometry(odom_readings.data() + step*2,
-																				 state_ptr_vector_.at(step*2-2),
-																				 state_ptr_vector_.at(step*2-1),
-																				 state_ptr_vector_.at(step*2),
-																				 state_ptr_vector_.back());
-			// Add correspondence
-			ceres_wrapper.addCorrespondence<Correspondence2DOdometry>(corrOdomPtr);
+			ceres_wrapper.addCorrespondence<Correspondence2DOdometry>(new Correspondence2DOdometry(odom_readings.data() + step*2,
+																								   state_ptr_vector_.at(step*2-2),
+																								   state_ptr_vector_.at(step*2-1),
+																								   state_ptr_vector_.at(step*2),
+																								   state_ptr_vector_.back()));
 		}
 		else
 		{
-			Correspondence2DOdometryTheta* corrOdomPtr = new Correspondence2DOdometryTheta(odom_readings.data() + step*2,
-																						   state_ptr_vector_.at(step*2-2),
-																						   state_ptr_vector_.at(step*2-1),
-																						   state_ptr_vector_.at(step*2),
-																						   state_ptr_vector_.back());
-			// Add correspondence
-			ceres_wrapper.addCorrespondence<Correspondence2DOdometryTheta>(corrOdomPtr);
+			ceres_wrapper.addCorrespondence<Correspondence2DOdometryTheta>(new Correspondence2DOdometryTheta(odom_readings.data() + step*2,
+																											 state_ptr_vector_.at(step*2-2),
+																											 state_ptr_vector_.at(step*2-1),
+																											 state_ptr_vector_.at(step*2),
+																											 state_ptr_vector_.back()));
 		}
 
 		// CORRESPONDENCE GPS (2D)
-		CorrespondenceGPS2D* corrGPSPtr = new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, state_ptr_vector_.at(step*2));
-		// Add correspondence
-		ceres_wrapper.addCorrespondence<CorrespondenceGPS2D>(corrGPSPtr);
+		ceres_wrapper.addCorrespondence<CorrespondenceGPS2D>(new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, state_ptr_vector_.at(step*2)));
 
 		// SOLVE CERES PROBLEM
 		//ceres::Solver::Summary summary = ceres_wrapper.solve();
@@ -966,11 +941,16 @@ int main(int argc, char** argv)
 	}
     
 	ceres::Solver::Summary summary = ceres_wrapper.solve();
-	std::cout << summary.total_time_in_seconds << std::endl;
+	t2=clock();
+	double seconds = ((double)t2-t1)/CLOCKS_PER_SEC;
+	//std::cout << summary.FullReport() << std::endl;
+	std::cout << "optimization seconds: " << summary.total_time_in_seconds << std::endl;
+	std::cout << "total seconds: " << seconds << std::endl;
 
 	//display/log results, by setting cout flags properly
 	VectorXs state_theta(n_execution * 3);
 	VectorXs ground_truth_theta(n_execution * 3);
+	VectorXs predicted_trajectory_theta(n_execution * 3);
 	if (complex_angle)
 	{
 		// change from complex angle to theta
@@ -978,23 +958,26 @@ int main(int argc, char** argv)
 		{
 			state_theta.segment(ii*3,3) << state(ii*4), state(ii*4+1), atan2(state(ii*4+2), state(ii*4+3));
 			ground_truth_theta.segment(ii*3,3) << ground_truth(ii*4), ground_truth(ii*4+1), atan2(ground_truth(ii*4+2), ground_truth(ii*4+3));
+			predicted_trajectory_theta.segment(ii*3,3) << predicted_trajectory(ii*4), predicted_trajectory(ii*4+1), atan2(predicted_trajectory(ii*4+2), predicted_trajectory(ii*4+3));
 		}
 	}
 	else
 	{
 		state_theta = state;
 		ground_truth_theta = ground_truth;
+		predicted_trajectory_theta = predicted_trajectory;
 	}
 	std::string homepath = getenv("HOME");
 	log_file.open(homepath + "/Desktop/log_file_2.txt", std::ofstream::out); //open log file
 	if (log_file.is_open())
 	{
-		log_file << summary.total_time_in_seconds << std::endl;
+		log_file << seconds << std::endl;
 		for (unsigned int ii = 0; ii<n_execution; ii++)
 			log_file << state_theta.segment(ii*3,3).transpose()
 					 << " " << ground_truth_theta.segment(ii*3,3).transpose()
 					 << " " << (state_theta.segment(ii*3,3)-ground_truth_theta.segment(ii*3,3)).transpose()
-					 << " " << gps_fix_readings.segment(ii*3,3).transpose() << std::endl;
+					 << " " << gps_fix_readings.segment(ii*3,3).transpose()
+					 << " " << predicted_trajectory_theta.segment(ii*3,3).transpose() << std::endl;
 		log_file.close(); //close log file
 		std::cout << std::endl << " Result file ~/Desktop/log_data.txt" << std::endl;
 	}

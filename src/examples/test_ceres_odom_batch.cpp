@@ -1,6 +1,7 @@
 // Testing a full wolf tree avoiding template classes for NodeLinked derived classes
 
 //std includes
+#include <ctime>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -177,8 +178,8 @@ class Odom2DFunctor
             dth = _x1[2] - _x0[2]; //
             
             //residuals in range and theta components 
-            _residual[0] = (T(dr2) - T(odom_inc_(0)*odom_inc_(0))) / T(odom_stdev_);
-            _residual[1] = (T(dth) - T(odom_inc_(1))) / T(odom_stdev_);
+            _residual[0] = (dr2 - T(odom_inc_(0)*odom_inc_(0))) / T(odom_stdev_);
+            _residual[1] = (dth - T(odom_inc_(1))) / T(odom_stdev_);
             
             //return 
             return true;
@@ -300,6 +301,9 @@ class CorrespondenceGPSFix : public CorrespondenceBaseX
 
 int main(int argc, char** argv) 
 {    
+	clock_t t1, t2;
+	t1 = clock();
+	
     //Welcome message
     std::cout << std::endl << " ========= WOLF-CERES test. Simple Odometry + GPS fix problem (with non-template classes) ===========" << std::endl << std::endl;
 
@@ -322,6 +326,7 @@ int main(int argc, char** argv)
     Eigen::Vector3s pose_true; //current true pose
     Eigen::VectorXs ground_truth; //accumulated true poses
     Eigen::Vector3s pose_predicted; // current predicted pose
+    Eigen::VectorXs predicted_trajectory; // current predicted pose
     Eigen::VectorXs state; //running window winth solver result
     Eigen::Vector2s odom_reading; //current odometry reading
     Eigen::Vector3s gps_fix_reading; //current GPS fix reading
@@ -338,6 +343,7 @@ int main(int argc, char** argv)
     ground_truth.resize(n_execution*3);// 3 components per iteration
     gps_log.resize(n_execution*3); //3 components per iteration
     state.resize(n_execution*3); //3 components per window element
+    predicted_trajectory.resize(n_execution*3); //3 components per window element
     
     //init true odom and true pose
     for (unsigned int ii = 0; ii<n_execution; ii++)
@@ -351,6 +357,7 @@ int main(int argc, char** argv)
     pose_predicted << 0,0,0;
     ground_truth.middleRows(0,3) << pose_true; //init point pushed to ground truth
     state.middleRows(0,3) << 0,0,0; //init state at origin
+    predicted_trajectory.middleRows(0,3) << pose_predicted;
     
     //init random generators
     std::default_random_engine generator(1);
@@ -377,6 +384,8 @@ int main(int argc, char** argv)
         pose_predicted(1) = pose_predicted(1) + odom_reading(0) * sin(pose_predicted(2)+odom_reading(1)); 
         pose_predicted(2) = pose_predicted(2) + odom_reading(1);
         state.middleRows(ii*3,3) << pose_predicted;
+        predicted_trajectory.middleRows(ii*3,3) << pose_predicted;
+        //std::cout << "pose_predicted(" << ii << ") = " << pose_predicted.transpose() << std::endl;
         
         //creating odom correspondence, exceptuating first iteration. Adding it to the problem 
         odom_corresp = new CorrespondenceOdom2D(state.data()+(ii-1)*3, odom_reading);
@@ -404,17 +413,24 @@ int main(int argc, char** argv)
     options.max_line_search_step_contraction = 1e-3;
     ceres::Solve(options, &problem, &summary);
     
+    t2=clock();
+	double seconds = ((double)t2-t1)/CLOCKS_PER_SEC;
+	//std::cout << summary.FullReport() << std::endl;
+	std::cout << "optimization seconds: " << summary.total_time_in_seconds << std::endl;
+	std::cout << "total seconds: " << seconds << std::endl;
+    
     //display/log results, by setting cout flags properly
     std::string homepath = getenv("HOME");
 	log_file.open(homepath + "/Desktop/log_file.txt", std::ofstream::out); //open log file
 	if (log_file.is_open())
 	{
-		log_file << summary.total_time_in_seconds << std::endl;
+		log_file << seconds << std::endl;
 		for (unsigned int ii = 0; ii<n_execution; ii++) 
 			log_file << state.middleRows(ii*3,3).transpose() 
 					 << " " << ground_truth.middleRows(ii*3,3).transpose() 
-					 << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose() 
-					 << " " << gps_log.middleRows(ii*3,3).transpose() << std::endl;
+					 << " " << (state.middleRows(ii*3,3)-ground_truth.middleRows(ii*3,3)).transpose()  
+					 << " " << gps_log.middleRows(ii*3,3).transpose()
+					 << " " << predicted_trajectory.middleRows(ii*3,3).transpose() << std::endl;
 		log_file.close(); //close log file
 		std::cout << std::endl << " Result to file ~/Desktop/log_data.txt" << std::endl;
 	}
