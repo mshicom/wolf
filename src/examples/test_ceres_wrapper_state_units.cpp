@@ -31,14 +31,9 @@
  **/
 
 using namespace Eigen;
-enum correspondenceType {
-	CORR_N_BLOCKS,
-	CORR_GPS_3D,
-	CORR_GPS_2D,
-	CORR_3D_RANGE,
-	CORR_2D_ODOMETRY,
-	CORR_2D_ODOMETRY_THETA,
-	CORR_2D_RANGE};
+enum costFunctionType {
+	AUTO,
+	NUMERIC};
 enum parametrizationType {
 	NONE,
 	COMPLEX_ANGLE,
@@ -227,7 +222,7 @@ class CorrespondenceBase
         {
         }
 
-        virtual correspondenceType getType() const = 0;
+        virtual costFunctionType getCostFunctionType() const = 0;
         virtual const std::vector<WolfScalar *> getBlockPtrVector() = 0;
 };
 
@@ -348,9 +343,9 @@ class CorrespondenceSparse: public CorrespondenceBase
         {
         }
 
-        virtual correspondenceType getType() const
+        virtual costFunctionType getCostFunctionType() const
         {
-        	return CORR_N_BLOCKS;
+        	return AUTO;
         }
 
 		virtual const std::vector<WolfScalar *> getBlockPtrVector()
@@ -388,9 +383,9 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 			return true;
 		}
 
-		virtual correspondenceType getType() const
+		virtual costFunctionType getCostFunctionType() const
 		{
-			return CORR_GPS_2D;
+			return AUTO;
 		}
 };
 
@@ -437,9 +432,9 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 //			return true;
 //        }
 //
-//        virtual correspondenceType getType() const
+//        virtual costFunctionType getCostFunctionType() const
 //        {
-//        	return CORR_2D_RANGE;
+//        	return AUTO;
 //        }
 //};
 
@@ -499,14 +494,14 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 
 			// Residuals
 			_residuals[0] = (expected_range - T((*this->measurement_ptr_)*(*this->measurement_ptr_))) / T(stdev_);
-			_residuals[1] = (expected_rotation - T(*this->measurement_ptr_+1)) / T(stdev_);
+			_residuals[1] = (expected_rotation - T(*(this->measurement_ptr_+1))) / T(stdev_);
 
 			return true;
         }
 
-        virtual correspondenceType getType() const
+        virtual costFunctionType getCostFunctionType() const
         {
-        	return CORR_2D_ODOMETRY;
+        	return AUTO;
         }
 };
 
@@ -549,11 +544,56 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
 			return true;
         }
 
-        virtual correspondenceType getType() const
+        virtual costFunctionType getCostFunctionType() const
         {
-        	return CORR_2D_ODOMETRY_THETA;
+        	return AUTO;
         }
 };
+
+class Correspondence2DOdometryThetaNumeric : public CorrespondenceSparse<2,2,1,2,1>
+{
+	public:
+		static const unsigned int N_BLOCKS = 4;
+		const double stdev_ = 0.01; //model parameters
+
+		Correspondence2DOdometryThetaNumeric(WolfScalar* _measurementPtr, WolfScalar** _blockPtrs) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _blockPtrs)
+		{
+		}
+
+		Correspondence2DOdometryThetaNumeric(WolfScalar* _measurementPtr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr, WolfScalar* _block4Ptr) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _block1Ptr, _block2Ptr, _block3Ptr, _block4Ptr)
+		{
+		}
+
+		Correspondence2DOdometryThetaNumeric(WolfScalar* _measurementPtr, StateBase* _state1Ptr, StateBase* _state2Ptr, StateBase* _state3Ptr, StateBase* _state4Ptr) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _state1Ptr->getPtr(), _state2Ptr->getPtr(),_state3Ptr->getPtr(), _state4Ptr->getPtr())
+		{
+		}
+
+		virtual ~Correspondence2DOdometryThetaNumeric()
+		{
+		}
+
+        bool operator()(const double* const _p1, const double* const _o1, const double* const _p2, const double* const _o2, double* _residuals) const
+        {
+			// Expected measurement
+        	double expected_range = (_p2[0]-_p1[0])*(_p2[0]-_p1[0]) + (_p2[1]-_p1[1])*(_p2[1]-_p1[1]); //square of the range
+        	double expected_rotation = _o2[0]-_o1[0];
+
+			// Residuals
+			_residuals[0] = (expected_range - ((*this->measurement_ptr_)*(*this->measurement_ptr_))) / stdev_;
+			_residuals[1] = (expected_rotation - (*(this->measurement_ptr_+1))) / stdev_;
+
+			return true;
+        }
+
+        virtual costFunctionType getCostFunctionType() const
+        {
+        	return NUMERIC;
+        }
+};
+
 
 class WolfProblem
 {
@@ -720,19 +760,44 @@ class CeresWrapper
 		template <typename CorrespondenceDerived>
 		ceres::CostFunction* createCostFunction(CorrespondenceDerived* _corrPtr)
 		{
-			// TODO: get_diff_type --> swich case (autodiff, numerical, etc)
-			return new ceres::AutoDiffCostFunction<CorrespondenceDerived,
-													_corrPtr->measurementSize,
-													_corrPtr->block0Size,
-													_corrPtr->block1Size,
-													_corrPtr->block2Size,
-													_corrPtr->block3Size,
-													_corrPtr->block4Size,
-													_corrPtr->block5Size,
-													_corrPtr->block6Size,
-													_corrPtr->block7Size,
-													_corrPtr->block8Size,
-													_corrPtr->block9Size>(_corrPtr);
+			switch (_corrPtr->getCostFunctionType())
+			{
+				case AUTO:
+				{
+					return new ceres::AutoDiffCostFunction<CorrespondenceDerived,
+															_corrPtr->measurementSize,
+															_corrPtr->block0Size,
+															_corrPtr->block1Size,
+															_corrPtr->block2Size,
+															_corrPtr->block3Size,
+															_corrPtr->block4Size,
+															_corrPtr->block5Size,
+															_corrPtr->block6Size,
+															_corrPtr->block7Size,
+															_corrPtr->block8Size,
+															_corrPtr->block9Size>(_corrPtr);
+					break;
+				}
+				case NUMERIC:
+				{
+					return new ceres::NumericDiffCostFunction<CorrespondenceDerived,
+															 ceres::CENTRAL,
+															 _corrPtr->measurementSize,
+															 _corrPtr->block0Size,
+															 _corrPtr->block1Size,
+															 _corrPtr->block2Size,
+															 _corrPtr->block3Size,
+															 _corrPtr->block4Size,
+															 _corrPtr->block5Size,
+															 _corrPtr->block6Size,
+															 _corrPtr->block7Size,
+															 _corrPtr->block8Size,
+															 _corrPtr->block9Size>(_corrPtr);
+					break;
+				}
+				default:
+					std::cout << "Unknown  cost function type!" << std::endl;
+			}
 		}
 
 		void applyLocalParametrizations()
@@ -815,7 +880,7 @@ int main(int argc, char** argv)
     ceres_options.max_line_search_step_contraction = 1e-3;
 //    ceres_options.minimizer_progress_to_stdout = false;
 //    ceres_options.line_search_direction_type = ceres::LBFGS;
-//    ceres_options.max_num_iterations = 100;
+//    ceres_options.max_num_iterations = 2;
     CeresWrapper ceres_wrapper(ceres_options);
     std::ofstream log_file;  //output file
 
