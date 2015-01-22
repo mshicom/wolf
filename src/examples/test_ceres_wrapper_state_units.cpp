@@ -1,4 +1,5 @@
 //std includes
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -35,6 +36,7 @@ enum correspondenceType {
 	CORR_GPS_2D,
 	CORR_3D_RANGE,
 	CORR_2D_ODOMETRY,
+	CORR_2D_ODOMETRY_THETA,
 	CORR_2D_RANGE};
 enum parametrizationType {
 	NONE,
@@ -106,6 +108,36 @@ class StatePoint2D: public StateBase
 		virtual void print() const
 		{
 			std::cout << *this->state_ptr_ << " " << *(this->state_ptr_+1) << std::endl;
+		}
+};
+
+class StateThetaAngle: public StateBase
+{
+	public:
+		static const unsigned int BLOCK_SIZE = 1;
+
+		StateThetaAngle(VectorXs& _st_remote, const unsigned int _idx) :
+			StateBase(_st_remote, _idx)
+		{
+		}
+
+		StateThetaAngle(WolfScalar* _st_ptr) :
+			StateBase(_st_ptr)
+		{
+		}
+
+		virtual ~StateThetaAngle()
+		{
+		}
+
+		virtual parametrizationType getParametrizationType() const
+		{
+			return NONE;
+		}
+
+		virtual void print() const
+		{
+			std::cout << *this->state_ptr_ << std::endl;
 		}
 };
 
@@ -181,7 +213,7 @@ class ComplexAngleParameterization : public ceres::LocalParameterization
 class CorrespondenceBase
 {
 	protected:
-    	WolfScalar *measurement_ptr_;
+		WolfScalar *measurement_ptr_;
 
     public:
 
@@ -330,6 +362,7 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 {
 	public:
 		static const unsigned int N_BLOCKS = 1;
+		const double stdev_ = 1;
 
 		CorrespondenceGPS2D(WolfScalar* _measurementPtr, WolfScalar* _statePtr) :
 			CorrespondenceSparse<2,2>(_measurementPtr, _statePtr)
@@ -348,8 +381,8 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 		template <typename T>
 		bool operator()(const T* const _x, T* _residuals) const
 		{
-			_residuals[0] = T(*this->measurement_ptr_) - _x[0];
-			_residuals[1] = T(*(this->measurement_ptr_+1)) - _x[1];
+			_residuals[0] = (T(*this->measurement_ptr_) - _x[0]) / T(stdev_);
+			_residuals[1] = (T(*(this->measurement_ptr_+1)) - _x[1]) / T(stdev_);
 
 			return true;
 		}
@@ -432,23 +465,24 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 //        }
 //};
 
-class Correspondence2DOdometry : public CorrespondenceSparse<3,2,2,2,2>
+class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 {
 	public:
-		static const unsigned int N_BLOCKS = 2;
+		static const unsigned int N_BLOCKS = 4;
+		const double stdev_ = 0.01; //model parameters
 
 		Correspondence2DOdometry(WolfScalar* _measurementPtr, WolfScalar** _blockPtrs) :
-			CorrespondenceSparse<3,2,2,2,2>(_measurementPtr, _blockPtrs)
+			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _blockPtrs)
 		{
 		}
 
 		Correspondence2DOdometry(WolfScalar* _measurementPtr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr, WolfScalar* _block4Ptr) :
-			CorrespondenceSparse<3,2,2,2,2>(_measurementPtr, _block1Ptr, _block2Ptr, _block3Ptr, _block4Ptr)
+			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _block1Ptr, _block2Ptr, _block3Ptr, _block4Ptr)
 		{
 		}
 
 		Correspondence2DOdometry(WolfScalar* _measurementPtr, StateBase* _state1Ptr, StateBase* _state2Ptr, StateBase* _state3Ptr, StateBase* _state4Ptr) :
-			CorrespondenceSparse<3,2,2,2,2>(_measurementPtr, _state1Ptr->getPtr(), _state2Ptr->getPtr(),_state3Ptr->getPtr(), _state4Ptr->getPtr())
+			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _state1Ptr->getPtr(), _state2Ptr->getPtr(),_state3Ptr->getPtr(), _state4Ptr->getPtr())
 		{
 		}
 
@@ -481,38 +515,13 @@ class Correspondence2DOdometry : public CorrespondenceSparse<3,2,2,2,2>
         	//	std::cout << *(this->measurement_ptr_+i) << std::endl;
         	//std::cout << std::endl;
 
-        	// LONGITUDINAL AND TRANVERSAL ERROR
-        	// Remap the vehicle state to the const evaluation point
-			Map<const Matrix<T,2,1>> p1_map(_p1,2);
-			Map<const Matrix<T,2,1>> p2_map(_p2,2);
-
 			// Expected measurement
-			Matrix<T,2,2> Rinv1; // Rotation matrix of the negative angle of the first pose
-			Rinv1 << _o1[0], _o1[1], -_o1[1], _o1[0];
-			Matrix<T,2,1> expected_meas = Rinv1 * (p1_map - p2_map);
+			T expected_range = (_p1[0]-_p2[0])*(_p1[0]-_p2[0]) + (_p1[1]-_p2[1])*(_p1[1]-_p2[1]); //square of the range
+			T expected_rotation = atan2(-_o1[0]*_o2[1] + _o1[1]*_o2[0], _o1[0]*_o2[0] + _o1[1]*_o2[1]);
 
-			// Map residuals
-			Map<Matrix<T,2,1>> p_residual(_residuals,2);
-
-			// Compute residuals
-			Vector2s p_meas;
-			p_meas << *(this->measurement_ptr_), *(this->measurement_ptr_+1);
-			p_residual = (p_meas).cast<T>() - expected_meas;
-
-			// ORIENTATION ERROR
-			_residuals[2] = T(*(this->measurement_ptr_+2)) - atan2(-_o1[0]*_o2[1] + _o1[1]*_o2[0],
-															  _o1[0]*_o2[0] + _o1[1]*_o2[1]);
-
-			// print outputs
-			// std::cout << "expected:" << std::endl;
-			// for (int i=0; i < 2; i++)
-			// 	std::cout << expected_meas(i) << std::endl;
-			// std::cout << atan2(-_o1[0]*_o2[1] + _o1[1]*_o2[0], _o1[0]*_o2[0] + _o1[1]*_o2[1]);
-			// std::cout << std::endl;
-			// std::cout << "_residuals:" << std::endl;
-			// for (int i=0; i < this->measurementSize; i++)
-			//	std::cout << _residuals[i] << std::endl;
-			// std::cout << std::endl << std::endl;
+			// Residuals
+			_residuals[0] = (expected_range - T((*this->measurement_ptr_)*(*this->measurement_ptr_))) / T(stdev_);
+			_residuals[1] = (expected_rotation - T(*this->measurement_ptr_+1)) / T(stdev_);
 
 			return true;
         }
@@ -520,6 +529,51 @@ class Correspondence2DOdometry : public CorrespondenceSparse<3,2,2,2,2>
         virtual correspondenceType getType() const
         {
         	return CORR_2D_ODOMETRY;
+        }
+};
+
+class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
+{
+	public:
+		static const unsigned int N_BLOCKS = 4;
+		const double stdev_ = 0.01; //model parameters
+
+		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, WolfScalar** _blockPtrs) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _blockPtrs)
+		{
+		}
+
+		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr, WolfScalar* _block4Ptr) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _block1Ptr, _block2Ptr, _block3Ptr, _block4Ptr)
+		{
+		}
+
+		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, StateBase* _state1Ptr, StateBase* _state2Ptr, StateBase* _state3Ptr, StateBase* _state4Ptr) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _state1Ptr->getPtr(), _state2Ptr->getPtr(),_state3Ptr->getPtr(), _state4Ptr->getPtr())
+		{
+		}
+
+		virtual ~Correspondence2DOdometryTheta()
+		{
+		}
+
+        template <typename T>
+        bool operator()(const T* const _p1, const T* const _o1, const T* const _p2, const T* const _o2, T* _residuals) const
+        {
+			// Expected measurement
+			T expected_range = (_p1[0]-_p2[0])*(_p1[0]-_p2[0]) + (_p1[1]-_p2[1])*(_p1[1]-_p2[1]); //square of the range
+			T expected_rotation = _o2[0]-_o1[0];
+
+			// Residuals
+			_residuals[0] = (expected_range - T((*this->measurement_ptr_)*(*this->measurement_ptr_))) / T(stdev_);
+			_residuals[1] = (expected_rotation - T(*this->measurement_ptr_+1)) / T(stdev_);
+
+			return true;
+        }
+
+        virtual correspondenceType getType() const
+        {
+        	return CORR_2D_ODOMETRY_THETA;
         }
 };
 
@@ -624,7 +678,7 @@ class CeresWrapper
 		{
 		}
 
-		void solve(const bool display_summary)
+		ceres::Solver::Summary solve()
 		{
 			// add Residual Blocks
 			addResidualBlocks();
@@ -636,22 +690,13 @@ class CeresWrapper
 			ceres::Solve(ceres_options_, &ceres_problem_, &ceres_summary_);
 
 			//display results
-			if (display_summary)
-				summary();
-		}
-
-		void summary()
-		{
-			std::cout << ceres_summary_.FullReport() << "\n";
+			return ceres_summary_;
 		}
 
 		template <class CorrespondenceType>
 		void addCorrespondence(CorrespondenceType* _corr_ptr)
 		{
-			//std::cout << "Adding a Correspondence to wolf_problem..." << std::endl;
 			wolf_problem_->addCorrespondence(_corr_ptr);
-			//std::cout << "Adding a Correspondence to the List..." << std::endl;
-			//ceres::CostFunction* cost_function_ptr = createCostFunction<CorrespondenceType>(_corr_ptr);
 			correspondence_list_.push_back(CorrespondenceWrapper{_corr_ptr, createCostFunction<CorrespondenceType>(_corr_ptr), _corr_ptr->getBlockPtrVector()});
 		}
 
@@ -691,13 +736,8 @@ class CeresWrapper
 
 		void addResidualBlocks()
 		{
-			//std::cout << "Adding residual blocks..." << std::endl;
-			//int i = 0;
 			for (std::list<CorrespondenceWrapper>::iterator it=correspondence_list_.begin(); it!=correspondence_list_.end(); ++it)
-			{
-				//std::cout << i++ << " block" << std::endl;
 				ceres_problem_.AddResidualBlock(it->cost_function_ptr_, NULL, it->block_ptrs_);
-			}
 		}
 
 		template <typename CorrespondenceDerived>
@@ -720,41 +760,42 @@ class CeresWrapper
 
 		void applyLocalParametrizations()
 		{
-			//std::cout << "Applying local parametrizations..." << std::endl;
 			for (std::list<LocalParametrizationWrapper>::iterator it=local_parametrization_list_.begin(); it!=local_parametrization_list_.end(); ++it)
 				ceres_problem_.SetParameterization(it->st_ptr_->getPtr(), it->local_parametrization_ptr_);
-
-			//std::cout << "Local parametrizations applied!" << std::endl;
 		}
 };
 
-
 int main(int argc, char** argv) 
 {
-    std::cout << " ========= 2D Robot with odometry, GPS and Range only between poses ===========" << std::endl << std::endl;
+    std::cout << " ========= 2D Robot with odometry and GPS ===========" << std::endl << std::endl;
     
     //user input
-	if (argc!=2)
+	if (argc!=4)
 	{
-		std::cout << "Please call me with: [./test_ceres_wrapper_states NI], where:" << std::endl;
-		std::cout << "       - NI is the number of iterations" << std::endl;
+		std::cout << "Please call me with: [./test_ceres_wrapper_states NI PRINT ORIENTATION_MODE], where:" << std::endl;
+		std::cout << "     - NI is the number of iterations" << std::endl;
+		std::cout << "     - PRINT = 1 for print results" << std::endl;
+		std::cout << "     - ORIENTATION_MODE: 0 for theta, 1 for complex angle" << std::endl;
 		std::cout << "EXIT due to bad user input" << std::endl << std::endl;
 		return -1;
 	}
 
 	unsigned int n_execution = (unsigned int) atoi(argv[1]); //number of iterations of the whole execution
+	bool print = (bool) atoi(argv[2]);
+	bool complex_angle = (bool) atoi(argv[3]);
 
 	//init google log
 	google::InitGoogleLogging(argv[0]);
 
 	//variables
+	int dim = (complex_angle ? 4 : 3);
 	Eigen::VectorXs odom_inc_true(n_execution*2);//invented motion
-	Eigen::Vector4s pose_true; //current true pose
-	Eigen::VectorXs ground_truth(n_execution*4); //all true poses
-	Eigen::Vector4s pose_predicted; // current predicted pose
-	Eigen::VectorXs state(n_execution*4); //running window winth solver result
+	Eigen::VectorXs pose_true(dim); //current true pose
+	Eigen::VectorXs ground_truth(n_execution*dim); //all true poses
+	Eigen::VectorXs pose_predicted(dim); // current predicted pose
+	Eigen::VectorXs state(n_execution*dim); //running window winth solver result
 	Eigen::VectorXs odom_readings(n_execution*2); // all odometry readings
-	Eigen::VectorXs gps_fix_readings(n_execution*2); //all GPS fix readings
+	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
 	std::vector<StateBase> state_vector_; // vector of state units
 	std::vector<StateBase*> state_ptr_vector_; // vector of pointers to state units
 
@@ -766,13 +807,21 @@ int main(int argc, char** argv)
 		else
 			odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , -fabs(sin((ii-floor(n_execution/2))/2000.)); //invented motion increments.
 	}
-	pose_true << 0,0,0,1;
-	pose_predicted << 0,0,0,1;
-	ground_truth.head(4) << pose_true; //init point pushed to ground truth
-	state.head(4) << pose_predicted; //init state at origin
+	if (complex_angle)
+	{
+		pose_true << 0,0,1,0;
+		pose_predicted << 0,0,1,0;
+	}
+	else
+	{
+		pose_true << 0,0,0;
+		pose_predicted << 0,0,0;
+	}
+	ground_truth.head(dim) << pose_true; //init point pushed to ground truth
+	state.head(dim) << pose_predicted; //init state at origin
 
 	//init random generators
-	std::default_random_engine generator;
+	std::default_random_engine generator(1);
 	std::normal_distribution<WolfScalar> distribution_odom(0.001,0.01); //odometry noise
 	std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
 
@@ -789,56 +838,83 @@ int main(int argc, char** argv)
 
 	// Start trajectory
 	ceres_wrapper.addStateUnit<StatePoint2D>(new StatePoint2D(state.data()));
-	ceres_wrapper.addStateUnit<StateComplexAngle>(new StateComplexAngle(state.data()+2));
 	state_ptr_vector_.push_back(new StatePoint2D(state.data()));
-	state_ptr_vector_.push_back(new StateComplexAngle(state.data() + 2));
+	if (complex_angle)
+	{
+		ceres_wrapper.addStateUnit<StateComplexAngle>(new StateComplexAngle(state.data()+2));
+		state_ptr_vector_.push_back(new StateComplexAngle(state.data() + 2));
+	}
+	else
+	{
+		ceres_wrapper.addStateUnit<StateThetaAngle>(new StateThetaAngle(state.data()+2));
+		state_ptr_vector_.push_back(new StateThetaAngle(state.data() + 2));
+	}
 
 	for (uint step=1; step < n_execution; step++)
 	{
-		std::cout << " ========= STEP " << step << "===========" << std::endl << std::endl;
-
 		// NEW STATE
 		//inventing a simple motion
-		double new_pose_true_2 = pose_true(2) * cos(odom_inc_true(step*2+1)) - pose_true(3) * sin(odom_inc_true(step*2+1));
-		double new_pose_true_3 = pose_true(2) * sin(odom_inc_true(step*2+1)) + pose_true(3) * cos(odom_inc_true(step*2+1));
-		pose_true(0) = pose_true(0) + odom_inc_true(step*2) * new_pose_true_2;
-		pose_true(1) = pose_true(1) + odom_inc_true(step*2) * new_pose_true_3;
-		pose_true(2) = new_pose_true_2;
-		pose_true(3) = new_pose_true_3;
+		if (complex_angle)
+		{
+			double new_pose_true_2 = pose_true(2) * cos(odom_inc_true(step*2+1)) - pose_true(3) * sin(odom_inc_true(step*2+1));
+			double new_pose_true_3 = pose_true(2) * sin(odom_inc_true(step*2+1)) + pose_true(3) * cos(odom_inc_true(step*2+1));
+			pose_true(0) = pose_true(0) + odom_inc_true(step*2) * new_pose_true_2;
+			pose_true(1) = pose_true(1) + odom_inc_true(step*2) * new_pose_true_3;
+			pose_true(2) = new_pose_true_2;
+			pose_true(3) = new_pose_true_3;
+		}
+		else
+		{
+			double new_pose_true_2 = pose_true(2) + (odom_inc_true(step*2+1));
+			pose_true(0) = pose_true(0) + odom_inc_true(step*2) * cos(new_pose_true_2);
+			pose_true(1) = pose_true(1) + odom_inc_true(step*2) * sin(new_pose_true_2);
+			pose_true(2) = new_pose_true_2;
+		}
 
 		//inventing sensor readings for odometry and GPS
 		odom_readings.segment(step*2,2) << odom_inc_true(step*2)+distribution_odom(generator), odom_inc_true(step*2+1)+distribution_odom(generator); //true range and theta with noise
-		gps_fix_readings.segment(step*2,2) << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator);
+		gps_fix_readings.segment(step*3,3) << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
 
 		//setting initial guess as an odometry prediction, using noisy odometry
-		double new_pose_predicted_2 = pose_predicted(2) * cos(odom_readings(step*2+1)) - pose_predicted(3) * sin(odom_readings(step*2+1));
-		double new_pose_predicted_3 = pose_predicted(2) * sin(odom_readings(step*2+1)) + pose_predicted(3) * cos(odom_readings(step*2+1));
-		pose_predicted(0) = pose_predicted(0) + odom_readings(step*2) * new_pose_predicted_2;
-		pose_predicted(1) = pose_predicted(1) + odom_readings(step*2) * new_pose_predicted_3;
-		pose_predicted(2) = new_pose_predicted_2;
-		pose_predicted(3) = new_pose_predicted_3;
+		if (complex_angle)
+		{
+			double new_pose_predicted_2 = pose_predicted(2) * cos(odom_readings(step*2+1)) - pose_predicted(3) * sin(odom_readings(step*2+1));
+			double new_pose_predicted_3 = pose_predicted(2) * sin(odom_readings(step*2+1)) + pose_predicted(3) * cos(odom_readings(step*2+1));
+			pose_predicted(0) = pose_predicted(0) + odom_readings(step*2) * new_pose_predicted_2;
+			pose_predicted(1) = pose_predicted(1) + odom_readings(step*2) * new_pose_predicted_3;
+			pose_predicted(2) = new_pose_predicted_2;
+			pose_predicted(3) = new_pose_predicted_3;
+		}
+		else
+		{
+			double new_pose_predicted_2 = pose_predicted(2) + (odom_readings(step*2+1));
+			pose_predicted(0) = pose_predicted(0) + odom_readings(step*2) * cos(new_pose_predicted_2);
+			pose_predicted(1) = pose_predicted(1) + odom_readings(step*2) * sin(new_pose_predicted_2);
+			pose_predicted(2) = new_pose_predicted_2;
+		}
 		// //setting initial guess randomly
 		//state.segment(4*step, 4).setRandom(); // initialize with random values
 		//state.segment(4*step+2, 2) /= state.segment(4*step+2, 2).norm(); //normalize
 
 		// store
-		state.segment(step*4,4) << pose_predicted;
-		ground_truth.segment(step*4,4) << pose_true;
-
-		// print
-		std::cout << "odom : " << odom_inc_true.segment(step*2,2).transpose() << std::endl << std::endl;
-		std::cout << "pose_predicted : " << pose_predicted.transpose() << std::endl << std::endl;
-		std::cout << "pose_true : " << pose_true.transpose() << std::endl << std::endl;
-		std::cout << "gps measurement : " << gps_fix_readings.segment(step*2,2).transpose() << std::endl << std::endl;
-		//std::cout << "state : " << std::endl << state.transpose() << std::endl << std::endl;
+		state.segment(step*dim,dim) << pose_predicted;
+		ground_truth.segment(step*dim,dim) << pose_true;
 
 		// STATE UNITS
 		// p
-		ceres_wrapper.addStateUnit<StatePoint2D>(new StatePoint2D(state.data() + step * 4));
-		state_ptr_vector_.push_back(new StatePoint2D(state.data() + step * 4));
+		ceres_wrapper.addStateUnit<StatePoint2D>(new StatePoint2D(state.data() + step * dim));
+		state_ptr_vector_.push_back(new StatePoint2D(state.data() + step * dim));
 		// o
-		ceres_wrapper.addStateUnit<StateComplexAngle>(new StateComplexAngle(state.data() + step * 4 + 2));
-		state_ptr_vector_.push_back(new StateComplexAngle(state.data() + step * 4 + 2));
+		if (complex_angle)
+		{
+			ceres_wrapper.addStateUnit<StateComplexAngle>(new StateComplexAngle(state.data() + step * dim + 2));
+			state_ptr_vector_.push_back(new StateComplexAngle(state.data() + step * dim + 2));
+		}
+		else
+		{
+			ceres_wrapper.addStateUnit<StateThetaAngle>(new StateThetaAngle(state.data() + step * dim + 2));
+			state_ptr_vector_.push_back(new StateThetaAngle(state.data() + step * dim + 2));
+		}
 		//std::cout << "New state ptr in the vector: " << std::endl;
 		//for (int j = 0; j < state_ptr_vector_.size(); j++)
 		//{
@@ -847,26 +923,83 @@ int main(int argc, char** argv)
 		//}
 
 		// CORRESPONDENCE ODOMETRY
-		Correspondence2DOdometry* corrOdomPtr = new Correspondence2DOdometry(odom_readings.data() + step*2,
-																			 state_ptr_vector_.at(step*2-2),
-																			 state_ptr_vector_.at(step*2-1),
-																			 state_ptr_vector_.at(step*2),
-																			 state_ptr_vector_.back());
-		// Add correspondence
-		ceres_wrapper.addCorrespondence<Correspondence2DOdometry>(corrOdomPtr);
+		if (complex_angle)
+		{
+			Correspondence2DOdometry* corrOdomPtr = new Correspondence2DOdometry(odom_readings.data() + step*2,
+																				 state_ptr_vector_.at(step*2-2),
+																				 state_ptr_vector_.at(step*2-1),
+																				 state_ptr_vector_.at(step*2),
+																				 state_ptr_vector_.back());
+			// Add correspondence
+			ceres_wrapper.addCorrespondence<Correspondence2DOdometry>(corrOdomPtr);
+		}
+		else
+		{
+			Correspondence2DOdometryTheta* corrOdomPtr = new Correspondence2DOdometryTheta(odom_readings.data() + step*2,
+																						   state_ptr_vector_.at(step*2-2),
+																						   state_ptr_vector_.at(step*2-1),
+																						   state_ptr_vector_.at(step*2),
+																						   state_ptr_vector_.back());
+			// Add correspondence
+			ceres_wrapper.addCorrespondence<Correspondence2DOdometryTheta>(corrOdomPtr);
+		}
 
 		// CORRESPONDENCE GPS (2D)
-		CorrespondenceGPS2D* corrGPSPtr = new CorrespondenceGPS2D(gps_fix_readings.data() + step*2, state_ptr_vector_.at(step*2));
+		CorrespondenceGPS2D* corrGPSPtr = new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, state_ptr_vector_.at(step*2));
 		// Add correspondence
 		ceres_wrapper.addCorrespondence<CorrespondenceGPS2D>(corrGPSPtr);
 
 		// SOLVE CERES PROBLEM
-		ceres_wrapper.solve(true);
-		std::cout << "state : " << std::endl << state.head(4*step).transpose() << std::endl;
-		std::cout << "ground_truth : " << std::endl << ground_truth.head(4*step).transpose() << std::endl;
-		std::cout << "error : " << std::endl << (ground_truth.head(4*step) - state.head(4*step)).transpose() << std::endl << std::endl;
+		//ceres::Solver::Summary summary = ceres_wrapper.solve();
+		if (print)
+		{
+			std::cout << " ========= STEP " << step << "===========" << std::endl << std::endl;
+			std::cout << "odom : " << odom_inc_true.segment(step*2,2).transpose() << std::endl << std::endl;
+			std::cout << "pose_predicted : " << pose_predicted.transpose() << std::endl << std::endl;
+			std::cout << "pose_true : " << pose_true.transpose() << std::endl << std::endl;
+			std::cout << "gps measurement : " << gps_fix_readings.segment(step*3,3).transpose() << std::endl << std::endl;
+			std::cout << "state : " << std::endl << state.head(step*dim).transpose() << std::endl;
+			std::cout << "ground_truth : " << std::endl << ground_truth.head(step*dim).transpose() << std::endl;
+			std::cout << "error : " << std::endl << (ground_truth.head(step*dim) - state.head(step*dim)).transpose() << std::endl << std::endl;
+			//std::cout << "total time (s):" << summary.total_time_in_seconds << std::endl;
+		}
 	}
     
+	ceres::Solver::Summary summary = ceres_wrapper.solve();
+	std::cout << summary.total_time_in_seconds << std::endl;
+
+	//display/log results, by setting cout flags properly
+	VectorXs state_theta(n_execution * 3);
+	VectorXs ground_truth_theta(n_execution * 3);
+	if (complex_angle)
+	{
+		// change from complex angle to theta
+		for (uint ii = 0; ii<n_execution; ii++)
+		{
+			state_theta.segment(ii*3,3) << state(ii*4), state(ii*4+1), atan2(state(ii*4+2), state(ii*4+3));
+			ground_truth_theta.segment(ii*3,3) << ground_truth(ii*4), ground_truth(ii*4+1), atan2(ground_truth(ii*4+2), ground_truth(ii*4+3));
+		}
+	}
+	else
+	{
+		state_theta = state;
+		ground_truth_theta = ground_truth;
+	}
+	std::string homepath = getenv("HOME");
+	log_file.open(homepath + "/Desktop/log_file_2.txt", std::ofstream::out); //open log file
+	if (log_file.is_open())
+	{
+		log_file << summary.total_time_in_seconds << std::endl;
+		for (unsigned int ii = 0; ii<n_execution; ii++)
+			log_file << state_theta.segment(ii*3,3).transpose()
+					 << " " << ground_truth_theta.segment(ii*3,3).transpose()
+					 << " " << (state_theta.segment(ii*3,3)-ground_truth_theta.segment(ii*3,3)).transpose()
+					 << " " << gps_fix_readings.segment(ii*3,3).transpose() << std::endl;
+		log_file.close(); //close log file
+		std::cout << std::endl << " Result file ~/Desktop/log_data.txt" << std::endl;
+	}
+	else
+		std::cout << std::endl << " Failed to write the file ~/Desktop/log_data.txt" << std::endl;
     //end Wolf iteration
     std::cout << " ========= END ===========" << std::endl << std::endl;
        
