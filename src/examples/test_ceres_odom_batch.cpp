@@ -409,7 +409,7 @@ int main(int argc, char** argv)
     
     //set options and solve (batch mode)
     //options.minimizer_progress_to_stdout = true;
-    options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;
+    options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;//
     options.max_line_search_step_contraction = 1e-3;
     ceres::Solve(options, &problem, &summary);
     

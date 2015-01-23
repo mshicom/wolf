@@ -104,9 +104,9 @@ typedef enum
 //      TYPEDEFS FOR POINTERS AND ITERATORS IN THE WOLF TREE
 /////////////////////////////////////////////////////////////////////////
 // - forwards for pointers
-class VehicleBase;
-class Frame;
-class Capture;
+//class VehicleBase;
+class FrameBase;
+class CaptureBase;
 class CaptureLaser2D;
 class FeatureBase;
 class FeatureCorner2D;
