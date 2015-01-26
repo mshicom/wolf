@@ -38,6 +38,12 @@ enum parametrizationType {
 	QUATERNION,
 	PO_2D};
 
+class CorrespondenceBase;
+class StateBase;
+
+typedef std::shared_ptr<CorrespondenceBase> CorrespondenceShPtr;
+typedef std::shared_ptr<StateBase> StateShPtr;
+
 class StateBase
 {
 	protected:
@@ -204,70 +210,7 @@ class ComplexAngleParameterization : public ceres::LocalParameterization
 		}
 };
 
-//forward declarations
-class CaptureBaseX;
-class FeatureBaseX;
-class CorrespondenceBaseX;
-
-//class FrameBaseX
-class FrameBaseX : public NodeLinked<TrajectoryBaseX,CaptureBaseX>
-{
-    protected:
-        double time_stamp_; //frame ts
-
-    public:
-        FrameBaseX(double _ts) :
-            NodeLinked(TOP, "FRAME"),
-            time_stamp_(_ts)
-        {
-            //
-        };
-
-        virtual ~FrameBaseX()
-        {
-
-        };
-};
-
-//class CaptureBaseX
-class CaptureBaseX : public NodeLinked<FrameBaseX,FeatureBaseX>
-{
-    protected:
-        double time_stamp_; //capture ts
-
-    public:
-        CaptureBaseX(double _ts) :
-            NodeLinked(MID, "CAPTURE"),
-            time_stamp_(_ts)
-        {
-            //
-        };
-
-        virtual ~CaptureBaseX()
-        {
-
-        };
-};
-
-//class FeatureBaseX
-class FeatureBaseX : public NodeLinked<CaptureBaseX,CorrespondenceBaseX>
-{
-    protected:
-
-    public:
-        FeatureBaseX() :
-            NodeLinked(MID, "FEATURE")
-        {
-            //
-        };
-
-        virtual ~FeatureBaseX()
-        {
-            //
-        };
-};
-
-class CorrespondenceBase: public NodeLinked<FeatureBaseX,NodeTerminus>
+class CorrespondenceBase
 {
 	protected:
 		WolfScalar *measurement_ptr_;
@@ -275,8 +218,7 @@ class CorrespondenceBase: public NodeLinked<FeatureBaseX,NodeTerminus>
     public:
 
         CorrespondenceBase(WolfScalar * _measurement_ptr) :
-        	measurement_ptr_(_measurement_ptr),
-			NodeLinked(BOTTOM, "CORRESPONDENCE")
+        	measurement_ptr_(_measurement_ptr)
         {
         }
 
@@ -302,7 +244,6 @@ template <const unsigned int MEASUREMENT_SIZE,
 class CorrespondenceSparse: public CorrespondenceBase
 {
     protected:
-		std::vector<Map<VectorXs>> state_block_map_vector_;
 		std::vector<WolfScalar*> state_block_ptr_vector_;
 		std::vector<unsigned int> block_sizes_vector_;
 
@@ -340,10 +281,7 @@ class CorrespondenceSparse: public CorrespondenceBase
 					break;
 				}
 				else
-				{
-					state_block_map_vector_.push_back(Map<VectorXs>(_blockPtrArray[i],block_sizes_vector_.at(i)));
 					state_block_ptr_vector_.push_back(_blockPtrArray[i]);
-				}
 			}
         }
 
@@ -387,14 +325,6 @@ class CorrespondenceSparse: public CorrespondenceBase
 					block_sizes_vector_.resize(i);
 					state_block_ptr_vector_.resize(i);
 					break;
-				}
-				else
-				{
-					state_block_map_vector_.push_back(Map<VectorXs>(state_block_ptr_vector_.at(i),block_sizes_vector_.at(i)));
-					//std::cout << "state " << i << ":" << std::endl;
-					//for (uint j = 0; j<block_sizes_vector_.at(i); j++ )
-					//	std::cout << *(state_block_ptr_vector_.at(i)+j) << ", ";
-					//std::cout << std::endl;
 				}
 			}
 
@@ -624,7 +554,7 @@ class CeresManager
 			return ceres_summary_;
 		}
 
-		void addCorrespondence(CorrespondenceBase* _corr_ptr)
+		void addCorrespondence(const CorrespondenceShPtr& _corr_ptr)
 		{
 			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
 			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceBase*>(blockIdx,_corr_ptr));
@@ -660,13 +590,13 @@ class CeresManager
 			}
 		}
 
-		ceres::CostFunction* createCostFunction(CorrespondenceBase* _corrPtr)
+		ceres::CostFunction* createCostFunction(const CorrespondenceShPtr& _corrPtr)
 		{
 			switch (_corrPtr->getType())
 			{
 				case GPS_2D:
 				{
-					CorrespondenceGPS2D* specific_ptr = (CorrespondenceGPS2D*)(_corrPtr);
+					CorrespondenceGPS2D* specific_ptr = (CorrespondenceGPS2D*)(_corrPtr.get());
 					return new ceres::AutoDiffCostFunction<CorrespondenceGPS2D,
 															specific_ptr->measurementSize,
 															specific_ptr->block0Size,
@@ -683,7 +613,7 @@ class CeresManager
 				}
 				case ODOM_2D_COMPLEX:
 				{
-					Correspondence2DOdometry* specific_ptr = (Correspondence2DOdometry*)(_corrPtr);
+					Correspondence2DOdometry* specific_ptr = (Correspondence2DOdometry*)(_corrPtr.get());
 					return new ceres::AutoDiffCostFunction<Correspondence2DOdometry,
 															specific_ptr->measurementSize,
 															specific_ptr->block0Size,
@@ -700,7 +630,7 @@ class CeresManager
 				}
 				case ODOM_2D_THETA:
 				{
-					Correspondence2DOdometryTheta* specific_ptr = (Correspondence2DOdometryTheta*)(_corrPtr);
+					Correspondence2DOdometryTheta* specific_ptr = (Correspondence2DOdometryTheta*)(_corrPtr.get());
 					return new ceres::AutoDiffCostFunction<Correspondence2DOdometryTheta,
 															specific_ptr->measurementSize,
 															specific_ptr->block0Size,
@@ -712,7 +642,7 @@ class CeresManager
 															specific_ptr->block6Size,
 															specific_ptr->block7Size,
 															specific_ptr->block8Size,
-															specific_ptr->block9Size>(specific_ptr);
+															specific_ptr->block9Size>(specific_ptr.get());
 					break;
 				}
 				default:
@@ -805,18 +735,15 @@ int main(int argc, char** argv)
 	// Start trajectory
     id_p = wolf_problem->addStateUnit(new StatePoint2D(state.data()));
 	ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_p));
-	state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_p));
 	if (complex_angle)
 	{
 	    id_o = wolf_problem->addStateUnit(new StateComplexAngle(state.data()+2));
 		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
-		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 	}
 	else
 	{
 	    id_o = wolf_problem->addStateUnit(new StateThetaAngle(state.data()+2));
 		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
-		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 	}
 
 	for (uint step=1; step < n_execution; step++)
@@ -898,7 +825,7 @@ int main(int argc, char** argv)
 																					wolf_problem->getStateUnitPtr(id_o_prev),
 																					wolf_problem->getStateUnitPtr(id_p),
 																					wolf_problem->getStateUnitPtr(id_o)));
-			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
+			ceres_manager.addCorrespondence(wolf_problem->getCorrespondenceShPrt(id_corr));
 		}
 		else
 		{
@@ -908,12 +835,12 @@ int main(int argc, char** argv)
 																						 wolf_problem->getStateUnitPtr(id_p),
 																						 wolf_problem->getStateUnitPtr(id_o)));
 
-			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
+			ceres_manager.addCorrespondence(wolf_problem->getCorrespondenceShPrt(id_corr));
 		}
 
 		// CORRESPONDENCE GPS (2D)
 		uint id_corr = wolf_problem->addCorrespondence(new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, wolf_problem->getStateUnitPtr(id_p)));
-		ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
+		ceres_manager.addCorrespondence(wolf_problem->getCorrespondenceShPrt(id_corr));
 
 		// SOLVE CERES PROBLEM
 		//ceres::Solver::Summary summary = ceres_wrapper.solve();
