@@ -38,11 +38,11 @@ enum parametrizationType {
 	QUATERNION,
 	PO_2D};
 
-class CorrespondenceBase;
-class StateBase;
-
-typedef std::shared_ptr<CorrespondenceBase> CorrespondenceShPtr;
-typedef std::shared_ptr<StateBase> StateShPtr;
+//class CorrespondenceBase;
+//class StateBase;
+//
+//typedef std::shared_ptr<CorrespondenceBase> CorrespondenceShPtr;
+//typedef std::shared_ptr<StateBase> StateShPtr;
 
 class StateBase
 {
@@ -227,7 +227,7 @@ class CorrespondenceBase
         }
 
         virtual correspondenceType getType() const = 0;
-        virtual const std::vector<WolfScalar *> getBlockPtrVector() = 0;
+        virtual const std::vector<WolfScalar*> getBlockPtrVector() = 0;
 };
 
 template <const unsigned int MEASUREMENT_SIZE,
@@ -287,15 +287,15 @@ class CorrespondenceSparse: public CorrespondenceBase
 
 		CorrespondenceSparse(WolfScalar* _measurementPtr,
 							 WolfScalar* _state0Ptr,
-							 WolfScalar* _state1Ptr = NULL,
-							 WolfScalar* _state2Ptr = NULL,
-							 WolfScalar* _state3Ptr = NULL,
-							 WolfScalar* _state4Ptr = NULL,
-							 WolfScalar* _state5Ptr = NULL,
-							 WolfScalar* _state6Ptr = NULL,
-							 WolfScalar* _state7Ptr = NULL,
-							 WolfScalar* _state8Ptr = NULL,
-							 WolfScalar* _state9Ptr = NULL ) :
+							 WolfScalar* _state1Ptr = nullptr,
+							 WolfScalar* _state2Ptr = nullptr,
+							 WolfScalar* _state3Ptr = nullptr,
+							 WolfScalar* _state4Ptr = nullptr,
+							 WolfScalar* _state5Ptr = nullptr,
+							 WolfScalar* _state6Ptr = nullptr,
+							 WolfScalar* _state7Ptr = nullptr,
+							 WolfScalar* _state8Ptr = nullptr,
+							 WolfScalar* _state9Ptr = nullptr ) :
 			CorrespondenceBase(_measurementPtr),
 			state_block_ptr_vector_({_state0Ptr,
 									 _state1Ptr,
@@ -354,7 +354,7 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 		{
 		}
 
-		CorrespondenceGPS2D(WolfScalar* _measurementPtr, StateBase* _statePtr) :
+		CorrespondenceGPS2D(WolfScalar* _measurementPtr, StateShPtr _statePtr) :
 			CorrespondenceSparse<2,2>(_measurementPtr, _statePtr->getPtr())
 		{
 		}
@@ -389,13 +389,13 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 		{
 		}
 
-		Correspondence2DOdometry(WolfScalar* _measurementPtr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr, WolfScalar* _block4Ptr) :
-			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _block1Ptr, _block2Ptr, _block3Ptr, _block4Ptr)
+		Correspondence2DOdometry(WolfScalar* _measurementPtr, WolfScalar* _block0Ptr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr) :
+			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _block0Ptr, _block1Ptr, _block2Ptr, _block3Ptr)
 		{
 		}
 
-		Correspondence2DOdometry(WolfScalar* _measurementPtr, StateBase* _state1Ptr, StateBase* _state2Ptr, StateBase* _state3Ptr, StateBase* _state4Ptr) :
-			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _state1Ptr->getPtr(), _state2Ptr->getPtr(),_state3Ptr->getPtr(), _state4Ptr->getPtr())
+		Correspondence2DOdometry(WolfScalar* _measurementPtr, StateShPtr _state0Ptr, StateShPtr _state1Ptr, StateShPtr _state2Ptr, StateShPtr _state3Ptr) :
+			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _state0Ptr->getPtr(), _state1Ptr->getPtr(),_state2Ptr->getPtr(), _state3Ptr->getPtr())
 		{
 		}
 
@@ -434,13 +434,13 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
 		{
 		}
 
-		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr, WolfScalar* _block4Ptr) :
-			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _block1Ptr, _block2Ptr, _block3Ptr, _block4Ptr)
+		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, WolfScalar* _block0Ptr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _block0Ptr, _block1Ptr, _block2Ptr, _block3Ptr)
 		{
 		}
 
-		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, StateBase* _state1Ptr, StateBase* _state2Ptr, StateBase* _state3Ptr, StateBase* _state4Ptr) :
-			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _state1Ptr->getPtr(), _state2Ptr->getPtr(),_state3Ptr->getPtr(), _state4Ptr->getPtr())
+		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, const StateShPtr& _state0Ptr, StateShPtr _state1Ptr, StateShPtr _state2Ptr, StateShPtr _state3Ptr) :
+			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _state0Ptr->getPtr(), _state1Ptr->getPtr(),_state2Ptr->getPtr(), _state3Ptr->getPtr())
 		{
 		}
 
@@ -471,7 +471,7 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
 class WolfManager
 {
     protected:
-        std::vector<StateBase*> state_units_;
+        std::vector<StateShPtr> state_units_;
         std::vector<CorrespondenceShPtr> correspondences_;
 
     public: 
@@ -490,29 +490,18 @@ class WolfManager
         	return correspondences_.size();
         }
 
-        unsigned int addCorrespondence(CorrespondenceBase* _corr_ptr)
-        {
-        	correspondences_.push_back(CorrespondenceShPtr(_corr_ptr));
-        	return correspondences_.size()-1;
-        }
-
-        unsigned int addCorrespondence(CorrespondenceShPtr _corr_ptr)
+        unsigned int addCorrespondence(const CorrespondenceShPtr& _corr_ptr)
         {
         	correspondences_.push_back(_corr_ptr);
         	return correspondences_.size()-1;
         }
 
-        CorrespondenceShPtr getCorrespondenceShPrt(unsigned int i)
+        CorrespondenceShPtr getCorrespondencePrt(unsigned int i)
         {
         	return correspondences_.at(i);
         }
 
-        CorrespondenceBase* getCorrespondencePrt(unsigned int i)
-        {
-        	return correspondences_.at(i).get();
-        }
-
-        unsigned int addStateUnit(StateBase* _st_ptr)
+        unsigned int addStateUnit(const StateShPtr& _st_ptr)
         {
         	//std::cout << "Adding state unit to the wolf list..." << std::endl;
         	state_units_.push_back(_st_ptr);
@@ -520,7 +509,7 @@ class WolfManager
         	return state_units_.size()-1;
         }
 
-        StateBase* getStateUnitPtr(unsigned int i)
+        StateShPtr getStateUnitPtr(unsigned int i)
 		{
 			return state_units_.at(i);
 		}
@@ -530,7 +519,7 @@ class CeresManager
 {
 	protected:
 
-		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceBase*>> correspondence_list_;
+		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceShPtr>> correspondence_list_;
 		ceres::Problem ceres_problem_;
 
 	public:
@@ -557,10 +546,10 @@ class CeresManager
 		void addCorrespondence(const CorrespondenceShPtr& _corr_ptr)
 		{
 			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
-			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceBase*>(blockIdx,_corr_ptr));
+			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceShPtr>(blockIdx,_corr_ptr));
 		}
 
-		void addStateUnit(StateBase* _st_ptr)
+		void addStateUnit(const StateShPtr& _st_ptr)
 		{
 			//std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
 			//_st_ptr->print();
@@ -642,7 +631,7 @@ class CeresManager
 															specific_ptr->block6Size,
 															specific_ptr->block7Size,
 															specific_ptr->block8Size,
-															specific_ptr->block9Size>(specific_ptr.get());
+															specific_ptr->block9Size>(specific_ptr);
 					break;
 				}
 				default:
@@ -798,17 +787,17 @@ int main(int argc, char** argv)
 		id_p_prev = id_p;
 		id_o_prev = id_o;
 		// p
-		id_p = wolf_problem->addStateUnit(new StatePoint2D(state.data() + step * dim));
+		id_p = wolf_problem->addStateUnit(StateShPtr(new StatePoint2D(state.data() + step * dim)));
 		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_p));
 		// o
 		if (complex_angle)
 		{
-			id_o = wolf_problem->addStateUnit(new StateComplexAngle(state.data() + step * dim + 2));
+			id_o = wolf_problem->addStateUnit(StateShPtr(new StateComplexAngle(state.data() + step * dim + 2)));
 			ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
 		}
 		else
 		{
-			id_o = wolf_problem->addStateUnit(new StateThetaAngle(state.data() + step * dim + 2));
+			id_o = wolf_problem->addStateUnit(StateShPtr(new StateThetaAngle(state.data() + step * dim + 2)));
 			ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
 		}
 
@@ -825,7 +814,7 @@ int main(int argc, char** argv)
 																					wolf_problem->getStateUnitPtr(id_o_prev),
 																					wolf_problem->getStateUnitPtr(id_p),
 																					wolf_problem->getStateUnitPtr(id_o)));
-			ceres_manager.addCorrespondence(wolf_problem->getCorrespondenceShPrt(id_corr));
+			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
 		}
 		else
 		{
@@ -835,12 +824,12 @@ int main(int argc, char** argv)
 																						 wolf_problem->getStateUnitPtr(id_p),
 																						 wolf_problem->getStateUnitPtr(id_o)));
 
-			ceres_manager.addCorrespondence(wolf_problem->getCorrespondenceShPrt(id_corr));
+			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
 		}
 
 		// CORRESPONDENCE GPS (2D)
 		uint id_corr = wolf_problem->addCorrespondence(new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, wolf_problem->getStateUnitPtr(id_p)));
-		ceres_manager.addCorrespondence(wolf_problem->getCorrespondenceShPrt(id_corr));
+		ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
 
 		// SOLVE CERES PROBLEM
 		//ceres::Solver::Summary summary = ceres_wrapper.solve();

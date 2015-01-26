@@ -119,7 +119,7 @@ class RawLaser2D;
 class SensorBase;
 class SensorLaser2D;
 class TransSensor;
-class StatePose;
+class StateBase;
 class PinHole;
 
 
@@ -167,11 +167,14 @@ typedef std::map<unsigned int, TransSensorShPtr > TransSensorMap;
 typedef TransSensorMap::iterator TransSensorIter;
 
 // - State Pose
-typedef std::shared_ptr<StatePose> StateShPtr;
-typedef StatePose* StatePtr;
+typedef std::shared_ptr<StateBase> StateShPtr;
+typedef StateBase* StatePtr;
 
 // - Pin hole
 typedef PinHole* PinHolePtr;
+
+// - WolfScalar
+typedef std::shared_ptr<WolfScalar> WolfScalarShPtr;
 
 
 ///** \brief Enumeration of all possible sensor types
