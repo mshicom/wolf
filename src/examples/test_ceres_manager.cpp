@@ -14,7 +14,6 @@
 //Ceres includes
 #include "ceres/jet.h"
 #include "ceres/ceres.h"
-//#include "ceres/loss_function.h"
 #include "glog/logging.h"
 
 //Wolf includes
@@ -29,6 +28,10 @@ using namespace Eigen;
 enum costFunctionType {
 	AUTO,
 	NUMERIC};
+enum correspondenceType {
+	GPS_2D,
+	ODOM_2D_COMPLEX,
+	ODOM_2D_THETA};
 enum parametrizationType {
 	NONE,
 	COMPLEX_ANGLE,
@@ -201,7 +204,70 @@ class ComplexAngleParameterization : public ceres::LocalParameterization
 		}
 };
 
-class CorrespondenceBase
+//forward declarations
+class CaptureBaseX;
+class FeatureBaseX;
+class CorrespondenceBaseX;
+
+//class FrameBaseX
+class FrameBaseX : public NodeLinked<TrajectoryBaseX,CaptureBaseX>
+{
+    protected:
+        double time_stamp_; //frame ts
+
+    public:
+        FrameBaseX(double _ts) :
+            NodeLinked(TOP, "FRAME"),
+            time_stamp_(_ts)
+        {
+            //
+        };
+
+        virtual ~FrameBaseX()
+        {
+
+        };
+};
+
+//class CaptureBaseX
+class CaptureBaseX : public NodeLinked<FrameBaseX,FeatureBaseX>
+{
+    protected:
+        double time_stamp_; //capture ts
+
+    public:
+        CaptureBaseX(double _ts) :
+            NodeLinked(MID, "CAPTURE"),
+            time_stamp_(_ts)
+        {
+            //
+        };
+
+        virtual ~CaptureBaseX()
+        {
+
+        };
+};
+
+//class FeatureBaseX
+class FeatureBaseX : public NodeLinked<CaptureBaseX,CorrespondenceBaseX>
+{
+    protected:
+
+    public:
+        FeatureBaseX() :
+            NodeLinked(MID, "FEATURE")
+        {
+            //
+        };
+
+        virtual ~FeatureBaseX()
+        {
+            //
+        };
+};
+
+class CorrespondenceBase: public NodeLinked<FeatureBaseX,NodeTerminus>
 {
 	protected:
 		WolfScalar *measurement_ptr_;
@@ -209,7 +275,8 @@ class CorrespondenceBase
     public:
 
         CorrespondenceBase(WolfScalar * _measurement_ptr) :
-        	measurement_ptr_(_measurement_ptr)
+        	measurement_ptr_(_measurement_ptr),
+			NodeLinked(BOTTOM, "CORRESPONDENCE")
         {
         }
 
@@ -217,7 +284,7 @@ class CorrespondenceBase
         {
         }
 
-        virtual costFunctionType getCostFunctionType() const = 0;
+        virtual correspondenceType getType() const = 0;
         virtual const std::vector<WolfScalar *> getBlockPtrVector() = 0;
 };
 
@@ -338,10 +405,7 @@ class CorrespondenceSparse: public CorrespondenceBase
         {
         }
 
-        virtual costFunctionType getCostFunctionType() const
-        {
-        	return AUTO;
-        }
+        virtual correspondenceType getType() const = 0;
 
 		virtual const std::vector<WolfScalar *> getBlockPtrVector()
 		{
@@ -378,60 +442,11 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 			return true;
 		}
 
-		virtual costFunctionType getCostFunctionType() const
+		virtual correspondenceType getType() const
 		{
-			return AUTO;
+			return GPS_2D;
 		}
 };
-
-//class Correspondence2DRange : public CorrespondenceSparse<1,2,2>
-//{
-//	public:
-//		static const unsigned int N_BLOCKS = 2;
-//
-//		Correspondence2DRange(WolfScalar** _blockPtrs) :
-//			CorrespondenceSparse(_blockPtrs)
-//		{
-//		}
-//
-//		Correspondence2DRange(WolfScalar* _block1Ptr, WolfScalar* _block2Ptr) :
-//			CorrespondenceSparse(_block1Ptr, _block2Ptr)
-//		{
-//		}
-//
-////		Correspondence2DRange(StateBase* _state1Ptr, StateBase* _state2Ptr) :
-////			CorrespondenceSparse(_state1Ptr, _state2Ptr)
-////		{
-////		}
-//
-//		~Correspondence2DRange()
-//		{
-//		}
-//
-//        template <typename T>
-//        bool operator()(const T* const _x1, const T* const _x2, T* _residuals) const
-//        {
-//
-//        	// Remap the vehicle state to the const evaluation point
-//			Map<const Matrix<T,Dynamic,1>> x1_map_const(_x1, this->block1Size);
-//			Map<const Matrix<T,Dynamic,1>> x2_map_const(_x2, this->block2Size);
-//
-//			// Map residuals vector to matrix (with sizes of the measurements matrix)
-//			Map<Matrix<T,Dynamic,1>> mapped_residuals(_residuals, this->measurementSize);
-//
-//			// Compute error or residuals
-//			Matrix<T,Dynamic,1> expected_measurement = ((x1_map_const - x2_map_const).transpose() * (x1_map_const - x2_map_const)).cwiseSqrt();
-//			VectorXd meas = this->measurement_;
-//			mapped_residuals = (meas).cast<T>() - expected_measurement;
-//
-//			return true;
-//        }
-//
-//        virtual costFunctionType getCostFunctionType() const
-//        {
-//        	return AUTO;
-//        }
-//};
 
 class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 {
@@ -461,28 +476,6 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
         template <typename T>
         bool operator()(const T* const _p1, const T* const _o1, const T* const _p2, const T* const _o2, T* _residuals) const
         {
-        	// print inputs
-        	// std::cout << "_p1:" << std::endl;
-        	//for (int i=0; i < this->block0Size; i++)
-        	//	std::cout << _p1[i] << std::endl;
-        	// std::cout << std::endl;
-        	// std::cout << "_o1:" << std::endl;
-        	//for (int i=0; i < this->block1Size; i++)
-        	//	 std::cout << _o1[i] << std::endl;
-        	//std::cout << std::endl;
-        	// std::cout << "_p2:" << std::endl;
-        	// for (int i=0; i < this->block2Size; i++)
-        	// 	std::cout << _p2[i] << std::endl;
-        	// std::cout << std::endl;
-        	//std::cout << "_o2:" << std::endl;
-        	//for (int i=0; i < this->block3Size; i++)
-        	//	 std::cout << _o2[i] << std::endl;
-        	//std::cout << std::endl;
-        	// std::cout << "measurement:" << std::endl;
-        	//for (int i=0; i < this->measurementSize; i++)
-        	//	std::cout << *(this->measurement_ptr_+i) << std::endl;
-        	//std::cout << std::endl;
-
 			// Expected measurement
 			T expected_range = (_p1[0]-_p2[0])*(_p1[0]-_p2[0]) + (_p1[1]-_p2[1])*(_p1[1]-_p2[1]); //square of the range
 			T expected_rotation = atan2(-_o1[0]*_o2[1] + _o1[1]*_o2[0], _o1[0]*_o2[0] + _o1[1]*_o2[1]);
@@ -494,9 +487,9 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 			return true;
         }
 
-        virtual costFunctionType getCostFunctionType() const
+        virtual correspondenceType getType() const
         {
-        	return AUTO;
+        	return ODOM_2D_COMPLEX;
         }
 };
 
@@ -539,71 +532,26 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
 			return true;
         }
 
-        virtual costFunctionType getCostFunctionType() const
+        virtual correspondenceType getType() const
         {
-        	return AUTO;
+        	return ODOM_2D_THETA;
         }
 };
 
-class Correspondence2DOdometryThetaNumeric : public CorrespondenceSparse<2,2,1,2,1>
-{
-	public:
-		static const unsigned int N_BLOCKS = 4;
-		const double stdev_ = 0.01; //model parameters
-
-		Correspondence2DOdometryThetaNumeric(WolfScalar* _measurementPtr, WolfScalar** _blockPtrs) :
-			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _blockPtrs)
-		{
-		}
-
-		Correspondence2DOdometryThetaNumeric(WolfScalar* _measurementPtr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr, WolfScalar* _block4Ptr) :
-			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _block1Ptr, _block2Ptr, _block3Ptr, _block4Ptr)
-		{
-		}
-
-		Correspondence2DOdometryThetaNumeric(WolfScalar* _measurementPtr, StateBase* _state1Ptr, StateBase* _state2Ptr, StateBase* _state3Ptr, StateBase* _state4Ptr) :
-			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _state1Ptr->getPtr(), _state2Ptr->getPtr(),_state3Ptr->getPtr(), _state4Ptr->getPtr())
-		{
-		}
-
-		virtual ~Correspondence2DOdometryThetaNumeric()
-		{
-		}
-
-        bool operator()(const double* const _p1, const double* const _o1, const double* const _p2, const double* const _o2, double* _residuals) const
-        {
-			// Expected measurement
-        	double expected_range = (_p2[0]-_p1[0])*(_p2[0]-_p1[0]) + (_p2[1]-_p1[1])*(_p2[1]-_p1[1]); //square of the range
-        	double expected_rotation = _o2[0]-_o1[0];
-
-			// Residuals
-			_residuals[0] = (expected_range - ((*this->measurement_ptr_)*(*this->measurement_ptr_))) / stdev_;
-			_residuals[1] = (expected_rotation - (*(this->measurement_ptr_+1))) / stdev_;
-
-			return true;
-        }
-
-        virtual costFunctionType getCostFunctionType() const
-        {
-        	return NUMERIC;
-        }
-};
-
-
-class WolfProblem
+class WolfManager
 {
     protected:
         std::vector<StateBase*> state_units_;
-        std::vector<CorrespondenceBase*> correspondences_;
+        std::vector<CorrespondenceShPtr> correspondences_;
 
     public: 
-        WolfProblem() :
+        WolfManager() :
 			state_units_(0),
 			correspondences_(0)
 		{
 		}
 
-        virtual ~WolfProblem()
+        virtual ~WolfManager()
         {
         }
 
@@ -614,13 +562,24 @@ class WolfProblem
 
         unsigned int addCorrespondence(CorrespondenceBase* _corr_ptr)
         {
+        	correspondences_.push_back(CorrespondenceShPtr(_corr_ptr));
+        	return correspondences_.size()-1;
+        }
+
+        unsigned int addCorrespondence(CorrespondenceShPtr _corr_ptr)
+        {
         	correspondences_.push_back(_corr_ptr);
         	return correspondences_.size()-1;
         }
 
-        CorrespondenceBase* getCorrespondencePrt(unsigned int i)
+        CorrespondenceShPtr getCorrespondenceShPrt(unsigned int i)
         {
         	return correspondences_.at(i);
+        }
+
+        CorrespondenceBase* getCorrespondencePrt(unsigned int i)
+        {
+        	return correspondences_.at(i).get();
         }
 
         unsigned int addStateUnit(StateBase* _st_ptr)
@@ -665,15 +624,13 @@ class CeresManager
 			return ceres_summary_;
 		}
 
-		template <class CorrespondenceType>
-		void addCorrespondence(CorrespondenceType* _corr_ptr)
+		void addCorrespondence(CorrespondenceBase* _corr_ptr)
 		{
-			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction<CorrespondenceType>(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
+			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
 			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceBase*>(blockIdx,_corr_ptr));
 		}
 
-		template <class StateUnitType>
-		void addStateUnit(StateUnitType* _st_ptr)
+		void addStateUnit(StateBase* _st_ptr)
 		{
 			//std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
 			//_st_ptr->print();
@@ -683,14 +640,13 @@ class CeresManager
 				case COMPLEX_ANGLE:
 				{
 					//std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
-					//ceres_problem_.SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
-					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), _st_ptr->BLOCK_SIZE, new ComplexAngleParameterization);
+					ceres_problem_.SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
+					//ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr)->BLOCK_SIZE, new ComplexAngleParameterization);
 					break;
 				}
 //				case QUATERNION:
 //				{
 //					std::cout << "Adding Quaternion Local Parametrization to the List... " << std::endl;
-//					local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, new EigenQuaternionParameterization});
 //					ceres_problem_.SetParameterization(_st_ptr->getPtr(), new EigenQuaternionParameterization);
 //					break;
 //				}
@@ -704,46 +660,64 @@ class CeresManager
 			}
 		}
 
-		template <typename CorrespondenceDerived>
-		ceres::CostFunction* createCostFunction(CorrespondenceDerived* _corrPtr)
+		ceres::CostFunction* createCostFunction(CorrespondenceBase* _corrPtr)
 		{
-			switch (_corrPtr->getCostFunctionType())
+			switch (_corrPtr->getType())
 			{
-				case AUTO:
+				case GPS_2D:
 				{
-					return new ceres::AutoDiffCostFunction<CorrespondenceDerived,
-															_corrPtr->measurementSize,
-															_corrPtr->block0Size,
-															_corrPtr->block1Size,
-															_corrPtr->block2Size,
-															_corrPtr->block3Size,
-															_corrPtr->block4Size,
-															_corrPtr->block5Size,
-															_corrPtr->block6Size,
-															_corrPtr->block7Size,
-															_corrPtr->block8Size,
-															_corrPtr->block9Size>(_corrPtr);
+					CorrespondenceGPS2D* specific_ptr = (CorrespondenceGPS2D*)(_corrPtr);
+					return new ceres::AutoDiffCostFunction<CorrespondenceGPS2D,
+															specific_ptr->measurementSize,
+															specific_ptr->block0Size,
+															specific_ptr->block1Size,
+															specific_ptr->block2Size,
+															specific_ptr->block3Size,
+															specific_ptr->block4Size,
+															specific_ptr->block5Size,
+															specific_ptr->block6Size,
+															specific_ptr->block7Size,
+															specific_ptr->block8Size,
+															specific_ptr->block9Size>(specific_ptr);
 					break;
 				}
-				case NUMERIC:
+				case ODOM_2D_COMPLEX:
 				{
-					return new ceres::NumericDiffCostFunction<CorrespondenceDerived,
-															 ceres::CENTRAL,
-															 _corrPtr->measurementSize,
-															 _corrPtr->block0Size,
-															 _corrPtr->block1Size,
-															 _corrPtr->block2Size,
-															 _corrPtr->block3Size,
-															 _corrPtr->block4Size,
-															 _corrPtr->block5Size,
-															 _corrPtr->block6Size,
-															 _corrPtr->block7Size,
-															 _corrPtr->block8Size,
-															 _corrPtr->block9Size>(_corrPtr);
+					Correspondence2DOdometry* specific_ptr = (Correspondence2DOdometry*)(_corrPtr);
+					return new ceres::AutoDiffCostFunction<Correspondence2DOdometry,
+															specific_ptr->measurementSize,
+															specific_ptr->block0Size,
+															specific_ptr->block1Size,
+															specific_ptr->block2Size,
+															specific_ptr->block3Size,
+															specific_ptr->block4Size,
+															specific_ptr->block5Size,
+															specific_ptr->block6Size,
+															specific_ptr->block7Size,
+															specific_ptr->block8Size,
+															specific_ptr->block9Size>(specific_ptr);
+					break;
+				}
+				case ODOM_2D_THETA:
+				{
+					Correspondence2DOdometryTheta* specific_ptr = (Correspondence2DOdometryTheta*)(_corrPtr);
+					return new ceres::AutoDiffCostFunction<Correspondence2DOdometryTheta,
+															specific_ptr->measurementSize,
+															specific_ptr->block0Size,
+															specific_ptr->block1Size,
+															specific_ptr->block2Size,
+															specific_ptr->block3Size,
+															specific_ptr->block4Size,
+															specific_ptr->block5Size,
+															specific_ptr->block6Size,
+															specific_ptr->block7Size,
+															specific_ptr->block8Size,
+															specific_ptr->block9Size>(specific_ptr);
 					break;
 				}
 				default:
-					std::cout << "Unknown  cost function type!" << std::endl;
+					std::cout << "Unknown correspondence type! Please add it in the CeresWrapper::createCostFunction()" << std::endl;
+
 					return NULL;
 			}
 		}
@@ -775,7 +749,7 @@ int main(int argc, char** argv)
 	google::InitGoogleLogging(argv[0]);
 
 	// wolf problem
-	WolfProblem* wolf_problem = new WolfProblem;
+	WolfManager* wolf_problem = new WolfManager;
 
 	//variables
 	int dim = (complex_angle ? 4 : 3);
@@ -787,17 +761,15 @@ int main(int argc, char** argv)
 	Eigen::VectorXs state(n_execution*dim); //running window winth solver result
 	Eigen::VectorXs odom_readings(n_execution*2); // all odometry readings
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
-	std::vector<StateBase> state_vector_; // vector of state units
-	std::vector<StateBase*> state_ptr_vector_; // vector of pointers to state units
 	int id_p, id_o, id_p_prev, id_o_prev;
 
 	//init true odom and true pose
 	for (unsigned int ii = 0; ii<n_execution; ii++)
 	{
 		if ( ii < (unsigned int)floor(n_execution/2) )
-			odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , fabs(sin(ii/2000.)); //invented motion increments.
+			odom_inc_true.segment(ii*2,2) << fabs(cos(ii/10.)) , fabs(sin(ii/2000.)); //invented motion increments.
 		else
-			odom_inc_true.middleRows(ii*2,2) << fabs(cos(ii/10.)) , -fabs(sin((ii-floor(n_execution/2))/2000.)); //invented motion increments.
+			odom_inc_true.segment(ii*2,2) << fabs(cos(ii/10.)) , -fabs(sin((ii-floor(n_execution/2))/2000.)); //invented motion increments.
 	}
 	if (complex_angle)
 	{
@@ -827,23 +799,23 @@ int main(int argc, char** argv)
 //    ceres_options.minimizer_progress_to_stdout = false;
 //    ceres_options.line_search_direction_type = ceres::LBFGS;
 //    ceres_options.max_num_iterations = 2;
-    CeresManager ceres_wrapper;
+    CeresManager ceres_manager;
     std::ofstream log_file;  //output file
 
 	// Start trajectory
     id_p = wolf_problem->addStateUnit(new StatePoint2D(state.data()));
-	ceres_wrapper.addStateUnit<StatePoint2D>((StatePoint2D*)(wolf_problem->getStateUnitPtr(id_p)));
+	ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_p));
 	state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_p));
 	if (complex_angle)
 	{
 	    id_o = wolf_problem->addStateUnit(new StateComplexAngle(state.data()+2));
-		ceres_wrapper.addStateUnit<StateComplexAngle>((StateComplexAngle*)(wolf_problem->getStateUnitPtr(id_o)));
+		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
 		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 	}
 	else
 	{
 	    id_o = wolf_problem->addStateUnit(new StateThetaAngle(state.data()+2));
-		ceres_wrapper.addStateUnit<StateThetaAngle>((StateThetaAngle*)(wolf_problem->getStateUnitPtr(id_o)));
+		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
 		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 	}
 
@@ -900,27 +872,18 @@ int main(int argc, char** argv)
 		id_o_prev = id_o;
 		// p
 		id_p = wolf_problem->addStateUnit(new StatePoint2D(state.data() + step * dim));
-		ceres_wrapper.addStateUnit<StatePoint2D>((StatePoint2D*)(wolf_problem->getStateUnitPtr(id_p)));
-		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_p));
+		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_p));
 		// o
 		if (complex_angle)
 		{
 			id_o = wolf_problem->addStateUnit(new StateComplexAngle(state.data() + step * dim + 2));
-			ceres_wrapper.addStateUnit<StateComplexAngle>((StateComplexAngle*)(wolf_problem->getStateUnitPtr(id_o)));
-			state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
+			ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
 		}
 		else
 		{
 			id_o = wolf_problem->addStateUnit(new StateThetaAngle(state.data() + step * dim + 2));
-			ceres_wrapper.addStateUnit<StateThetaAngle>((StateThetaAngle*)(wolf_problem->getStateUnitPtr(id_o)));
-			state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
+			ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
 		}
-//		std::cout << "New state ptr in the vector: " << std::endl;
-//		for (int j = 0; j < state_ptr_vector_.size(); j++)
-//		{
-//			std::cout << j << ":" <<  std::endl;
-//			state_ptr_vector_.at(j)->print();
-//		}
 
 		// CORRESPONDENCE ODOMETRY
 		if (complex_angle)
@@ -935,7 +898,7 @@ int main(int argc, char** argv)
 																					wolf_problem->getStateUnitPtr(id_o_prev),
 																					wolf_problem->getStateUnitPtr(id_p),
 																					wolf_problem->getStateUnitPtr(id_o)));
-			ceres_wrapper.addCorrespondence<Correspondence2DOdometry>((Correspondence2DOdometry*)wolf_problem->getCorrespondencePrt(id_corr));
+			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
 		}
 		else
 		{
@@ -945,12 +908,12 @@ int main(int argc, char** argv)
 																						 wolf_problem->getStateUnitPtr(id_p),
 																						 wolf_problem->getStateUnitPtr(id_o)));
 
-			ceres_wrapper.addCorrespondence<Correspondence2DOdometryTheta>((Correspondence2DOdometryTheta*)wolf_problem->getCorrespondencePrt(id_corr));
+			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
 		}
 
 		// CORRESPONDENCE GPS (2D)
 		uint id_corr = wolf_problem->addCorrespondence(new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, wolf_problem->getStateUnitPtr(id_p)));
-		ceres_wrapper.addCorrespondence<CorrespondenceGPS2D>((CorrespondenceGPS2D*)wolf_problem->getCorrespondencePrt(id_corr));
+		ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
 
 		// SOLVE CERES PROBLEM
 		//ceres::Solver::Summary summary = ceres_wrapper.solve();
@@ -968,7 +931,7 @@ int main(int argc, char** argv)
 		}
 	}
     
-	ceres::Solver::Summary summary = ceres_wrapper.solve(ceres_options);
+	ceres::Solver::Summary summary = ceres_manager.solve(ceres_options);
 	std::cout << summary.FullReport() << std::endl;
 
 	t2=clock();

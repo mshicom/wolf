@@ -824,7 +824,7 @@ class WolfProblem
 //        }
 };
 
-class CeresWrapper
+class CeresManager
 {
 	protected:
 		WolfProblem* wolf_problem_;
@@ -859,7 +859,7 @@ class CeresWrapper
 		{
 		}
 
-		~CeresWrapper()
+		~CeresManager()
 		{
 		}
 
@@ -1028,7 +1028,7 @@ int main(int argc, char** argv)
     ceres_options.minimizer_type = ceres::TRUST_REGION;
     ceres_options.line_search_direction_type = ceres::LBFGS;
     ceres_options.max_num_iterations = 100;
-    CeresWrapper ceres_wrapper(ceres_options);
+    CeresManager ceres_wrapper(ceres_options);
 
     VectorXs state_(4);
     VectorXs actualState_(4);
