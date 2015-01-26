@@ -70,6 +70,17 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
         WolfScalar getTimeStamp() const;
         
         void getTimeStamp(WolfScalar & _ts) const;
+//--        
+//         void addCapture(CaptureShPtr& _sc_ptr);
+// 
+//         const CaptureList& captureList() const;
+// 
+//         const StateShPtr& stateShPtr() const;
+//         const StatePtr statePtr() const;
+//         const StatePose& state() const;
+// 
+//         virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
+        
         
 };
 #endif

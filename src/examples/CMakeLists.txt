@@ -19,28 +19,28 @@ ADD_EXECUTABLE(test_ceres_wrapper_jet_2_sensors test_ceres_wrapper_jet_2_sensors
 TARGET_LINK_LIBRARIES(test_ceres_wrapper_jet_2_sensors ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test with 2 sensors and wrapper
-ADD_EXECUTABLE(test_ceres_wrapper test_ceres_wrapper.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper ${CERES_LIBRARIES} ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_ceres_wrapper test_ceres_wrapper.cpp)
+# TARGET_LINK_LIBRARIES(test_ceres_wrapper ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test different residual block sizes
-ADD_EXECUTABLE(test_ceres_wrapper_block_sizes test_ceres_wrapper_block_sizes.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper_block_sizes ${CERES_LIBRARIES} ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_ceres_wrapper_block_sizes test_ceres_wrapper_block_sizes.cpp)
+# TARGET_LINK_LIBRARIES(test_ceres_wrapper_block_sizes ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test different residual block and local parametrization sizes
 # ADD_EXECUTABLE(test_ceres_wrapper_residual_parametrization test_ceres_wrapper_residual_parametrization.cpp)
 # TARGET_LINK_LIBRARIES(test_ceres_wrapper_residual_parametrization ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test different bla
-ADD_EXECUTABLE(test_ceres_wrapper_states test_ceres_wrapper_states.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_ceres_wrapper_states test_ceres_wrapper_states.cpp)
+# TARGET_LINK_LIBRARIES(test_ceres_wrapper_states ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test different bla
 ADD_EXECUTABLE(test_ceres_wrapper_state_units test_ceres_wrapper_state_units.cpp)
 TARGET_LINK_LIBRARIES(test_ceres_wrapper_state_units ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test manager
-ADD_EXECUTABLE(test_ceres_manager test_ceres_manager.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_manager ${CERES_LIBRARIES} ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_ceres_manager test_ceres_manager.cpp)
+# TARGET_LINK_LIBRARIES(test_ceres_manager ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # Testing a full wolf tree avoiding template classes for NodeLinked derived classes
 ADD_EXECUTABLE(test_ceres_odom_batch test_ceres_odom_batch.cpp)
