@@ -2,6 +2,9 @@
 #ifndef FRAME_BASE_H_
 #define FRAME_BASE_H_
 
+class NodeTerminus;
+class CaptureBase;
+
 //std includes
 #include <ctime>
 #include <cstdlib>
@@ -13,18 +16,19 @@
 #include <cmath>
 
 //Wolf includes
-#include "wolf.h"
-#include "node_terminus.h"
-#include "node_linked.h"
+ #include "wolf.h"
 #include "time_stamp.h"
+#include "node_linked.h"
+#include "node_terminus.h"
+#include "capture_base.h"
 
-//class FrameBaseX
+//class FrameBase
 class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
 {
     protected:
         FrameType type_; //type of frame. Either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
         TimeStamp time_stamp_; //frame time stamp
-        std::shared_ptr<WolfScalar> state_; //TBD: Instead , It could be a vector/list of pointers to state units
+        std::shared_ptr<const WolfScalar> state_; //TBD: Instead , It could be a vector/list of pointers to state units
         
     public:
         /** \brief Constructor with only time stamp

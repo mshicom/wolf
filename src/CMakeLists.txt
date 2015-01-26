@@ -17,16 +17,23 @@ ENDIF(Ceres_FOUND)
 
 #headers
 SET(HDRS
+    capture_base.h
+    correspondence_base.h
+    feature_base.h
     frame_base.h
     node_base.h
     node_terminus.h
     node_linked.h
+    time_stamp.h
     wolf.h)
     
 #sources
 SET(SRCS
+#     capture_base.cpp
     frame_base.cpp
-    node_base.cpp)
+    node_base.cpp
+    node_terminus.cpp
+    time_stamp.cpp)
 
 #optional HDRS and SRCS
 #IF (Ceres_FOUND)

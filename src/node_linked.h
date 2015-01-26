@@ -158,7 +158,7 @@ class NodeLinked : public NodeBase
          * TODO: Review if it could return a pointer to a derived class instead of NodeBase
          * 
          **/
-        NodeBase* getTop();
+        virtual NodeBase* getTop();
 
         /** \brief Prints node information
          * 

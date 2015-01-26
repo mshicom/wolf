@@ -122,21 +122,21 @@ class TimeStamp
          * Comparison operator
          * 
          */
-        bool operator<(const TimeStamp ts) const;
+        bool operator<(const TimeStamp & ts) const;
 
         /** \brief comparison operator
          * 
          * Comparison operator
          * 
          */
-        bool operator<=(const TimeStamp ts) const;
+        bool operator<=(const TimeStamp & ts) const;
 
         /** \brief difference operator
          * 
          * difference operator
          * 
          */
-        WolfScalar operator-(const TimeStamp ts) const;
+        WolfScalar operator-(const TimeStamp & ts) const;
 
 };
 #endif

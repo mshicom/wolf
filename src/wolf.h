@@ -105,6 +105,9 @@ typedef enum
 /////////////////////////////////////////////////////////////////////////
 // - forwards for pointers
 //class VehicleBase;
+
+/*
+class NodeTerminus;
 class FrameBase;
 class CaptureBase;
 class CaptureLaser2D;
@@ -169,7 +172,7 @@ typedef StatePose* StatePtr;
 
 // - Pin hole
 typedef PinHole* PinHolePtr;
-
+*/
 
 ///** \brief Enumeration of all possible sensor types
 // *

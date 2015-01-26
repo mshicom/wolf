@@ -21,20 +21,6 @@ class NodeTerminus : public NodeBase
 {
     public:
         virtual ~NodeTerminus();
-        NodeBase* getTop();
+        virtual NodeBase* getTop();
 };
-
-////////////////////////////////
-// IMPLEMENTATION
-////////////////////////////////
-inline NodeTerminus::~NodeTerminus()
-{
-  //
-}
-
-inline NodeBase* NodeTerminus::getTop()
-{
-    return nullptr;
-}
-
 #endif /* NODE_TERMINUS_H_ */

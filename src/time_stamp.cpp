@@ -77,17 +77,17 @@ void TimeStamp::print(std::ostream & ost) const
     ost.precision(nn);
 }
 
-void TimeStamp::operator=(const WolfScalar ts)
+void TimeStamp::operator=(const WolfScalar & ts)
 {
     time_stamp_ = ts;
 }
 
-void TimeStamp::operator=(const TimeStamp ts)
+void TimeStamp::operator=(const TimeStamp & ts)
 {
     time_stamp_ = ts.get();
 }
 
-bool TimeStamp::operator<(const TimeStamp ts) const
+bool TimeStamp::operator<(const TimeStamp & ts) const
 {
     if (time_stamp_ < ts.get())
         return true;
@@ -95,7 +95,7 @@ bool TimeStamp::operator<(const TimeStamp ts) const
         return false;
 }
 
-bool TimeStamp::operator<=(const TimeStamp ts) const
+bool TimeStamp::operator<=(const TimeStamp & ts) const
 {
     if (time_stamp_ <= ts.get())
         return true;
@@ -103,7 +103,7 @@ bool TimeStamp::operator<=(const TimeStamp ts) const
         return false;
 }
 
-WolfScalar TimeStamp::operator-(const TimeStamp ts) const
+WolfScalar TimeStamp::operator-(const TimeStamp & ts) const
 {
     return (time_stamp_ - ts.get());
 }
