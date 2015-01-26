@@ -119,7 +119,7 @@ class RawLaser2D;
 class SensorBase;
 class SensorLaser2D;
 class TransSensor;
-class StateBase;
+class StatePose;
 class PinHole;
 
 
@@ -142,14 +142,14 @@ typedef std::list<CaptureBaseShPtr> CaptureBaseList;
 typedef CaptureBaseList::iterator CaptureBaseIter;
 
 // - Feature
-typedef std::shared_ptr<FeatureBase> FeatureShPtr;
-typedef FeatureBase* FeaturePtr; ///< Feature pointer type
-typedef std::list<FeatureShPtr> FeatureList;
-typedef FeatureList::iterator FeatureIter;
+typedef std::shared_ptr<FeatureBase> FeatureBaseShPtr;
+typedef FeatureBase* FeatureBasePtr; ///< Feature pointer type
+typedef std::list<FeatureBaseShPtr> FeatureBaseList;
+typedef FeatureBaseList::iterator FeatureBaseIter;
 
 // - Correspondence
-typedef std::shared_ptr<CorrespondenceBase> CorrespondenceShPtr;
-typedef std::list<CorrespondenceShPtr> CorrespondenceList;
+typedef std::shared_ptr<CorrespondenceBase> CorrespondenceBaseShPtr;
+typedef std::list<CorrespondenceBaseShPtr> CorrespondenceList;
 typedef CorrespondenceList::iterator CorrespondenceIter;
 
 // - Raw data
@@ -157,8 +157,8 @@ typedef std::shared_ptr<RawBase> RawShPtr;
 typedef RawBase* RawPtr;
 
 // - Sensor
-typedef std::shared_ptr<SensorBase> SensorShPtr;
-typedef SensorBase* SensorPtr;
+typedef std::shared_ptr<SensorBase> SensorBaseShPtr;
+typedef SensorBase* SensorBasePtr;
 
 // - transSensor
 typedef std::shared_ptr<TransSensor> TransSensorShPtr;
@@ -167,14 +167,11 @@ typedef std::map<unsigned int, TransSensorShPtr > TransSensorMap;
 typedef TransSensorMap::iterator TransSensorIter;
 
 // - State Pose
-typedef std::shared_ptr<StateBase> StateShPtr;
-typedef StateBase* StatePtr;
+typedef std::shared_ptr<StatePose> StateShPtr;
+typedef StatePose* StatePtr;
 
 // - Pin hole
 typedef PinHole* PinHolePtr;
-
-// - WolfScalar
-typedef std::shared_ptr<WolfScalar> WolfScalarShPtr;
 
 
 ///** \brief Enumeration of all possible sensor types

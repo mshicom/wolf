@@ -6,17 +6,14 @@ class NodeTerminus;
 class CaptureBase;
 
 //std includes
-#include <ctime>
-#include <cstdlib>
 #include <iostream>
-#include <fstream>
 #include <vector>
 #include <list>
 #include <random>
 #include <cmath>
 
 //Wolf includes
- #include "wolf.h"
+#include "wolf.h"
 #include "time_stamp.h"
 #include "node_linked.h"
 #include "node_terminus.h"
@@ -28,7 +25,7 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
     protected:
         FrameType type_; //type of frame. Either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
         TimeStamp time_stamp_; //frame time stamp
-        std::shared_ptr<const WolfScalar> state_; //TBD: Instead , It could be a vector/list of pointers to state units
+        Eigen::Vector3s state_; //TBD: Instead , It could be a vector/list/map of pointers to state units
         
     public:
         /** \brief Constructor with only time stamp
@@ -47,7 +44,7 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
          * \param _st a pointer to the state block marking this frame 
          * 
          **/        
-        FrameBase(const FrameType & _tp, const WolfScalar & _ts, const WolfScalar * _st);
+        FrameBase(const FrameType & _tp, const WolfScalar & _ts);
         
         /** \brief Destructor
          * 
@@ -70,17 +67,14 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
         WolfScalar getTimeStamp() const;
         
         void getTimeStamp(WolfScalar & _ts) const;
-//--        
-//         void addCapture(CaptureShPtr& _sc_ptr);
-// 
-//         const CaptureList& captureList() const;
-// 
-//         const StateShPtr& stateShPtr() const;
-//         const StatePtr statePtr() const;
-//         const StatePose& state() const;
-// 
-//         virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
-        
+
+        void addCapture(CaptureBaseShPtr& _capt_ptr);
+
+        const CaptureBaseList & captureList() const;
+
+        const Eigen::Vector3s & state() const;
+
+        virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
         
 };
 #endif

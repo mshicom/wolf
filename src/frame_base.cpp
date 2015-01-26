@@ -4,17 +4,15 @@
 FrameBase::FrameBase(const double & _ts) :
             NodeLinked(TOP, "FRAME"),
             type_(REGULAR_FRAME),
-            time_stamp_(_ts), 
-            state_(nullptr)
+            time_stamp_(_ts)
 {
     //
 }
 
-FrameBase::FrameBase(const FrameType & _tp, const double & _ts, const WolfScalar * _st) :
+FrameBase::FrameBase(const FrameType & _tp, const double & _ts) :
             NodeLinked(TOP, "FRAME"),
             type_(REGULAR_FRAME),
-            time_stamp_(_ts), 
-            state_(_st)
+            time_stamp_(_ts) 
 {
     //
 }
@@ -49,4 +47,28 @@ inline void FrameBase::getTimeStamp(WolfScalar & _ts) const
 {
     _ts = time_stamp_.get();
 }
+
+inline void FrameBase::addCapture(CaptureBaseShPtr & _capt_ptr)
+{
+    addDownNode(_capt_ptr);
+}
+
+inline const CaptureBaseList & FrameBase::captureList() const
+{
+    return downNodeList();
+}
+
+inline const Eigen::Vector3s & FrameBase::state() const
+{
+    return state_;
+}
+
+void FrameBase::printSelf(unsigned int _ntabs, std::ostream& _ost) const
+{
+    NodeLinked::printSelf(_ntabs, _ost);
+    printTabs(_ntabs);
+    _ost << "\tFrame Pose : ( " << state_.transpose() << " )" << std::endl;    
+}
+
+
 

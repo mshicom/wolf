@@ -29,7 +29,7 @@ SET(HDRS
     
 #sources
 SET(SRCS
-#     capture_base.cpp
+    capture_base.cpp
     frame_base.cpp
     node_base.cpp
     node_terminus.cpp
