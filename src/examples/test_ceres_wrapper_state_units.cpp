@@ -598,24 +598,12 @@ class Correspondence2DOdometryThetaNumeric : public CorrespondenceSparse<2,2,1,2
 class WolfProblem
 {
     protected:
-        std::vector<StateBase*> state_units_;
-        std::list<CorrespondenceBase*> correspondences_;
+        std::vector<StateBase> state_units_;
+        std::vector<CorrespondenceBase> correspondences_;
 
     public: 
-        WolfProblem(WolfScalar* _st_ptr, unsigned int _size) :
-			//tate_units_(0),
-			correspondences_(0)
-        {
-        }
-
-        WolfProblem(VectorXs& _st) :
-			//state_units_(0),
-			correspondences_(0)
-        {
-        }
-        
         WolfProblem() :
-			//state_units_(0),
+			state_units_(0),
 			correspondences_(0)
 		{
 		}
@@ -624,71 +612,45 @@ class WolfProblem
         {
         }
 
-        std::list<CorrespondenceBase*> getCorrespondenceList()
-        {
-        	return correspondences_;
-        }
-
         unsigned int getCorrespondencesSize()
         {
         	return correspondences_.size();
         }
 
-        void addCorrespondence(CorrespondenceBase* _corrPtr)
+        unsigned int addCorrespondence(const CorrespondenceBase& _corrPtr)
         {
         	correspondences_.push_back(_corrPtr);
+        	return correspondences_.size()-1;
         }
 
-        void removeCorrespondence(CorrespondenceBase* _corrPtr)
+        CorrespondenceBase* getCorrespondencePrt(unsigned int i)
         {
-        	correspondences_.remove(_corrPtr);
+        	return &correspondences_.at(i);
         }
 
-        void addStateUnit(StateBase* _stPtr)
+        unsigned int addStateUnit(const StateBase& _st)
         {
         	//std::cout << "Adding state unit to the wolf list..." << std::endl;
-        	state_units_.push_back(_stPtr);
+        	state_units_.push_back(_st);
         	//std::cout << "Added!" << std::endl;
+        	return state_units_.size()-1;
         }
 
-//        void removeStateUnit(StateBase* _stPtr)
-//        {
-//        	state_units_.remove(_stPtr);
-//        }
+        StateBase* getStateUnitPtr(unsigned int i)
+		{
+			return &state_units_.at(i);
+		}
 };
 
 class CeresWrapper
 {
 	protected:
-		WolfProblem* wolf_problem_;
-		struct CorrespondenceWrapper
-		{
-			CorrespondenceBase* corr_ptr_;
-			ceres::CostFunction* cost_function_ptr_;
-			const std::vector<WolfScalar*> block_ptrs_;
-		};
-		std::list<CorrespondenceWrapper> correspondence_list_;
-		struct LocalParametrizationWrapper
-		{
-			StateBase* st_ptr_;
-			ceres::LocalParameterization* local_parametrization_ptr_;
-		};
-		std::list<LocalParametrizationWrapper> local_parametrization_list_;
 
+		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceBase*>> correspondence_list_;
 		ceres::Problem ceres_problem_;
-		ceres::Solver::Summary ceres_summary_;
-		ceres::Solver::Options ceres_options_;
 
 	public:
-		CeresWrapper(const ceres::Solver::Options& _ceres_options) :
-			ceres_options_(_ceres_options)
-		{
-			wolf_problem_= new WolfProblem;
-		}
-
-		CeresWrapper(const ceres::Solver::Options& _ceres_options, WolfProblem* _wolf_problem) :
-			wolf_problem_(_wolf_problem),
-			ceres_options_(_ceres_options)
+		CeresWrapper()
 		{
 		}
 
@@ -696,16 +658,13 @@ class CeresWrapper
 		{
 		}
 
-		ceres::Solver::Summary solve()
+		ceres::Solver::Summary solve(const ceres::Solver::Options& _ceres_options)
 		{
-			// add Residual Blocks
-			addResidualBlocks();
-
-			// apply Local Parametrizations
-			applyLocalParametrizations();
+			// create summary
+			ceres::Solver::Summary ceres_summary_;
 
 			// run Ceres Solver
-			ceres::Solve(ceres_options_, &ceres_problem_, &ceres_summary_);
+			ceres::Solve(_ceres_options, &ceres_problem_, &ceres_summary_);
 
 			//display results
 			return ceres_summary_;
@@ -714,12 +673,12 @@ class CeresWrapper
 		template <class CorrespondenceType>
 		void addCorrespondence(CorrespondenceType* _corr_ptr)
 		{
-			wolf_problem_->addCorrespondence(_corr_ptr);
-			correspondence_list_.push_back(CorrespondenceWrapper{_corr_ptr, createCostFunction<CorrespondenceType>(_corr_ptr), _corr_ptr->getBlockPtrVector()});
+			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction<CorrespondenceType>(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
+			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceBase*>(blockIdx,_corr_ptr));
 		}
 
-		template <class StateType>
-		void addStateUnit(StateType* _st_ptr)
+		template <class StateUnitType>
+		void addStateUnit(StateUnitType* _st_ptr)
 		{
 			//std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
 			//_st_ptr->print();
@@ -729,13 +688,15 @@ class CeresWrapper
 				case COMPLEX_ANGLE:
 				{
 					//std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
-					local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, new ComplexAngleParameterization});
+					//ceres_problem_.SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
+					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), _st_ptr->BLOCK_SIZE, new ComplexAngleParameterization);
 					break;
 				}
 //				case QUATERNION:
 //				{
 //					std::cout << "Adding Quaternion Local Parametrization to the List... " << std::endl;
 //					local_parametrization_list_.push_back(LocalParametrizationWrapper{_st_ptr, new EigenQuaternionParameterization});
+//					ceres_problem_.SetParameterization(_st_ptr->getPtr(), new EigenQuaternionParameterization);
 //					break;
 //				}
 				case NONE:
@@ -746,15 +707,6 @@ class CeresWrapper
 				default:
 					std::cout << "Unknown  Local Parametrization type!" << std::endl;
 			}
-			//std::cout << "Local Parametrization List... " << std::endl;
-			//for (std::list<LocalParametrizationWrapper>::iterator it=local_parametrization_list_.begin(); it!=local_parametrization_list_.end(); ++it)
-			//	it->st_ptr_->print();
-		}
-
-		void addResidualBlocks()
-		{
-			for (std::list<CorrespondenceWrapper>::iterator it=correspondence_list_.begin(); it!=correspondence_list_.end(); ++it)
-				ceres_problem_.AddResidualBlock(it->cost_function_ptr_, NULL, it->block_ptrs_);
 		}
 
 		template <typename CorrespondenceDerived>
@@ -797,13 +749,8 @@ class CeresWrapper
 				}
 				default:
 					std::cout << "Unknown  cost function type!" << std::endl;
+					return NULL;
 			}
-		}
-
-		void applyLocalParametrizations()
-		{
-			for (std::list<LocalParametrizationWrapper>::iterator it=local_parametrization_list_.begin(); it!=local_parametrization_list_.end(); ++it)
-				ceres_problem_.SetParameterization(it->st_ptr_->getPtr(), it->local_parametrization_ptr_);
 		}
 };
 
@@ -832,6 +779,9 @@ int main(int argc, char** argv)
 	//init google log
 	google::InitGoogleLogging(argv[0]);
 
+	// wolf problem
+	WolfProblem* wolf_problem = new WolfProblem;
+
 	//variables
 	int dim = (complex_angle ? 4 : 3);
 	Eigen::VectorXs odom_inc_true(n_execution*2);//invented motion
@@ -844,6 +794,7 @@ int main(int argc, char** argv)
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
 	std::vector<StateBase> state_vector_; // vector of state units
 	std::vector<StateBase*> state_ptr_vector_; // vector of pointers to state units
+	int id_p, id_o, id_p_prev, id_o_prev;
 
 	//init true odom and true pose
 	for (unsigned int ii = 0; ii<n_execution; ii++)
@@ -881,21 +832,24 @@ int main(int argc, char** argv)
 //    ceres_options.minimizer_progress_to_stdout = false;
 //    ceres_options.line_search_direction_type = ceres::LBFGS;
 //    ceres_options.max_num_iterations = 2;
-    CeresWrapper ceres_wrapper(ceres_options);
+    CeresWrapper ceres_wrapper;
     std::ofstream log_file;  //output file
 
 	// Start trajectory
-	ceres_wrapper.addStateUnit<StatePoint2D>(new StatePoint2D(state.data()));
-	state_ptr_vector_.push_back(new StatePoint2D(state.data()));
+    id_p = wolf_problem->addStateUnit(StatePoint2D(state.data()));
+	ceres_wrapper.addStateUnit<StatePoint2D>((StatePoint2D*)(wolf_problem->getStateUnitPtr(id_p)));
+	state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_p));
 	if (complex_angle)
 	{
-		ceres_wrapper.addStateUnit<StateComplexAngle>(new StateComplexAngle(state.data()+2));
-		state_ptr_vector_.push_back(new StateComplexAngle(state.data() + 2));
+	    id_o = wolf_problem->addStateUnit(StateComplexAngle(state.data()+2));
+		ceres_wrapper.addStateUnit<StateComplexAngle>((StateComplexAngle*)(wolf_problem->getStateUnitPtr(id_o)));
+		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 	}
 	else
 	{
-		ceres_wrapper.addStateUnit<StateThetaAngle>(new StateThetaAngle(state.data()+2));
-		state_ptr_vector_.push_back(new StateThetaAngle(state.data() + 2));
+	    id_o = wolf_problem->addStateUnit(StateThetaAngle(state.data()+2));
+		ceres_wrapper.addStateUnit<StateThetaAngle>((StateThetaAngle*)(wolf_problem->getStateUnitPtr(id_o)));
+		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 	}
 
 	for (uint step=1; step < n_execution; step++)
@@ -947,19 +901,24 @@ int main(int argc, char** argv)
 		ground_truth.segment(step*dim,dim) << pose_true;
 
 		// STATE UNITS
+		id_p_prev = id_p;
+		id_o_prev = id_o;
 		// p
-		ceres_wrapper.addStateUnit<StatePoint2D>(new StatePoint2D(state.data() + step * dim));
-		state_ptr_vector_.push_back(new StatePoint2D(state.data() + step * dim));
+		id_p = wolf_problem->addStateUnit(StatePoint2D(state.data() + step * dim));
+		ceres_wrapper.addStateUnit<StatePoint2D>((StatePoint2D*)(wolf_problem->getStateUnitPtr(id_p)));
+		state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_p));
 		// o
 		if (complex_angle)
 		{
-			ceres_wrapper.addStateUnit<StateComplexAngle>(new StateComplexAngle(state.data() + step * dim + 2));
-			state_ptr_vector_.push_back(new StateComplexAngle(state.data() + step * dim + 2));
+			id_o = wolf_problem->addStateUnit(StateComplexAngle(state.data() + step * dim + 2));
+			ceres_wrapper.addStateUnit<StateComplexAngle>((StateComplexAngle*)(wolf_problem->getStateUnitPtr(id_o)));
+			state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 		}
 		else
 		{
-			ceres_wrapper.addStateUnit<StateThetaAngle>(new StateThetaAngle(state.data() + step * dim + 2));
-			state_ptr_vector_.push_back(new StateThetaAngle(state.data() + step * dim + 2));
+			id_o = wolf_problem->addStateUnit(StateThetaAngle(state.data() + step * dim + 2));
+			ceres_wrapper.addStateUnit<StateThetaAngle>((StateThetaAngle*)(wolf_problem->getStateUnitPtr(id_o)));
+			state_ptr_vector_.push_back(wolf_problem->getStateUnitPtr(id_o));
 		}
 //		std::cout << "New state ptr in the vector: " << std::endl;
 //		for (int j = 0; j < state_ptr_vector_.size(); j++)
@@ -971,23 +930,32 @@ int main(int argc, char** argv)
 		// CORRESPONDENCE ODOMETRY
 		if (complex_angle)
 		{
-			ceres_wrapper.addCorrespondence<Correspondence2DOdometry>(new Correspondence2DOdometry(odom_readings.data() + step*2,
-																								   state_ptr_vector_.at(step*2-2),
-																								   state_ptr_vector_.at(step*2-1),
-																								   state_ptr_vector_.at(step*2),
-																								   state_ptr_vector_.back()));
+
+			// int odomIdx = wolf_manager.addOdomMeasurement(odom_readings.data() + step*2);
+			// Correspondence2DOdometry* odomCorrPtr = wolf_manager.getCorrespondence(odomIdx);
+			// ceres_wrapper.addCorrespondence<Correspondence2DOdometry>(odomCorrPtr, odomCorrPtr->getP1(), odomCorrPtr->getO1(), odomCorrPtr->getP2(), odomCorrPtr->getO2());
+
+			uint id_corr = wolf_problem->addCorrespondence(Correspondence2DOdometry(odom_readings.data() + step*2,
+																					wolf_problem->getStateUnitPtr(id_p_prev),
+																					wolf_problem->getStateUnitPtr(id_o_prev),
+																					wolf_problem->getStateUnitPtr(id_p),
+																					wolf_problem->getStateUnitPtr(id_o)));
+			ceres_wrapper.addCorrespondence<Correspondence2DOdometry>((Correspondence2DOdometry*)wolf_problem->getCorrespondencePrt(id_corr));
 		}
 		else
 		{
-			ceres_wrapper.addCorrespondence<Correspondence2DOdometryTheta>(new Correspondence2DOdometryTheta(odom_readings.data() + step*2,
-																											 state_ptr_vector_.at(step*2-2),
-																											 state_ptr_vector_.at(step*2-1),
-																											 state_ptr_vector_.at(step*2),
-																											 state_ptr_vector_.back()));
+			uint id_corr = wolf_problem->addCorrespondence(Correspondence2DOdometryTheta(odom_readings.data() + step*2,
+																						 wolf_problem->getStateUnitPtr(id_p_prev),
+																						 wolf_problem->getStateUnitPtr(id_o_prev),
+																						 wolf_problem->getStateUnitPtr(id_p),
+																						 wolf_problem->getStateUnitPtr(id_o)));
+
+			ceres_wrapper.addCorrespondence<Correspondence2DOdometryTheta>((Correspondence2DOdometryTheta*)wolf_problem->getCorrespondencePrt(id_corr));
 		}
 
 		// CORRESPONDENCE GPS (2D)
-		ceres_wrapper.addCorrespondence<CorrespondenceGPS2D>(new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, state_ptr_vector_.at(step*2)));
+		uint id_corr = wolf_problem->addCorrespondence(CorrespondenceGPS2D(gps_fix_readings.data() + step*3, wolf_problem->getStateUnitPtr(id_p)));
+		ceres_wrapper.addCorrespondence<CorrespondenceGPS2D>((CorrespondenceGPS2D*)wolf_problem->getCorrespondencePrt(id_corr));
 
 		// SOLVE CERES PROBLEM
 		//ceres::Solver::Summary summary = ceres_wrapper.solve();
@@ -1005,10 +973,11 @@ int main(int argc, char** argv)
 		}
 	}
     
-	ceres::Solver::Summary summary = ceres_wrapper.solve();
+	ceres::Solver::Summary summary = ceres_wrapper.solve(ceres_options);
+	std::cout << summary.FullReport() << std::endl;
+
 	t2=clock();
 	double seconds = ((double)t2-t1)/CLOCKS_PER_SEC;
-	//std::cout << summary.FullReport() << std::endl;
 	std::cout << "optimization seconds: " << summary.total_time_in_seconds << std::endl;
 	std::cout << "total seconds: " << seconds << std::endl;
 
