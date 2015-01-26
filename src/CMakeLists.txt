@@ -17,6 +17,7 @@ ENDIF(Ceres_FOUND)
 
 #headers
 SET(HDRS
+    frame_base.h
     node_base.h
     node_terminus.h
     node_linked.h
@@ -24,6 +25,7 @@ SET(HDRS
     
 #sources
 SET(SRCS
+    frame_base.cpp
     node_base.cpp)
 
 #optional HDRS and SRCS

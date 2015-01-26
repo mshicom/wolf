@@ -121,22 +121,22 @@ class PinHole;
 
 
 // - Vehicle
-typedef std::shared_ptr<VehicleBase> VehicleShPtr;
-typedef VehicleBase* VehiclePtr;
-typedef std::list<VehicleShPtr> VehicleList;
-typedef VehicleList::iterator VehicleIter;
+// typedef std::shared_ptr<VehicleBase> VehicleShPtr;
+// typedef VehicleBase* VehiclePtr;
+// typedef std::list<VehicleShPtr> VehicleList;
+// typedef VehicleList::iterator VehicleIter;
 
 // - Frame
-typedef std::shared_ptr<Frame> FrameShPtr;
-typedef Frame* FramePtr;
-typedef std::list<FrameShPtr> FrameList;
-typedef FrameList::iterator FrameIter;
+typedef std::shared_ptr<FrameBase> FrameBaseShPtr;
+typedef FrameBase* FrameBasePtr;
+typedef std::list<FrameBaseShPtr> FrameBaseList;
+typedef FrameBaseList::iterator FrameBaseIter;
 
 // - Capture
-typedef std::shared_ptr<Capture> CaptureShPtr;
-typedef Capture* CapturePtr;
-typedef std::list<CaptureShPtr> CaptureList;
-typedef CaptureList::iterator CaptureIter;
+typedef std::shared_ptr<CaptureBase> CaptureBaseShPtr;
+typedef CaptureBase* CaptureBasePtr;
+typedef std::list<CaptureBaseShPtr> CaptureBaseList;
+typedef CaptureBaseList::iterator CaptureBaseIter;
 
 // - Feature
 typedef std::shared_ptr<FeatureBase> FeatureShPtr;

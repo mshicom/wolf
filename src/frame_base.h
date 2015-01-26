@@ -23,7 +23,7 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
 {
     protected:
         FrameType type_; //type of frame. Either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
-        TimeStampe time_stamp_; //frame time stamp
+        TimeStamp time_stamp_; //frame time stamp
         std::shared_ptr<WolfScalar> state_; //TBD: Instead , It could be a vector/list of pointers to state units
         
     public:
@@ -33,7 +33,7 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
          * \param _tp indicates frame type. Generally either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
          * 
          **/
-        FrameBaseX(const WolfScalar & _ts);
+        FrameBase(const WolfScalar & _ts);
 
         /** \brief Constructor with type, time stamp and state pointer
          * 
@@ -43,14 +43,14 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
          * \param _st a pointer to the state block marking this frame 
          * 
          **/        
-        FrameBaseX(const FrameType & _tp, const WolfScalar & _ts, const WolfScalar * _st);
+        FrameBase(const FrameType & _tp, const WolfScalar & _ts, const WolfScalar * _st);
         
         /** \brief Destructor
          * 
          * Destructor
          * 
          **/
-        virtual ~FrameBaseX();
+        virtual ~FrameBase();
         
         /** \brief Checks if this frame is KEY_FRAME 
          * 
@@ -61,11 +61,11 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
         
         void setType(FrameType _ft);
         
-        void setTimeStamp(const double & _ts)
+        void setTimeStamp(const double & _ts);
         
         WolfScalar getTimeStamp() const;
         
-        void getTimeStamp() const;
+        void getTimeStamp(WolfScalar & _ts) const;
         
 };
 #endif
