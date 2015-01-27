@@ -6,6 +6,7 @@
 #include <random>
 #include <typeinfo>
 #include <ctime>
+#include <queue>          // std::queue
 
 // Eigen includes
 #include <eigen3/Eigen/Dense>
@@ -17,6 +18,8 @@
 #include "glog/logging.h"
 
 //Wolf includes
+#include "frame_base.h"
+#include "capture_base.h"
 #include "wolf.h"
 
 /**
@@ -37,12 +40,18 @@ enum parametrizationType {
 	COMPLEX_ANGLE,
 	QUATERNION,
 	PO_2D};
+enum captureType{
+	CAPT_GPS_2D,
+	CAPT_ODOM_2D};
 
-//class CorrespondenceBase;
-//class StateBase;
-//
-//typedef std::shared_ptr<CorrespondenceBase> CorrespondenceShPtr;
-//typedef std::shared_ptr<StateBase> StateShPtr;
+class Frame2DPO;
+class CaptureXBase;
+class StateBase;
+class CorrespondenceXBase;
+typedef std::shared_ptr<CorrespondenceXBase> CorrespondenceXShPtr;
+typedef std::shared_ptr<Frame2DPO> Frame2DPOShPtr;
+typedef std::shared_ptr<CaptureXBase> CaptureXShPtr;
+typedef std::shared_ptr<StateBase> StateXShPtr;
 
 class StateBase
 {
@@ -210,19 +219,19 @@ class ComplexAngleParameterization : public ceres::LocalParameterization
 		}
 };
 
-class CorrespondenceBase
+class CorrespondenceXBase
 {
 	protected:
 		WolfScalar *measurement_ptr_;
 
     public:
 
-        CorrespondenceBase(WolfScalar * _measurement_ptr) :
+		CorrespondenceXBase(WolfScalar * _measurement_ptr) :
         	measurement_ptr_(_measurement_ptr)
         {
         }
 
-        virtual ~CorrespondenceBase()
+        virtual ~CorrespondenceXBase()
         {
         }
 
@@ -241,7 +250,7 @@ template <const unsigned int MEASUREMENT_SIZE,
 				unsigned int BLOCK_7_SIZE = 0,
 				unsigned int BLOCK_8_SIZE = 0,
 				unsigned int BLOCK_9_SIZE = 0>
-class CorrespondenceSparse: public CorrespondenceBase
+class CorrespondenceSparse: public CorrespondenceXBase
 {
     protected:
 		std::vector<WolfScalar*> state_block_ptr_vector_;
@@ -261,17 +270,8 @@ class CorrespondenceSparse: public CorrespondenceBase
 		static const unsigned int block9Size = BLOCK_9_SIZE;
 
 		CorrespondenceSparse(WolfScalar* _measurementPtr, WolfScalar** _blockPtrArray) :
-        	CorrespondenceBase(_measurementPtr),
-			block_sizes_vector_({BLOCK_0_SIZE,
-								 BLOCK_1_SIZE,
-								 BLOCK_2_SIZE,
-								 BLOCK_3_SIZE,
-								 BLOCK_4_SIZE,
-								 BLOCK_5_SIZE,
-								 BLOCK_6_SIZE,
-								 BLOCK_7_SIZE,
-								 BLOCK_8_SIZE,
-								 BLOCK_9_SIZE})
+        	CorrespondenceXBase(_measurementPtr),
+			block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
 			for (uint i = 0; i<block_sizes_vector_.size(); i++)
 			{
@@ -296,27 +296,9 @@ class CorrespondenceSparse: public CorrespondenceBase
 							 WolfScalar* _state7Ptr = nullptr,
 							 WolfScalar* _state8Ptr = nullptr,
 							 WolfScalar* _state9Ptr = nullptr ) :
-			CorrespondenceBase(_measurementPtr),
-			state_block_ptr_vector_({_state0Ptr,
-									 _state1Ptr,
-									 _state2Ptr,
-									 _state3Ptr,
-									 _state4Ptr,
-									 _state5Ptr,
-									 _state6Ptr,
-									 _state7Ptr,
-									 _state8Ptr,
-									 _state9Ptr}),
-			block_sizes_vector_({BLOCK_0_SIZE,
-								 BLOCK_1_SIZE,
-								 BLOCK_2_SIZE,
-								 BLOCK_3_SIZE,
-								 BLOCK_4_SIZE,
-								 BLOCK_5_SIZE,
-								 BLOCK_6_SIZE,
-								 BLOCK_7_SIZE,
-								 BLOCK_8_SIZE,
-								 BLOCK_9_SIZE})
+			CorrespondenceXBase(_measurementPtr),
+			state_block_ptr_vector_({_state0Ptr,_state1Ptr,_state2Ptr,_state3Ptr,_state4Ptr,_state5Ptr,_state6Ptr,_state7Ptr,_state8Ptr,_state9Ptr}),
+			block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
 		{
 			for (uint i = 0; i<block_sizes_vector_.size(); i++)
 			{
@@ -354,7 +336,7 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 		{
 		}
 
-		CorrespondenceGPS2D(WolfScalar* _measurementPtr, StateShPtr _statePtr) :
+		CorrespondenceGPS2D(WolfScalar* _measurementPtr, const StateXShPtr& _statePtr) :
 			CorrespondenceSparse<2,2>(_measurementPtr, _statePtr->getPtr())
 		{
 		}
@@ -394,7 +376,7 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 		{
 		}
 
-		Correspondence2DOdometry(WolfScalar* _measurementPtr, StateShPtr _state0Ptr, StateShPtr _state1Ptr, StateShPtr _state2Ptr, StateShPtr _state3Ptr) :
+		Correspondence2DOdometry(WolfScalar* _measurementPtr, const StateXShPtr& _state0Ptr, const StateXShPtr& _state1Ptr, const StateXShPtr& _state2Ptr, const StateXShPtr& _state3Ptr) :
 			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _state0Ptr->getPtr(), _state1Ptr->getPtr(),_state2Ptr->getPtr(), _state3Ptr->getPtr())
 		{
 		}
@@ -439,7 +421,7 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
 		{
 		}
 
-		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, const StateShPtr& _state0Ptr, StateShPtr _state1Ptr, StateShPtr _state2Ptr, StateShPtr _state3Ptr) :
+		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, const StateXShPtr& _state0Ptr, const StateXShPtr& _state1Ptr, const StateXShPtr& _state2Ptr, const StateXShPtr& _state3Ptr) :
 			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _state0Ptr->getPtr(), _state1Ptr->getPtr(),_state2Ptr->getPtr(), _state3Ptr->getPtr())
 		{
 		}
@@ -468,17 +450,123 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
         }
 };
 
+class Frame2DPO : public FrameBase
+{
+	protected:
+		StateXShPtr p_ptr_;
+		StateXShPtr o_ptr_;
+
+	public:
+		Frame2DPO(const StateXShPtr& _p_ptr, const StateXShPtr& _o_ptr, const WolfScalar & _ts, const FrameType & _tp = REGULAR_FRAME):
+			FrameBase(_tp, _ts),
+			p_ptr_(_p_ptr),
+			o_ptr_(_o_ptr)
+		{
+		}
+
+		virtual ~Frame2DPO()
+		{
+		}
+
+		StateXShPtr getPPtr()
+		{
+			return p_ptr_;
+		}
+
+		StateXShPtr getOPtr()
+		{
+			return o_ptr_;
+		}
+};
+
+class CaptureXBase
+{
+	public:
+		VectorXs capture;
+		WolfScalar time_stamp;
+
+		CaptureXBase(const VectorXs& _capture, const WolfScalar& _time_stamp) :
+			capture(_capture),
+			time_stamp(_time_stamp)
+		{
+		}
+
+		virtual ~CaptureXBase()
+		{
+		}
+
+		virtual captureType getCaptureType() const = 0;
+
+		WolfScalar* getPtr()
+		{
+			return capture.data();
+		}
+};
+
+class CaptureOdom2D : public CaptureXBase
+{
+	public:
+	CaptureOdom2D(const VectorXs& _capture, const WolfScalar& _time_stamp) :
+			CaptureXBase(_capture, _time_stamp)
+		{
+		}
+
+		virtual ~CaptureOdom2D()
+		{
+		}
+
+		virtual captureType getCaptureType() const
+		{
+			return CAPT_ODOM_2D;
+		}
+};
+
+class CaptureGPS2D : public CaptureXBase
+{
+	public:
+	CaptureGPS2D(const VectorXs& _capture, const WolfScalar& _time_stamp) :
+			CaptureXBase(_capture, _time_stamp)
+		{
+		}
+
+		virtual ~CaptureGPS2D()
+		{
+		}
+
+		virtual captureType getCaptureType() const
+		{
+			return CAPT_GPS_2D;
+		}
+};
+
 class WolfManager
 {
     protected:
-        std::vector<StateShPtr> state_units_;
-        std::vector<CorrespondenceShPtr> correspondences_;
+		VectorXs state_;
+		unsigned int first_empty_state_;
+		bool use_complex_angles_;
+//		Frame2DPO current_frame_;
+		std::vector<Frame2DPOShPtr> frames_;
+        std::vector<CorrespondenceXShPtr> correspondences_;
+        std::vector<VectorXs> odom_captures_;
+        std::vector<VectorXs> gps_captures_;
+        std::queue<CaptureXShPtr> new_captures_;
+        std::vector<CaptureXShPtr> captures_;
 
     public: 
-        WolfManager() :
-			state_units_(0),
+        WolfManager(const unsigned int& _state_length=1000, const bool _complex_angle=false) :
+        	state_(_state_length),
+			first_empty_state_(0),
+        	use_complex_angles_(_complex_angle),
+        	frames_(0),
 			correspondences_(0)
 		{
+        	VectorXs init_frame(use_complex_angles_ ? 4 : 3);
+        	if (use_complex_angles_)
+        		init_frame << 0, 0, 1, 0;
+        	else
+        		init_frame << 0, 0, 0;
+        	createFrame(init_frame, 0);
 		}
 
         virtual ~WolfManager()
@@ -490,28 +578,128 @@ class WolfManager
         	return correspondences_.size();
         }
 
-        unsigned int addCorrespondence(const CorrespondenceShPtr& _corr_ptr)
+        void createFrame(const VectorXs& _frame_state, const WolfScalar& _time_stamp)
         {
-        	correspondences_.push_back(_corr_ptr);
-        	return correspondences_.size()-1;
+        	// Store in state_
+        	state_.segment(first_empty_state_, use_complex_angles_ ? 4 : 3) << _frame_state;
+
+        	// Create frame
+        	if (use_complex_angles_)
+				frames_.push_back(Frame2DPOShPtr(new Frame2DPO(StateXShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+															   StateXShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2)),
+															   _time_stamp)));
+
+        	else
+				frames_.push_back(Frame2DPOShPtr(new Frame2DPO(StateXShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+															   StateXShPtr(new StateThetaAngle(state_.data()+first_empty_state_+2)),
+															   _time_stamp)));
+
+        	// Update first free state location index
+        	first_empty_state_ += use_complex_angles_ ? 4 : 3;
         }
 
-        CorrespondenceShPtr getCorrespondencePrt(unsigned int i)
+        void addOdomCapture(const VectorXs& _odom_capture, const WolfScalar& _time_stamp)
+        {
+        	new_captures_.push(CaptureXShPtr(new CaptureOdom2D(_odom_capture, _time_stamp)));
+        }
+
+        void addGPSCapture(const VectorXs& _gps_capture, const WolfScalar& _time_stamp)
+        {
+        	new_captures_.push(CaptureXShPtr(new CaptureGPS2D(_gps_capture, _time_stamp)));
+        }
+
+        void computeOdomCapture(const CaptureXShPtr& _odom_capture)
+		{
+        	Frame2DPOShPtr prev_frame_ptr = frames_.back();
+
+        	// STORE CAPTURE
+        	captures_.push_back(_odom_capture);
+        	VectorXs capture_data = _odom_capture->capture;
+
+        	// PRIOR
+        	VectorXs pose_predicted(use_complex_angles_ ? 4 : 3);
+        	Map<VectorXs> previous_pose(prev_frame_ptr->getPPtr()->getPtr(), use_complex_angles_ ? 4 : 3);
+        	if (use_complex_angles_)
+			{
+				double new_pose_predicted_2 = previous_pose(2) * cos(capture_data(1)) - previous_pose(3) * sin(capture_data(1));
+				double new_pose_predicted_3 = previous_pose(2) * sin(capture_data(1)) + previous_pose(3) * cos(capture_data(1));
+				pose_predicted(0) = previous_pose(0) + capture_data(0) * new_pose_predicted_2;
+				pose_predicted(1) = previous_pose(1) + capture_data(0) * new_pose_predicted_3;
+				pose_predicted(2) = new_pose_predicted_2;
+				pose_predicted(3) = new_pose_predicted_3;
+			}
+			else
+			{
+				pose_predicted(0) = previous_pose(0) + capture_data(0) * cos(previous_pose(2) + (capture_data(1)));
+				pose_predicted(1) = previous_pose(1) + capture_data(0) * sin(previous_pose(2) + (capture_data(1)));
+				pose_predicted(2) = previous_pose(2) + (capture_data(1));
+			}
+
+        	// NEW FRAME
+        	createFrame(pose_predicted, _odom_capture->time_stamp);
+
+			// CORRESPONDENCE ODOMETRY
+			if (use_complex_angles_)
+				correspondences_.push_back(CorrespondenceXShPtr(new Correspondence2DOdometry(_odom_capture->getPtr(),
+																						   prev_frame_ptr->getPPtr()->getPtr(),
+																						   prev_frame_ptr->getOPtr()->getPtr(),
+																						   frames_.back()->getPPtr()->getPtr(),
+																						   frames_.back()->getOPtr()->getPtr())));
+
+			else
+				correspondences_.push_back(CorrespondenceXShPtr(new Correspondence2DOdometryTheta(_odom_capture->getPtr(),
+																						   	    prev_frame_ptr->getPPtr()->getPtr(),
+																								prev_frame_ptr->getOPtr()->getPtr(),
+																								frames_.back()->getPPtr()->getPtr(),
+																								frames_.back()->getOPtr()->getPtr())));
+		}
+
+        void computeGPSCapture(const CaptureXShPtr& _gps_capture)
+		{
+			// STORE CAPTURE
+        	captures_.push_back(_gps_capture);
+
+			// CORRESPONDENCE GPS
+			correspondences_.push_back(CorrespondenceXShPtr(new CorrespondenceGPS2D(_gps_capture->getPtr(), frames_.back()->getPPtr()->getPtr())));
+		}
+
+        void update(std::queue<StateXShPtr>& new_state_units, std::queue<CorrespondenceXShPtr>& new_correspondences)
+        {
+        	while (!new_captures_.empty())
+        	{
+        		switch (new_captures_.front()->getCaptureType())
+        		{
+        			case CAPT_GPS_2D:
+        				computeGPSCapture(new_captures_.front());
+        				new_correspondences.push(correspondences_.back());
+        				break;
+        			case CAPT_ODOM_2D:
+        				computeOdomCapture(new_captures_.front());
+        				new_correspondences.push(correspondences_.back());
+        				new_state_units.push(frames_.back()->getPPtr());
+        				new_state_units.push(frames_.back()->getOPtr());
+        				break;
+        			default:
+        				std::cout << "unknown capture...\n";
+        		}
+        		new_captures_.pop();
+        	}
+
+        }
+
+        VectorXs getState()
+        {
+        	return state_;
+        }
+
+        CorrespondenceXShPtr getCorrespondencePrt(unsigned int i)
         {
         	return correspondences_.at(i);
         }
 
-        unsigned int addStateUnit(const StateShPtr& _st_ptr)
-        {
-        	//std::cout << "Adding state unit to the wolf list..." << std::endl;
-        	state_units_.push_back(_st_ptr);
-        	//std::cout << "Added!" << std::endl;
-        	return state_units_.size()-1;
-        }
-
-        StateShPtr getStateUnitPtr(unsigned int i)
+        std::queue<StateXShPtr> getStateUnitsPtrs(unsigned int i)
 		{
-			return state_units_.at(i);
+			return std::queue<StateXShPtr>({frames_.at(i)->getPPtr(),frames_.at(i)->getOPtr()});
 		}
 };
 
@@ -519,7 +707,7 @@ class CeresManager
 {
 	protected:
 
-		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceShPtr>> correspondence_list_;
+		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceXShPtr>> correspondence_list_;
 		ceres::Problem ceres_problem_;
 
 	public:
@@ -543,13 +731,31 @@ class CeresManager
 			return ceres_summary_;
 		}
 
-		void addCorrespondence(const CorrespondenceShPtr& _corr_ptr)
+		void addCorrespondences(std::queue<CorrespondenceXShPtr>& _new_correspondences)
 		{
-			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
-			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceShPtr>(blockIdx,_corr_ptr));
+			while (!_new_correspondences.empty())
+			{
+				addCorrespondence(_new_correspondences.front());
+				_new_correspondences.pop();
+			}
 		}
 
-		void addStateUnit(const StateShPtr& _st_ptr)
+		void addCorrespondence(const CorrespondenceXShPtr& _corr_ptr)
+		{
+			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
+			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceXShPtr>(blockIdx,_corr_ptr));
+		}
+
+		void addStateUnits(std::queue<StateXShPtr>& _new_state_units)
+		{
+			while (!_new_state_units.empty())
+			{
+				addStateUnit(_new_state_units.front());
+				_new_state_units.pop();
+			}
+		}
+
+		void addStateUnit(const StateXShPtr& _st_ptr)
 		{
 			//std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
 			//_st_ptr->print();
@@ -559,8 +765,8 @@ class CeresManager
 				case COMPLEX_ANGLE:
 				{
 					//std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
-					ceres_problem_.SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
-					//ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr)->BLOCK_SIZE, new ComplexAngleParameterization);
+					//ceres_problem_.SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
+					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr.get())->BLOCK_SIZE, new ComplexAngleParameterization);
 					break;
 				}
 //				case QUATERNION:
@@ -579,7 +785,7 @@ class CeresManager
 			}
 		}
 
-		ceres::CostFunction* createCostFunction(const CorrespondenceShPtr& _corrPtr)
+		ceres::CostFunction* createCostFunction(const CorrespondenceXShPtr& _corrPtr)
 		{
 			switch (_corrPtr->getType())
 			{
@@ -649,10 +855,10 @@ int main(int argc, char** argv)
 
     std::cout << " ========= 2D Robot with odometry and GPS ===========" << std::endl << std::endl;
     
-    //user input
+    // USER INPUT ============================================================================================
 	if (argc!=4)
 	{
-		std::cout << "Please call me with: [./test_ceres_wrapper_states NI PRINT ORIENTATION_MODE], where:" << std::endl;
+		std::cout << "Please call me with: [./test_ceres_manager NI PRINT ORIENTATION_MODE], where:" << std::endl;
 		std::cout << "     - NI is the number of iterations" << std::endl;
 		std::cout << "     - PRINT = 1 for print results" << std::endl;
 		std::cout << "     - ORIENTATION_MODE: 0 for theta, 1 for complex angle" << std::endl;
@@ -664,217 +870,111 @@ int main(int argc, char** argv)
 	bool print = (bool) atoi(argv[2]);
 	bool complex_angle = (bool) atoi(argv[3]);
 
+	// INITIALIZATION ============================================================================================
+	//init random generators
+	std::default_random_engine generator(1);
+	std::normal_distribution<WolfScalar> distribution_odom(0.0,0.01); //odometry noise
+	std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
+
 	//init google log
 	google::InitGoogleLogging(argv[0]);
 
-	// wolf problem
-	WolfManager* wolf_problem = new WolfManager;
+	// Ceres initialization
+	ceres::Solver::Options ceres_options;
+	ceres_options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;
+	ceres_options.max_line_search_step_contraction = 1e-3;
+	//    ceres_options.minimizer_progress_to_stdout = false;
+	//    ceres_options.line_search_direction_type = ceres::LBFGS;
+	//    ceres_options.max_num_iterations = 2;
+	CeresManager ceres_manager;
+	std::ofstream log_file;  //output file
+
+	// Wolf manager initialization
+	WolfManager* wolf_manager = new WolfManager(n_execution, complex_angle);
 
 	//variables
 	int dim = (complex_angle ? 4 : 3);
 	Eigen::VectorXs odom_inc_true(n_execution*2);//invented motion
-	Eigen::VectorXs pose_true(dim); //current true pose
-	Eigen::VectorXs ground_truth(n_execution*dim); //all true poses
-	Eigen::VectorXs pose_predicted(dim); // current predicted pose
-	Eigen::VectorXs predicted_trajectory(n_execution*dim); // current predicted pose
-	Eigen::VectorXs state(n_execution*dim); //running window winth solver result
+	Eigen::VectorXs pose_true(3); //current true pose
+	Eigen::VectorXs ground_truth(n_execution*3); //all true poses
 	Eigen::VectorXs odom_readings(n_execution*2); // all odometry readings
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
-	int id_p, id_o, id_p_prev, id_o_prev;
+	std::queue<StateXShPtr> new_state_units; // new state units in wolf that must be added to ceres
+	std::queue<CorrespondenceXShPtr> new_correspondences; // new correspondences in wolf that must be added to ceres
 
-	//init true odom and true pose
+	// Initial pose
+	pose_true << 0,0,0;
+	ground_truth.head(dim) = pose_true;
+
+	// SENSOR DATA ============================================================================================
+	// Ground truth
 	for (unsigned int ii = 0; ii<n_execution; ii++)
 	{
+		// inventing odometry ground truth
 		if ( ii < (unsigned int)floor(n_execution/2) )
 			odom_inc_true.segment(ii*2,2) << fabs(cos(ii/10.)) , fabs(sin(ii/2000.)); //invented motion increments.
 		else
 			odom_inc_true.segment(ii*2,2) << fabs(cos(ii/10.)) , -fabs(sin((ii-floor(n_execution/2))/2000.)); //invented motion increments.
-	}
-	if (complex_angle)
-	{
-		pose_true << 0,0,1,0;
-		pose_predicted << 0,0,1,0;
-	}
-	else
-	{
-		pose_true << 0,0,0;
-		pose_predicted << 0,0,0;
-	}
-	ground_truth.head(dim) << pose_true; //init point pushed to ground truth
-	state.head(dim) << pose_predicted; //init state at origin
-	predicted_trajectory.head(dim) << pose_predicted;
 
-	//init random generators
-	std::default_random_engine generator(1);
-	std::normal_distribution<WolfScalar> distribution_odom(0.001,0.01); //odometry noise
-	std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
+		// Computing ground truth trajectory
+		pose_true(0) = pose_true(0) + odom_inc_true(ii*2) * cos(pose_true(2) + odom_inc_true(ii*2+1));
+		pose_true(1) = pose_true(1) + odom_inc_true(ii*2) * sin(pose_true(2) + odom_inc_true(ii*2+1));
+		pose_true(2) = pose_true(2) + odom_inc_true(ii*2+1);
+		ground_truth.segment(ii*3,3) << pose_true;
 
-    // TODO: incorporar weights a les funcions residu (via LossFunction o directament a operador())
-
-    // Ceres problem initialization
-    ceres::Solver::Options ceres_options;
-    ceres_options.minimizer_type = ceres::LINE_SEARCH;//ceres::TRUST_REGION;
-    ceres_options.max_line_search_step_contraction = 1e-3;
-//    ceres_options.minimizer_progress_to_stdout = false;
-//    ceres_options.line_search_direction_type = ceres::LBFGS;
-//    ceres_options.max_num_iterations = 2;
-    CeresManager ceres_manager;
-    std::ofstream log_file;  //output file
-
-	// Start trajectory
-    id_p = wolf_problem->addStateUnit(new StatePoint2D(state.data()));
-	ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_p));
-	if (complex_angle)
-	{
-	    id_o = wolf_problem->addStateUnit(new StateComplexAngle(state.data()+2));
-		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
-	}
-	else
-	{
-	    id_o = wolf_problem->addStateUnit(new StateThetaAngle(state.data()+2));
-		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
+		// corrupting sensor readings (odometry and GPS)
+		odom_readings.segment(ii*2,2) << odom_inc_true(ii*2) + distribution_odom(generator),
+										 odom_inc_true(ii*2+1) + distribution_odom(generator); //true range and theta with noise
+		gps_fix_readings.segment(ii*3,3) << pose_true(0) + distribution_gps(generator),
+											pose_true(1) + distribution_gps(generator),
+											0. + distribution_gps(generator);
 	}
 
-	for (uint step=1; step < n_execution; step++)
+	// START TRAJECTORY ============================================================================================
+    new_state_units = wolf_manager->getStateUnitsPtrs(0); // First pose to be added in ceres
+    for (uint step=1; step < n_execution; step++)
 	{
-		// NEW STATE
-		//inventing a simple motion
-		if (complex_angle)
-		{
-			double new_pose_true_2 = pose_true(2) * cos(odom_inc_true(step*2+1)) - pose_true(3) * sin(odom_inc_true(step*2+1));
-			double new_pose_true_3 = pose_true(2) * sin(odom_inc_true(step*2+1)) + pose_true(3) * cos(odom_inc_true(step*2+1));
-			pose_true(0) = pose_true(0) + odom_inc_true(step*2) * new_pose_true_2;
-			pose_true(1) = pose_true(1) + odom_inc_true(step*2) * new_pose_true_3;
-			pose_true(2) = new_pose_true_2;
-			pose_true(3) = new_pose_true_3;
-		}
-		else
-		{
-			double new_pose_true_2 = pose_true(2) + (odom_inc_true(step*2+1));
-			pose_true(0) = pose_true(0) + odom_inc_true(step*2) * cos(new_pose_true_2);
-			pose_true(1) = pose_true(1) + odom_inc_true(step*2) * sin(new_pose_true_2);
-			pose_true(2) = new_pose_true_2;
-		}
+    	// adding sensor captures
+		wolf_manager->addOdomCapture(odom_readings.segment(step*2,2),step);
+		wolf_manager->addGPSCapture(gps_fix_readings.segment(step*3,3),step);
 
-		//inventing sensor readings for odometry and GPS
-		odom_readings.segment(step*2,2) << odom_inc_true(step*2)+distribution_odom(generator), odom_inc_true(step*2+1)+distribution_odom(generator); //true range and theta with noise
-		gps_fix_readings.segment(step*3,3) << pose_true(0) + distribution_gps(generator), pose_true(1) + distribution_gps(generator), 0. + distribution_gps(generator);
+		// updating problem
+		wolf_manager->update(new_state_units, new_correspondences);
 
-		//setting initial guess as an odometry prediction, using noisy odometry
-		if (complex_angle)
-		{
-			double new_pose_predicted_2 = pose_predicted(2) * cos(odom_readings(step*2+1)) - pose_predicted(3) * sin(odom_readings(step*2+1));
-			double new_pose_predicted_3 = pose_predicted(2) * sin(odom_readings(step*2+1)) + pose_predicted(3) * cos(odom_readings(step*2+1));
-			pose_predicted(0) = pose_predicted(0) + odom_readings(step*2) * new_pose_predicted_2;
-			pose_predicted(1) = pose_predicted(1) + odom_readings(step*2) * new_pose_predicted_3;
-			pose_predicted(2) = new_pose_predicted_2;
-			pose_predicted(3) = new_pose_predicted_3;
-		}
-		else
-		{
-			double new_pose_predicted_2 = pose_predicted(2) + (odom_readings(step*2+1));
-			pose_predicted(0) = pose_predicted(0) + odom_readings(step*2) * cos(new_pose_predicted_2);
-			pose_predicted(1) = pose_predicted(1) + odom_readings(step*2) * sin(new_pose_predicted_2);
-			pose_predicted(2) = new_pose_predicted_2;
-		}
-		predicted_trajectory.segment(step*dim,dim) = pose_predicted;
+		// adding new state units and correspondences to ceres
+		ceres_manager.addStateUnits(new_state_units);
+		ceres_manager.addCorrespondences(new_correspondences);
 
-		// store
-		state.segment(step*dim,dim) << pose_predicted;
-		ground_truth.segment(step*dim,dim) << pose_true;
-
-		// STATE UNITS
-		id_p_prev = id_p;
-		id_o_prev = id_o;
-		// p
-		id_p = wolf_problem->addStateUnit(StateShPtr(new StatePoint2D(state.data() + step * dim)));
-		ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_p));
-		// o
-		if (complex_angle)
-		{
-			id_o = wolf_problem->addStateUnit(StateShPtr(new StateComplexAngle(state.data() + step * dim + 2)));
-			ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
-		}
-		else
-		{
-			id_o = wolf_problem->addStateUnit(StateShPtr(new StateThetaAngle(state.data() + step * dim + 2)));
-			ceres_manager.addStateUnit(wolf_problem->getStateUnitPtr(id_o));
-		}
-
-		// CORRESPONDENCE ODOMETRY
-		if (complex_angle)
-		{
-
-			// int odomIdx = wolf_manager.addOdomMeasurement(odom_readings.data() + step*2);
-			// Correspondence2DOdometry* odomCorrPtr = wolf_manager.getCorrespondence(odomIdx);
-			// ceres_wrapper.addCorrespondence<Correspondence2DOdometry>(odomCorrPtr, odomCorrPtr->getP1(), odomCorrPtr->getO1(), odomCorrPtr->getP2(), odomCorrPtr->getO2());
-
-			uint id_corr = wolf_problem->addCorrespondence(new Correspondence2DOdometry(odom_readings.data() + step*2,
-																					wolf_problem->getStateUnitPtr(id_p_prev),
-																					wolf_problem->getStateUnitPtr(id_o_prev),
-																					wolf_problem->getStateUnitPtr(id_p),
-																					wolf_problem->getStateUnitPtr(id_o)));
-			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
-		}
-		else
-		{
-			uint id_corr = wolf_problem->addCorrespondence(new Correspondence2DOdometryTheta(odom_readings.data() + step*2,
-																						 wolf_problem->getStateUnitPtr(id_p_prev),
-																						 wolf_problem->getStateUnitPtr(id_o_prev),
-																						 wolf_problem->getStateUnitPtr(id_p),
-																						 wolf_problem->getStateUnitPtr(id_o)));
-
-			ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
-		}
-
-		// CORRESPONDENCE GPS (2D)
-		uint id_corr = wolf_problem->addCorrespondence(new CorrespondenceGPS2D(gps_fix_readings.data() + step*3, wolf_problem->getStateUnitPtr(id_p)));
-		ceres_manager.addCorrespondence(wolf_problem->getCorrespondencePrt(id_corr));
-
-		// SOLVE CERES PROBLEM
-		//ceres::Solver::Summary summary = ceres_wrapper.solve();
+		// print data
 		if (print)
 		{
 			std::cout << " ========= STEP " << step << "===========" << std::endl << std::endl;
 			std::cout << "odom : " << odom_inc_true.segment(step*2,2).transpose() << std::endl << std::endl;
-			std::cout << "pose_predicted : " << pose_predicted.transpose() << std::endl << std::endl;
-			std::cout << "pose_true : " << pose_true.transpose() << std::endl << std::endl;
 			std::cout << "gps measurement : " << gps_fix_readings.segment(step*3,3).transpose() << std::endl << std::endl;
-			std::cout << "state : " << std::endl << state.head(step*dim).transpose() << std::endl;
 			std::cout << "ground_truth : " << std::endl << ground_truth.head(step*dim).transpose() << std::endl;
-			std::cout << "error : " << std::endl << (ground_truth.head(step*dim) - state.head(step*dim)).transpose() << std::endl << std::endl;
-			//std::cout << "total time (s):" << summary.total_time_in_seconds << std::endl;
 		}
 	}
     
+    // SOLVE OPTIMIZATION ============================================================================================
 	ceres::Solver::Summary summary = ceres_manager.solve(ceres_options);
-	std::cout << summary.FullReport() << std::endl;
-
 	t2=clock();
 	double seconds = ((double)t2-t1)/CLOCKS_PER_SEC;
+
+	// DISPLAY RESULTS ============================================================================================
+	std::cout << summary.FullReport() << std::endl;
 	std::cout << "optimization seconds: " << summary.total_time_in_seconds << std::endl;
 	std::cout << "total seconds: " << seconds << std::endl;
 
-	//display/log results, by setting cout flags properly
+	// change from complex angle to theta
+	VectorXs state = wolf_manager->getState();
 	VectorXs state_theta(n_execution * 3);
-	VectorXs ground_truth_theta(n_execution * 3);
-	VectorXs predicted_trajectory_theta(n_execution * 3);
 	if (complex_angle)
-	{
-		// change from complex angle to theta
 		for (uint ii = 0; ii<n_execution; ii++)
-		{
 			state_theta.segment(ii*3,3) << state(ii*4), state(ii*4+1), atan2(state(ii*4+2), state(ii*4+3));
-			ground_truth_theta.segment(ii*3,3) << ground_truth(ii*4), ground_truth(ii*4+1), atan2(ground_truth(ii*4+2), ground_truth(ii*4+3));
-			predicted_trajectory_theta.segment(ii*3,3) << predicted_trajectory(ii*4), predicted_trajectory(ii*4+1), atan2(predicted_trajectory(ii*4+2), predicted_trajectory(ii*4+3));
-		}
-	}
 	else
-	{
 		state_theta = state;
-		ground_truth_theta = ground_truth;
-		predicted_trajectory_theta = predicted_trajectory;
-	}
+
+	// Print log file
 	std::string homepath = getenv("HOME");
 	log_file.open(homepath + "/Desktop/log_file_2.txt", std::ofstream::out); //open log file
 	if (log_file.is_open())
@@ -882,16 +982,15 @@ int main(int argc, char** argv)
 		log_file << seconds << std::endl;
 		for (unsigned int ii = 0; ii<n_execution; ii++)
 			log_file << state_theta.segment(ii*3,3).transpose()
-					 << " " << ground_truth_theta.segment(ii*3,3).transpose()
-					 << " " << (state_theta.segment(ii*3,3)-ground_truth_theta.segment(ii*3,3)).transpose()
-					 << " " << gps_fix_readings.segment(ii*3,3).transpose()
-					 << " " << predicted_trajectory_theta.segment(ii*3,3).transpose() << std::endl;
+					 << " " << ground_truth.segment(ii*3,3).transpose()
+					 << " " << (state_theta.segment(ii*3,3)-ground_truth.segment(ii*3,3)).transpose()
+					 << " " << gps_fix_readings.segment(ii*3,3).transpose();
 		log_file.close(); //close log file
 		std::cout << std::endl << " Result file ~/Desktop/log_data.txt" << std::endl;
 	}
 	else
 		std::cout << std::endl << " Failed to write the file ~/Desktop/log_data.txt" << std::endl;
-    //end Wolf iteration
+
     std::cout << " ========= END ===========" << std::endl << std::endl;
        
     //exit
