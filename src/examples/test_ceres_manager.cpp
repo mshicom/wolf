@@ -350,7 +350,6 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 		{
 			_residuals[0] = (T(*this->measurement_ptr_) - _x[0]) / T(stdev_);
 			_residuals[1] = (T(*(this->measurement_ptr_+1)) - _x[1]) / T(stdev_);
-
 			return true;
 		}
 
@@ -390,7 +389,8 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
         {
 			// Expected measurement
 			T expected_range = (_p1[0]-_p2[0])*(_p1[0]-_p2[0]) + (_p1[1]-_p2[1])*(_p1[1]-_p2[1]); //square of the range
-			T expected_rotation = atan2(-_o1[0]*_o2[1] + _o1[1]*_o2[0], _o1[0]*_o2[0] + _o1[1]*_o2[1]);
+			T expected_rotation = atan2(_o2[1]*_o1[0] - _o2[0]*_o1[1], _o1[0]*_o2[0] + _o1[1]*_o2[1]);
+			//T expected_rotation = atan2(_o2[1], _o2[0]) -atan2(_o1[1],_o1[0]);
 
 			// Residuals
 			_residuals[0] = (expected_range - T((*this->measurement_ptr_)*(*this->measurement_ptr_))) / T(stdev_);
@@ -733,6 +733,7 @@ class CeresManager
 
 		void addCorrespondences(std::queue<CorrespondenceXShPtr>& _new_correspondences)
 		{
+			//std::cout << _new_correspondences.size() << " new correspondences\n";
 			while (!_new_correspondences.empty())
 			{
 				addCorrespondence(_new_correspondences.front());
@@ -853,7 +854,7 @@ int main(int argc, char** argv)
 	clock_t t1, t2;
 	t1=clock();
 
-    std::cout << " ========= 2D Robot with odometry and GPS ===========" << std::endl << std::endl;
+    std::cout << " ========= 2D Robot with odometry and GPS ===========\n\n";
     
     // USER INPUT ============================================================================================
 	if (argc!=4)
@@ -873,7 +874,7 @@ int main(int argc, char** argv)
 	// INITIALIZATION ============================================================================================
 	//init random generators
 	std::default_random_engine generator(1);
-	std::normal_distribution<WolfScalar> distribution_odom(0.0,0.01); //odometry noise
+	std::normal_distribution<WolfScalar> distribution_odom(0.001,0.01); //odometry noise
 	std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
 
 	//init google log
@@ -888,15 +889,15 @@ int main(int argc, char** argv)
 	//    ceres_options.max_num_iterations = 2;
 	CeresManager ceres_manager;
 	std::ofstream log_file;  //output file
-
 	// Wolf manager initialization
-	WolfManager* wolf_manager = new WolfManager(n_execution, complex_angle);
+	WolfManager* wolf_manager = new WolfManager(n_execution * (complex_angle ? 4 : 3), complex_angle);
 
 	//variables
-	int dim = (complex_angle ? 4 : 3);
 	Eigen::VectorXs odom_inc_true(n_execution*2);//invented motion
 	Eigen::VectorXs pose_true(3); //current true pose
+	Eigen::VectorXs pose_odom(3); //current true pose
 	Eigen::VectorXs ground_truth(n_execution*3); //all true poses
+	Eigen::VectorXs odom_trajectory(n_execution*3); //all true poses
 	Eigen::VectorXs odom_readings(n_execution*2); // all odometry readings
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
 	std::queue<StateXShPtr> new_state_units; // new state units in wolf that must be added to ceres
@@ -904,11 +905,13 @@ int main(int argc, char** argv)
 
 	// Initial pose
 	pose_true << 0,0,0;
-	ground_truth.head(dim) = pose_true;
+	pose_odom << 0,0,0;
+	ground_truth.head(3) = pose_true;
+	odom_trajectory.head(3) = pose_true;
 
 	// SENSOR DATA ============================================================================================
 	// Ground truth
-	for (unsigned int ii = 0; ii<n_execution; ii++)
+	for (unsigned int ii = 1; ii<n_execution; ii++)
 	{
 		// inventing odometry ground truth
 		if ( ii < (unsigned int)floor(n_execution/2) )
@@ -928,6 +931,12 @@ int main(int argc, char** argv)
 		gps_fix_readings.segment(ii*3,3) << pose_true(0) + distribution_gps(generator),
 											pose_true(1) + distribution_gps(generator),
 											0. + distribution_gps(generator);
+
+		// Computing ground truth trajectory
+		pose_odom(0) = pose_odom(0) + odom_readings(ii*2) * cos(pose_odom(2) + odom_readings(ii*2+1));
+		pose_odom(1) = pose_odom(1) + odom_readings(ii*2) * sin(pose_odom(2) + odom_readings(ii*2+1));
+		pose_odom(2) = pose_odom(2) + odom_readings(ii*2+1);
+		odom_trajectory.segment(ii*3,3) << pose_odom;
 	}
 
 	// START TRAJECTORY ============================================================================================
@@ -948,13 +957,12 @@ int main(int argc, char** argv)
 		// print data
 		if (print)
 		{
-			std::cout << " ========= STEP " << step << "===========" << std::endl << std::endl;
-			std::cout << "odom : " << odom_inc_true.segment(step*2,2).transpose() << std::endl << std::endl;
-			std::cout << "gps measurement : " << gps_fix_readings.segment(step*3,3).transpose() << std::endl << std::endl;
-			std::cout << "ground_truth : " << std::endl << ground_truth.head(step*dim).transpose() << std::endl;
+			std::cout << " ========= STEP " << step << "===========" << std::endl;
+			std::cout << "odom : " << odom_inc_true.segment(step*2,2).transpose() << std::endl;
+			std::cout << "gps measurement : " << gps_fix_readings.segment(step*3,3).transpose() << std::endl;
+			std::cout << "ground_truth : " << ground_truth.segment(step*3,3).transpose() << std::endl << std::endl;
 		}
 	}
-    
     // SOLVE OPTIMIZATION ============================================================================================
 	ceres::Solver::Summary summary = ceres_manager.solve(ceres_options);
 	t2=clock();
@@ -975,21 +983,23 @@ int main(int argc, char** argv)
 		state_theta = state;
 
 	// Print log file
-	std::string homepath = getenv("HOME");
-	log_file.open(homepath + "/Desktop/log_file_2.txt", std::ofstream::out); //open log file
+	std::string filepath = getenv("HOME") + (complex_angle ? std::string("/Desktop/log_file_3.txt") : std::string("/Desktop/log_file_2.txt"));
+	log_file.open(filepath, std::ofstream::out); //open log file
+
 	if (log_file.is_open())
 	{
 		log_file << seconds << std::endl;
 		for (unsigned int ii = 0; ii<n_execution; ii++)
 			log_file << state_theta.segment(ii*3,3).transpose()
-					 << " " << ground_truth.segment(ii*3,3).transpose()
-					 << " " << (state_theta.segment(ii*3,3)-ground_truth.segment(ii*3,3)).transpose()
-					 << " " << gps_fix_readings.segment(ii*3,3).transpose();
+					 << "\t" << ground_truth.segment(ii*3,3).transpose()
+					 << "\t" << (state_theta.segment(ii*3,3)-ground_truth.segment(ii*3,3)).transpose()
+					 << "\t" << odom_trajectory.segment(ii*3,3).transpose()
+					 << "\t" << gps_fix_readings.segment(ii*3,3).transpose() << std::endl;
 		log_file.close(); //close log file
-		std::cout << std::endl << " Result file ~/Desktop/log_data.txt" << std::endl;
+		std::cout << std::endl << " Result file " << filepath << std::endl;
 	}
 	else
-		std::cout << std::endl << " Failed to write the file ~/Desktop/log_data.txt" << std::endl;
+		std::cout << std::endl << " Failed to write the file " << filepath << std::endl;
 
     std::cout << " ========= END ===========" << std::endl << std::endl;
        

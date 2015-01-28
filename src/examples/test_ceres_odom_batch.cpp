@@ -416,7 +416,7 @@ int main(int argc, char** argv)
     
     t2=clock();
 	double seconds = ((double)t2-t1)/CLOCKS_PER_SEC;
-	//std::cout << summary.FullReport() << std::endl;
+	std::cout << summary.FullReport() << std::endl;
 	std::cout << "optimization seconds: " << summary.total_time_in_seconds << std::endl;
 	std::cout << "total seconds: " << seconds << std::endl;
     
