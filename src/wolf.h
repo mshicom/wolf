@@ -149,8 +149,8 @@ typedef FeatureBaseList::iterator FeatureBaseIter;
 
 // - Correspondence
 typedef std::shared_ptr<CorrespondenceBase> CorrespondenceBaseShPtr;
-typedef std::list<CorrespondenceBaseShPtr> CorrespondenceList;
-typedef CorrespondenceList::iterator CorrespondenceIter;
+typedef std::list<CorrespondenceBaseShPtr> CorrespondenceBaseList;
+typedef CorrespondenceBaseList::iterator CorrespondenceBaseIter;
 
 // - Raw data
 typedef std::shared_ptr<RawBase> RawShPtr;

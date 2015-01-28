@@ -23,8 +23,8 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         TimeStamp time_stamp_; ///< Time stamp        
         Eigen::VectorXs data_; ///< raw data
         SensorBasePtr sensor_ptr_; ///< Pointer to sensor
-        Eigen::Vector3s global_pose_; ///< Sensor pose in world frame: composition of the frame pose and the sensor pose. TODO: use state units
-        Eigen::Vector3s inverse_global_pose_; ///< World pose in the sensor frame: inverse of the global_pose_. TODO: use state units
+        Eigen::Vector3s sensor_pose_global_; ///< Sensor pose in world frame: composition of the frame pose and the sensor pose. TODO: use state units
+        Eigen::Vector3s inverse_sensor_pose_; ///< World pose in the sensor frame: inverse of the global_pose_. TODO: use state units
         
     public:
         CaptureBase(double _ts, const SensorBasePtr _sensor_ptr);
@@ -69,5 +69,8 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         
         void setData(unsigned int _size, const WolfScalar *_data);
         
+        virtual void processCapture() = 0;
+
+        virtual void printSelf(unsigned int _ntabs = 0, std::ostream & _ost = std::cout) const;
 };
 #endif
