@@ -851,11 +851,8 @@ class CeresManager
 
 int main(int argc, char** argv) 
 {
-	clock_t t1, t2;
-	t1=clock();
+	std::cout << " ========= 2D Robot with odometry and GPS ===========\n\n";
 
-    std::cout << " ========= 2D Robot with odometry and GPS ===========\n\n";
-    
     // USER INPUT ============================================================================================
 	if (argc!=4)
 	{
@@ -866,6 +863,9 @@ int main(int argc, char** argv)
 		std::cout << "EXIT due to bad user input" << std::endl << std::endl;
 		return -1;
 	}
+
+	clock_t t1, t2;
+	t1=clock();
 
 	unsigned int n_execution = (unsigned int) atoi(argv[1]); //number of iterations of the whole execution
 	bool print = (bool) atoi(argv[2]);
@@ -1002,7 +1002,7 @@ int main(int argc, char** argv)
 		std::cout << std::endl << " Failed to write the file " << filepath << std::endl;
 
     std::cout << " ========= END ===========" << std::endl << std::endl;
-       
+
     delete wolf_manager;
     //exit
     return 0;
