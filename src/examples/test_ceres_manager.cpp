@@ -1003,6 +1003,7 @@ int main(int argc, char** argv)
 
     std::cout << " ========= END ===========" << std::endl << std::endl;
        
+    delete wolf_manager;
     //exit
     return 0;
 }
