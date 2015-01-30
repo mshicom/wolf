@@ -99,6 +99,23 @@ typedef enum
     REGULAR_FRAME ///< marks a regular frame. It does play at optimizations but it will be discarded from the window once a newer frame arrives.
 } FrameType;
 
+/** \brief Enumeration of all possible correspondences
+ *
+ * Enumeration of all possible correspondences.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ * 
+ * TODO: End character "_" should be removed once test manager uses these enums
+ * 
+ */
+typedef enum 
+{
+    GPS_FIX_2D_,
+    ODOM_2D_COMPLEX_,
+    ODOM_2D_THETA_
+    
+} CorrespondenceType;
+
 
 /////////////////////////////////////////////////////////////////////////
 //      TYPEDEFS FOR POINTERS AND ITERATORS IN THE WOLF TREE
