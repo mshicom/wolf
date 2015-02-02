@@ -16,8 +16,3 @@ inline CorrespondenceType CorrespondenceBase::getType() const
 {
     return type_;
 }
-
-inline const std::vector<WolfScalar*> * CorrespondenceBase::getStateBlockPtrVector()
-{
-    return & state_block_ptr_vector_;
-}

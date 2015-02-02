@@ -53,10 +53,15 @@ inline void CaptureBase::setTimeStampToNow()
     time_stamp_.setToNow();
 }
 
-inline void CaptureBase::setData(unsigned int _size, const WolfScalar *_data)
+void CaptureBase::setData(unsigned int _size, const WolfScalar *_data)
 {
     data_.resize(_size);
     for (unsigned int ii=0; ii<_size; ii++) data_(ii) = *(&_data[ii]);
+}
+
+inline void CaptureBase::processCapture()
+{
+    std::cout << "... processing capture" << std::endl;
 }
 
 void CaptureBase::printSelf(unsigned int _ntabs, std::ostream & _ost) const

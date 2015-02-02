@@ -39,6 +39,8 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
         
         const CorrespondenceBaseList & getCorrespondenceList() const;
         
+        const Eigen::VectorXs * getMeasurement() const;
+        
         void setMeasurement(const Eigen::VectorXs & _meas);
         
         /** \brief Generic interface to find correspondences

@@ -17,8 +17,9 @@ ENDIF(Ceres_FOUND)
 
 #headers
 SET(HDRS
-#    capture_base.h
+    capture_base.h
     correspondence_base.h
+    correspondence_sparse.h
     feature_base.h
     frame_base.h
     node_base.h

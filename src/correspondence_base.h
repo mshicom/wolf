@@ -21,8 +21,6 @@ class CorrespondenceBase : public NodeLinked<FeatureBase,NodeTerminus>
 {
     protected:
         CorrespondenceType type_; //type of correspondence (types defined at wolf.h)
-        std::vector<WolfScalar*> state_block_ptr_vector_;
-        std::vector<unsigned int> state_block_sizes_vector_;
         
     public:
         /** \brief Conructor
@@ -46,12 +44,5 @@ class CorrespondenceBase : public NodeLinked<FeatureBase,NodeTerminus>
          **/
         CorrespondenceType getType() const;
         
-        /** \brief Returns a pointer to the measurement getBlockPtrVector
-         * 
-         * Returns a pointer to the measurement getBlockPtrVector in which this correspondence depends
-         * Measurement is owned by upper-level feature
-         * 
-         **/
-        const std::vector<WolfScalar*> * getStateBlockPtrVector();
 };
 #endif

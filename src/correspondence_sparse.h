@@ -9,7 +9,7 @@
 //TODO: 
 // - public static const may be are not necessary, since sizes are already kept in CorrespondenceBase::state_block_sizes_vector_
 // - measurement_ptr can be set from FeatureBase::measurement_, once this correspondence is up-linked to a feature. 
-//   May be a simple get is //enough to access this data.
+//   May be a simple get is enough to access this data.
 // - 
 
 //template class CorrespondenceBase
@@ -27,6 +27,8 @@ template <const unsigned int MEASUREMENT_SIZE,
 class CorrespondenceSparse: public CorrespondenceBase
 {
     protected:
+        std::vector<WolfScalar*> state_block_ptr_vector_;
+        std::vector<unsigned int> state_block_sizes_vector_;
 
     public:
         static const unsigned int measurementSize = MEASUREMENT_SIZE;
@@ -41,23 +43,36 @@ class CorrespondenceSparse: public CorrespondenceBase
         static const unsigned int block8Size = BLOCK_8_SIZE;
         static const unsigned int block9Size = BLOCK_9_SIZE;
 
-        CorrespondenceSparse(WolfScalar* _measurementPtr, WolfScalar** _blockPtrArray) :
-            CorrespondenceXBase(_measurementPtr),
-            block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
+         /** \brief Contructor with state pointer array
+         * 
+         * Constructor with state pointer array
+         * 
+         **/               
+        CorrespondenceSparse(CorrespondenceType _tp, WolfScalar** _blockPtrArray) :
+            CorrespondenceBase(_tp),
+            state_block_ptr_vector_(10),
+            state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
-            for (uint i = 0; i<block_sizes_vector_.size(); i++)
+            for (uint ii = 0; ii<state_block_sizes_vector_.size(); ii++)
             {
-                if (block_sizes_vector_.at(i) == 0)
+                if (state_block_sizes_vector_.at(ii) != 0)
                 {
-                    block_sizes_vector_.resize(i);
+                    state_block_ptr_vector_.at(ii) = _blockPtrArray[ii];
+                }
+                else //at the end the vector is cropped to just relevant components
+                {
+                    state_block_ptr_vector_.resize(ii); 
                     break;
                 }
-                else
-                    state_block_ptr_vector_.push_back(_blockPtrArray[i]);
             }
         }
 
-        CorrespondenceSparse(WolfScalar* _measurementPtr,
+        /** \brief Contructor with state pointer separated
+         * 
+         * Constructor with state pointers separated
+         * 
+         **/        
+        CorrespondenceSparse(CorrespondenceType _tp, 
                              WolfScalar* _state0Ptr,
                              WolfScalar* _state1Ptr = nullptr,
                              WolfScalar* _state2Ptr = nullptr,
@@ -68,65 +83,54 @@ class CorrespondenceSparse: public CorrespondenceBase
                              WolfScalar* _state7Ptr = nullptr,
                              WolfScalar* _state8Ptr = nullptr,
                              WolfScalar* _state9Ptr = nullptr ) :
-            CorrespondenceXBase(_measurementPtr),
+            CorrespondenceBase(_tp),
             state_block_ptr_vector_({_state0Ptr,_state1Ptr,_state2Ptr,_state3Ptr,_state4Ptr,_state5Ptr,_state6Ptr,_state7Ptr,_state8Ptr,_state9Ptr}),
-            block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
+            state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
-            for (uint i = 0; i<block_sizes_vector_.size(); i++)
+            for (uint ii = 0; ii<state_block_sizes_vector_.size(); ii++)
             {
-                if (block_sizes_vector_.at(i) == 0)
+                if ( (state_block_ptr_vector_ == nullptr) && (state_block_sizes_vector_.at(i) == 0) )
                 {
-                    block_sizes_vector_.resize(i);
-                    state_block_ptr_vector_.resize(i);
+                    state_block_sizes_vector_.resize(ii);
+                    state_block_ptr_vector_.resize(ii);
                     break;
                 }
+                else // check error cases
+                {
+                    assert(state_block_ptr_vector_ != nullptr);
+                    assert(state_block_sizes_vector_ != 0);
+                }
             }
-
-            //TODO: Check if while size OK, pointers NULL
         }
 
+        /** \brief Destructor
+         * 
+         * Destructor
+         * 
+         **/        
         virtual ~CorrespondenceSparse()
         {
+            //
         }
 
-        virtual correspondenceType getType() const = 0;
-
-        virtual const std::vector<WolfScalar *> getBlockPtrVector()
+        /** \brief Returns a pointer to the state_block_ptr_vector_
+         * 
+         * Returns a pointer to the state_block_ptr_vector_ in which this correspondence depends
+         * 
+         **/
+        const std::vector<WolfScalar*> * getStateBlockPtrVector()
         {
-            return state_block_ptr_vector_;
+            return & state_block_ptr_vector_;
+        }
+        
+        /** \brief Returns a pointer to the mesaurement associated to this correspondence
+         * 
+         * Returns a pointer to the mesaurement associated to this correspondence.
+         * Measurement is owned by upper-level feature
+         **/
+        const Eigen::VectorXs * getMeasurement() const 
+        {
+            return upperNode().getMeasurement();
         }
 };
-
-class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
-{
-    public:
-        static const unsigned int N_BLOCKS = 1;
-        const double stdev_ = 1;
-
-        CorrespondenceGPS2D(WolfScalar* _measurementPtr, WolfScalar* _statePtr) :
-            CorrespondenceSparse<2,2>(_measurementPtr, _statePtr)
-        {
-        }
-
-        CorrespondenceGPS2D(WolfScalar* _measurementPtr, const StateXShPtr& _statePtr) :
-            CorrespondenceSparse<2,2>(_measurementPtr, _statePtr->getPtr())
-        {
-        }
-
-        virtual ~CorrespondenceGPS2D()
-        {
-        }
-
-        template <typename T>
-        bool operator()(const T* const _x, T* _residuals) const
-        {
-            _residuals[0] = (T(*this->measurement_ptr_) - _x[0]) / T(stdev_);
-            _residuals[1] = (T(*(this->measurement_ptr_+1)) - _x[1]) / T(stdev_);
-            return true;
-        }
-
-        virtual correspondenceType getType() const
-        {
-            return GPS_2D;
-        }
-};
+#endif

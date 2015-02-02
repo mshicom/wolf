@@ -32,6 +32,11 @@ inline const CorrespondenceBaseList & FeatureBase::getCorrespondenceList() const
     return downNodeList();
 }
 
+inline const Eigen::VectorXs * FeatureBase::getMeasurement() const
+{
+    return & measurement_;
+}
+
 inline void FeatureBase::setMeasurement(const Eigen::VectorXs & _meas)
 {
     measurement_ = _meas;

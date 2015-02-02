@@ -69,7 +69,7 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         
         void setData(unsigned int _size, const WolfScalar *_data);
         
-        virtual void processCapture() = 0;
+        virtual void processCapture();// = 0;
 
         virtual void printSelf(unsigned int _ntabs = 0, std::ostream & _ost = std::cout) const;
 };
