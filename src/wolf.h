@@ -173,7 +173,7 @@ typedef std::map<unsigned int, TransSensorShPtr > TransSensorMap;
 typedef TransSensorMap::iterator TransSensorIter;
 
 // - State Pose
-typedef std::shared_ptr<StatePose> StateShPtr;
+typedef std::shared_ptr<StatePose> StateBaseShPtr;
 typedef StatePose* StatePtr;
 
 // - Pin hole
