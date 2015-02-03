@@ -105,17 +105,57 @@ typedef enum
  *
  * You may add items to this list as needed. Be concise with names, and document your entries.
  * 
- * TODO: End character "_" should be removed once test manager uses these enums
- * 
  */
 typedef enum 
 {
-    GPS_FIX_2D_,
-    ODOM_2D_COMPLEX_,
-    ODOM_2D_THETA_
+    CORR_GPS_FIX_2D,		///< marks a 2D GPS Fix correspondence.
+	CORR_ODOM_2D_COMPLEX,	///< marks a 2D Odometry using complex angles.
+	CORR_ODOM_2D_THETA		///< marks a 2D Odometry using theta angles.
     
 } CorrespondenceType;
 
+/** \brief Enumeration of all possible captures
+ *
+ * Enumeration of all possible captures.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ *
+ */
+typedef enum
+{
+	CAPT_GPS_FIX_2D,	///< marks a 2D GPS Fix capture: X, Y.
+	CAPT_ODOM_2D		///< marks a 2D Odometry capture: displacement + rotation.
+} captureType;
+
+/** \brief Enumeration of all possible cost function types
+ *
+ * Enumeration of all possible cost function types.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ *
+ */
+typedef enum
+{
+	AUTO,		///< Auto-computed jacobians (see ceres::jet).
+	NUMERIC		///< Numerically computed jacobians.
+} costFunctionType;
+
+/** \brief Enumeration of all possible state parametrizations
+ *
+ * Enumeration of all possible state parametrizations.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ *
+ */
+typedef enum
+{
+	ST_POINT_1D,		///< A 1D point. No parametrization.
+	ST_POINT_2D,		///< A 2D point. No parametrization.
+	ST_POINT_3D,		///< A 3D point. No parametrization.
+	ST_THETA,			///< A 2D orientation represented by a single angle. No parametrization (equivalent to ST_POINT_1D).
+	ST_COMPLEX_ANGLE,	///< A 2D orientation represented by a complex number.
+	ST_QUATERNION		///< A 3D orientation represented by a quaternion.
+} stateType;
 
 /////////////////////////////////////////////////////////////////////////
 //      TYPEDEFS FOR POINTERS AND ITERATORS IN THE WOLF TREE
@@ -136,7 +176,8 @@ class RawLaser2D;
 class SensorBase;
 class SensorLaser2D;
 class TransSensor;
-class StatePose;
+class StateBase;
+template <unsigned int SIZE> class StatePoint;
 class PinHole;
 
 
@@ -184,8 +225,13 @@ typedef std::map<unsigned int, TransSensorShPtr > TransSensorMap;
 typedef TransSensorMap::iterator TransSensorIter;
 
 // - State Pose
-typedef std::shared_ptr<StatePose> StateShPtr;
-typedef StatePose* StatePtr;
+typedef std::shared_ptr<StateBase> StateBaseShPtr;
+typedef StateBase* StatePtr;
+
+typedef StatePoint<1> StateTheta;
+typedef StatePoint<1> StatePoint1D;
+typedef StatePoint<2> StatePoint2D;
+typedef StatePoint<3> StatePoint3D;
 
 // - Pin hole
 typedef PinHole* PinHolePtr;

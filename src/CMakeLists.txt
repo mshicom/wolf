@@ -25,6 +25,9 @@ SET(HDRS
     node_base.h
     node_terminus.h
     node_linked.h
+    state_base.h
+    state_point.h
+    state_complex_angle.h
     time_stamp.h
     wolf.h)
     
@@ -36,6 +39,8 @@ SET(SRCS
     frame_base.cpp
     node_base.cpp
     node_terminus.cpp
+    state_base.cpp
+    state_complex_angle.cpp
     time_stamp.cpp)
 
 #optional HDRS and SRCS

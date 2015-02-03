@@ -8,6 +8,7 @@
 
 //TODO: 
 // - public static const may be are not necessary, since sizes are already kept in CorrespondenceBase::state_block_sizes_vector_
+// 	 JVN: Yes, they are necessary for the ceres cost function constructor. Maybe, the state_block_sizes_vector_ is not necessary (it can be useful in filtering...)
 // - measurement_ptr can be set from FeatureBase::measurement_, once this correspondence is up-linked to a feature. 
 //   May be a simple get is enough to access this data.
 // - 
@@ -113,12 +114,12 @@ class CorrespondenceSparse: public CorrespondenceBase
             //
         }
 
-        /** \brief Returns a pointer to the state_block_ptr_vector_
+        /** \brief Returns a vector of pointers to the state blocks
          * 
-         * Returns a pointer to the state_block_ptr_vector_ in which this correspondence depends
+         * Returns a vector of pointers to the state blocks in which this correspondence depends
          * 
          **/
-        const std::vector<WolfScalar*> * getStateBlockPtrVector()
+        virtual const std::vector<WolfScalar*> getStateBlockPtrVector()
         {
             return & state_block_ptr_vector_;
         }

@@ -23,9 +23,9 @@ class CorrespondenceBase : public NodeLinked<FeatureBase,NodeTerminus>
         CorrespondenceType type_; //type of correspondence (types defined at wolf.h)
         
     public:
-        /** \brief Conructor
+        /** \brief Constructor
          * 
-         * Conructor
+         * Constructor
          * 
          **/                
         CorrespondenceBase(CorrespondenceType _tp);
@@ -44,5 +44,12 @@ class CorrespondenceBase : public NodeLinked<FeatureBase,NodeTerminus>
          **/
         CorrespondenceType getType() const;
         
+        /** \brief Returns a vector of scalar pointers to the first element of all state blocks involved in the correspondence
+		 *
+		 * Returns a vector of scalar pointers to the first element of all state blocks involved in the correspondence.
+		 *
+		 **/
+        virtual const std::vector<WolfScalar*> getBlockPtrVector() = 0;
+
 };
 #endif

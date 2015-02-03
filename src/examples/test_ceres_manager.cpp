@@ -19,7 +19,10 @@
 
 //Wolf includes
 #include "frame_base.h"
+#include "state_point.h"
+#include "state_complex_angle.h"
 #include "capture_base.h"
+#include "state_base.h"
 #include "wolf.h"
 
 /**
@@ -28,157 +31,11 @@
  **/
 
 using namespace Eigen;
-enum costFunctionType {
-	AUTO,
-	NUMERIC};
-enum correspondenceType {
-	GPS_2D,
-	ODOM_2D_COMPLEX,
-	ODOM_2D_THETA};
-enum parametrizationType {
-	NONE,
-	COMPLEX_ANGLE,
-	QUATERNION,
-	PO_2D};
-enum captureType{
-	CAPT_GPS_2D,
-	CAPT_ODOM_2D};
 
-class Frame2DPO;
 class CaptureXBase;
-class StateBase;
 class CorrespondenceXBase;
 typedef std::shared_ptr<CorrespondenceXBase> CorrespondenceXShPtr;
-typedef std::shared_ptr<Frame2DPO> Frame2DPOShPtr;
 typedef std::shared_ptr<CaptureXBase> CaptureXShPtr;
-typedef std::shared_ptr<StateBase> StateXShPtr;
-
-class StateBase
-{
-	protected:
-		WolfScalar* state_ptr_;
-
-	public:
-
-		StateBase(VectorXs& _st_remote, const unsigned int _idx) :
-			state_ptr_(_st_remote.data() + _idx)
-		{
-		}
-
-		StateBase(WolfScalar* _st_ptr) :
-			state_ptr_(_st_ptr)
-		{
-		}
-
-		StateBase(StateBase& _st) :
-			state_ptr_(_st.state_ptr_)
-		{
-		}
-
-
-		virtual ~StateBase()
-		{
-		}
-
-		virtual WolfScalar* getPtr()
-		{
-			return state_ptr_;
-		}
-
-		virtual parametrizationType getParametrizationType() const = 0;
-
-		virtual void print() const = 0;
-};
-
-class StatePoint2D: public StateBase
-{
-	public:
-		static const unsigned int BLOCK_SIZE = 2;
-
-		StatePoint2D(VectorXs& _st_remote, const unsigned int _idx) :
-			StateBase(_st_remote, _idx)
-		{
-		}
-
-		StatePoint2D(WolfScalar* _st_ptr) :
-			StateBase(_st_ptr)
-		{
-		}
-
-		virtual ~StatePoint2D()
-		{
-		}
-
-		virtual parametrizationType getParametrizationType() const
-		{
-			return NONE;
-		}
-
-		virtual void print() const
-		{
-			std::cout << *this->state_ptr_ << " " << *(this->state_ptr_+1) << std::endl;
-		}
-};
-
-class StateThetaAngle: public StateBase
-{
-	public:
-		static const unsigned int BLOCK_SIZE = 1;
-
-		StateThetaAngle(VectorXs& _st_remote, const unsigned int _idx) :
-			StateBase(_st_remote, _idx)
-		{
-		}
-
-		StateThetaAngle(WolfScalar* _st_ptr) :
-			StateBase(_st_ptr)
-		{
-		}
-
-		virtual ~StateThetaAngle()
-		{
-		}
-
-		virtual parametrizationType getParametrizationType() const
-		{
-			return NONE;
-		}
-
-		virtual void print() const
-		{
-			std::cout << *this->state_ptr_ << std::endl;
-		}
-};
-
-class StateComplexAngle: public StateBase
-{
-	public:
-		static const unsigned int BLOCK_SIZE = 2;
-
-		StateComplexAngle(VectorXs& _st_remote, const unsigned int _idx) :
-			StateBase(_st_remote, _idx)
-		{
-		}
-
-		StateComplexAngle(WolfScalar* _st_ptr) :
-			StateBase(_st_ptr)
-		{
-		}
-
-		virtual ~StateComplexAngle()
-		{
-		}
-
-		virtual parametrizationType getParametrizationType() const
-		{
-			return COMPLEX_ANGLE;
-		}
-
-		virtual void print() const
-		{
-			std::cout << *this->state_ptr_ << " " << *(this->state_ptr_+1) << std::endl;
-		}
-};
 
 class ComplexAngleParameterization : public ceres::LocalParameterization
 {
@@ -235,7 +92,7 @@ class CorrespondenceXBase
         {
         }
 
-        virtual correspondenceType getType() const = 0;
+        virtual CorrespondenceType getType() const = 0;
         virtual const std::vector<WolfScalar*> getBlockPtrVector() = 0;
 };
 
@@ -317,7 +174,7 @@ class CorrespondenceSparse: public CorrespondenceXBase
         {
         }
 
-        virtual correspondenceType getType() const = 0;
+        virtual CorrespondenceType getType() const = 0;
 
 		virtual const std::vector<WolfScalar *> getBlockPtrVector()
 		{
@@ -336,7 +193,7 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 		{
 		}
 
-		CorrespondenceGPS2D(WolfScalar* _measurementPtr, const StateXShPtr& _statePtr) :
+		CorrespondenceGPS2D(WolfScalar* _measurementPtr, const StateBaseShPtr& _statePtr) :
 			CorrespondenceSparse<2,2>(_measurementPtr, _statePtr->getPtr())
 		{
 		}
@@ -353,9 +210,9 @@ class CorrespondenceGPS2D : public CorrespondenceSparse<2,2>
 			return true;
 		}
 
-		virtual correspondenceType getType() const
+		virtual CorrespondenceType getType() const
 		{
-			return GPS_2D;
+			return CORR_GPS_FIX_2D;
 		}
 };
 
@@ -375,7 +232,7 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 		{
 		}
 
-		Correspondence2DOdometry(WolfScalar* _measurementPtr, const StateXShPtr& _state0Ptr, const StateXShPtr& _state1Ptr, const StateXShPtr& _state2Ptr, const StateXShPtr& _state3Ptr) :
+		Correspondence2DOdometry(WolfScalar* _measurementPtr, const StateBaseShPtr& _state0Ptr, const StateBaseShPtr& _state1Ptr, const StateBaseShPtr& _state2Ptr, const StateBaseShPtr& _state3Ptr) :
 			CorrespondenceSparse<2,2,2,2,2>(_measurementPtr, _state0Ptr->getPtr(), _state1Ptr->getPtr(),_state2Ptr->getPtr(), _state3Ptr->getPtr())
 		{
 		}
@@ -399,9 +256,9 @@ class Correspondence2DOdometry : public CorrespondenceSparse<2,2,2,2,2>
 			return true;
         }
 
-        virtual correspondenceType getType() const
+        virtual CorrespondenceType getType() const
         {
-        	return ODOM_2D_COMPLEX;
+        	return CORR_ODOM_2D_COMPLEX;
         }
 };
 
@@ -421,7 +278,7 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
 		{
 		}
 
-		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, const StateXShPtr& _state0Ptr, const StateXShPtr& _state1Ptr, const StateXShPtr& _state2Ptr, const StateXShPtr& _state3Ptr) :
+		Correspondence2DOdometryTheta(WolfScalar* _measurementPtr, const StateBaseShPtr& _state0Ptr, const StateBaseShPtr& _state1Ptr, const StateBaseShPtr& _state2Ptr, const StateBaseShPtr& _state3Ptr) :
 			CorrespondenceSparse<2,2,1,2,1>(_measurementPtr, _state0Ptr->getPtr(), _state1Ptr->getPtr(),_state2Ptr->getPtr(), _state3Ptr->getPtr())
 		{
 		}
@@ -444,39 +301,10 @@ class Correspondence2DOdometryTheta : public CorrespondenceSparse<2,2,1,2,1>
 			return true;
         }
 
-        virtual correspondenceType getType() const
+        virtual CorrespondenceType getType() const
         {
-        	return ODOM_2D_THETA;
+        	return CORR_ODOM_2D_THETA;
         }
-};
-
-class Frame2DPO : public FrameBase
-{
-	protected:
-		StateXShPtr p_ptr_;
-		StateXShPtr o_ptr_;
-
-	public:
-		Frame2DPO(const StateXShPtr& _p_ptr, const StateXShPtr& _o_ptr, const WolfScalar & _ts, const FrameType & _tp = REGULAR_FRAME):
-			FrameBase(_tp, _ts),
-			p_ptr_(_p_ptr),
-			o_ptr_(_o_ptr)
-		{
-		}
-
-		virtual ~Frame2DPO()
-		{
-		}
-
-		StateXShPtr getPPtr()
-		{
-			return p_ptr_;
-		}
-
-		StateXShPtr getOPtr()
-		{
-			return o_ptr_;
-		}
 };
 
 class CaptureXBase
@@ -535,7 +363,7 @@ class CaptureGPS2D : public CaptureXBase
 
 		virtual captureType getCaptureType() const
 		{
-			return CAPT_GPS_2D;
+			return CAPT_GPS_FIX_2D;
 		}
 };
 
@@ -545,8 +373,7 @@ class WolfManager
 		VectorXs state_;
 		unsigned int first_empty_state_;
 		bool use_complex_angles_;
-//		Frame2DPO current_frame_;
-		std::vector<Frame2DPOShPtr> frames_;
+		std::vector<FrameBaseShPtr> frames_;
         std::vector<CorrespondenceXShPtr> correspondences_;
         std::vector<VectorXs> odom_captures_;
         std::vector<VectorXs> gps_captures_;
@@ -571,6 +398,18 @@ class WolfManager
 
         virtual ~WolfManager()
         {
+//        	std::cout << "Destroying WolfManager...\n";
+//        	std::cout << "Clearing correspondences_...\n";
+//        	correspondences_.clear();
+//        	std::cout << "Clearing frames...\n";
+//        	frames_.clear();
+//        	std::cout << "Clearing odom_captures_...\n";
+//        	odom_captures_.clear();
+//        	std::cout << "Clearing gps_captures_...\n";
+//        	gps_captures_.clear();
+//        	captures_.clear();
+//
+//        	std::cout << "all cleared...\n";
         }
 
         unsigned int getCorrespondencesSize()
@@ -585,14 +424,14 @@ class WolfManager
 
         	// Create frame
         	if (use_complex_angles_)
-				frames_.push_back(Frame2DPOShPtr(new Frame2DPO(StateXShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
-															   StateXShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2)),
-															   _time_stamp)));
+				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp,
+															   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+															   StateBaseShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2)))));
 
         	else
-				frames_.push_back(Frame2DPOShPtr(new Frame2DPO(StateXShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
-															   StateXShPtr(new StateThetaAngle(state_.data()+first_empty_state_+2)),
-															   _time_stamp)));
+				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp,
+						   	   	   	   	   	   	   	   	   	   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+															   StateBaseShPtr(new StateTheta(state_.data()+first_empty_state_+2)))));
 
         	// Update first free state location index
         	first_empty_state_ += use_complex_angles_ ? 4 : 3;
@@ -610,7 +449,7 @@ class WolfManager
 
         void computeOdomCapture(const CaptureXShPtr& _odom_capture)
 		{
-        	Frame2DPOShPtr prev_frame_ptr = frames_.back();
+        	FrameBaseShPtr prev_frame_ptr = frames_.back();
 
         	// STORE CAPTURE
         	captures_.push_back(_odom_capture);
@@ -663,13 +502,13 @@ class WolfManager
 			correspondences_.push_back(CorrespondenceXShPtr(new CorrespondenceGPS2D(_gps_capture->getPtr(), frames_.back()->getPPtr()->getPtr())));
 		}
 
-        void update(std::queue<StateXShPtr>& new_state_units, std::queue<CorrespondenceXShPtr>& new_correspondences)
+        void update(std::queue<StateBaseShPtr>& new_state_units, std::queue<CorrespondenceXShPtr>& new_correspondences)
         {
         	while (!new_captures_.empty())
         	{
         		switch (new_captures_.front()->getCaptureType())
         		{
-        			case CAPT_GPS_2D:
+        			case CAPT_GPS_FIX_2D:
         				computeGPSCapture(new_captures_.front());
         				new_correspondences.push(correspondences_.back());
         				break;
@@ -697,9 +536,9 @@ class WolfManager
         	return correspondences_.at(i);
         }
 
-        std::queue<StateXShPtr> getStateUnitsPtrs(unsigned int i)
+        std::queue<StateBaseShPtr> getStateUnitsPtrs(unsigned int i)
 		{
-			return std::queue<StateXShPtr>({frames_.at(i)->getPPtr(),frames_.at(i)->getOPtr()});
+			return std::queue<StateBaseShPtr>({frames_.at(i)->getPPtr(),frames_.at(i)->getOPtr()});
 		}
 };
 
@@ -717,6 +556,15 @@ class CeresManager
 
 		~CeresManager()
 		{
+			std::vector<double*> state_units;
+			ceres_problem_.GetParameterBlocks(&state_units);
+
+			for (uint i = 0; i< state_units.size(); i++)
+				removeStateUnit(state_units.at(i));
+
+			std::cout << "all state units removed! \n";
+			std::cout << "residuals: " << ceres_problem_.NumResiduals() << "\n";
+			std::cout << "parameters: " << ceres_problem_.NumParameters() << "\n";
 		}
 
 		ceres::Solver::Summary solve(const ceres::Solver::Options& _ceres_options)
@@ -741,13 +589,23 @@ class CeresManager
 			}
 		}
 
+		void removeCorrespondences()
+		{
+			for (uint i = 0; i<correspondence_list_.size(); i++)
+			{
+				ceres_problem_.RemoveResidualBlock(correspondence_list_.at(i).first);
+			}
+			correspondence_list_.clear();
+			std::cout << ceres_problem_.NumResidualBlocks() << " residual blocks \n";
+		}
+
 		void addCorrespondence(const CorrespondenceXShPtr& _corr_ptr)
 		{
 			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
 			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceXShPtr>(blockIdx,_corr_ptr));
 		}
 
-		void addStateUnits(std::queue<StateXShPtr>& _new_state_units)
+		void addStateUnits(std::queue<StateBaseShPtr>& _new_state_units)
 		{
 			while (!_new_state_units.empty())
 			{
@@ -756,29 +614,49 @@ class CeresManager
 			}
 		}
 
-		void addStateUnit(const StateXShPtr& _st_ptr)
+		void removeStateUnit(WolfScalar* _st_ptr)
+		{
+			ceres_problem_.RemoveParameterBlock(_st_ptr);
+		}
+
+		void addStateUnit(const StateBaseShPtr& _st_ptr)
 		{
 			//std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
 			//_st_ptr->print();
 
-			switch (_st_ptr->getParametrizationType())
+			switch (_st_ptr->getStateType())
 			{
-				case COMPLEX_ANGLE:
+				case ST_COMPLEX_ANGLE:
 				{
 					//std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
 					//ceres_problem_.SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
 					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr.get())->BLOCK_SIZE, new ComplexAngleParameterization);
 					break;
 				}
-//				case QUATERNION:
+//				case PARAM_QUATERNION:
 //				{
 //					std::cout << "Adding Quaternion Local Parametrization to the List... " << std::endl;
 //					ceres_problem_.SetParameterization(_st_ptr->getPtr(), new EigenQuaternionParameterization);
+//					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StateQuaternion*)_st_ptr.get())->BLOCK_SIZE, new QuaternionParameterization);
 //					break;
 //				}
-				case NONE:
+				case ST_POINT_1D:
+				case ST_THETA:
 				{
 					//std::cout << "No Local Parametrization to be added" << std::endl;
+					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StatePoint1D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					break;
+				}
+				case ST_POINT_2D:
+				{
+					//std::cout << "No Local Parametrization to be added" << std::endl;
+					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StatePoint2D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					break;
+				}
+				case ST_POINT_3D:
+				{
+					//std::cout << "No Local Parametrization to be added" << std::endl;
+					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StatePoint3D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
 					break;
 				}
 				default:
@@ -790,7 +668,7 @@ class CeresManager
 		{
 			switch (_corrPtr->getType())
 			{
-				case GPS_2D:
+				case CORR_GPS_FIX_2D:
 				{
 					CorrespondenceGPS2D* specific_ptr = (CorrespondenceGPS2D*)(_corrPtr.get());
 					return new ceres::AutoDiffCostFunction<CorrespondenceGPS2D,
@@ -807,7 +685,7 @@ class CeresManager
 															specific_ptr->block9Size>(specific_ptr);
 					break;
 				}
-				case ODOM_2D_COMPLEX:
+				case CORR_ODOM_2D_COMPLEX:
 				{
 					Correspondence2DOdometry* specific_ptr = (Correspondence2DOdometry*)(_corrPtr.get());
 					return new ceres::AutoDiffCostFunction<Correspondence2DOdometry,
@@ -824,7 +702,7 @@ class CeresManager
 															specific_ptr->block9Size>(specific_ptr);
 					break;
 				}
-				case ODOM_2D_THETA:
+				case CORR_ODOM_2D_THETA:
 				{
 					Correspondence2DOdometryTheta* specific_ptr = (Correspondence2DOdometryTheta*)(_corrPtr.get());
 					return new ceres::AutoDiffCostFunction<Correspondence2DOdometryTheta,
@@ -844,7 +722,7 @@ class CeresManager
 				default:
 					std::cout << "Unknown correspondence type! Please add it in the CeresWrapper::createCostFunction()" << std::endl;
 
-					return NULL;
+					return nullptr;
 			}
 		}
 };
@@ -854,11 +732,10 @@ int main(int argc, char** argv)
 	std::cout << " ========= 2D Robot with odometry and GPS ===========\n\n";
 
     // USER INPUT ============================================================================================
-	if (argc!=4)
+	if (argc!=3)
 	{
 		std::cout << "Please call me with: [./test_ceres_manager NI PRINT ORIENTATION_MODE], where:" << std::endl;
 		std::cout << "     - NI is the number of iterations" << std::endl;
-		std::cout << "     - PRINT = 1 for print results" << std::endl;
 		std::cout << "     - ORIENTATION_MODE: 0 for theta, 1 for complex angle" << std::endl;
 		std::cout << "EXIT due to bad user input" << std::endl << std::endl;
 		return -1;
@@ -868,8 +745,7 @@ int main(int argc, char** argv)
 	t1=clock();
 
 	unsigned int n_execution = (unsigned int) atoi(argv[1]); //number of iterations of the whole execution
-	bool print = (bool) atoi(argv[2]);
-	bool complex_angle = (bool) atoi(argv[3]);
+	bool complex_angle = (bool) atoi(argv[2]);
 
 	// INITIALIZATION ============================================================================================
 	//init random generators
@@ -886,7 +762,7 @@ int main(int argc, char** argv)
 	ceres_options.max_line_search_step_contraction = 1e-3;
 	//    ceres_options.minimizer_progress_to_stdout = false;
 	//    ceres_options.line_search_direction_type = ceres::LBFGS;
-	//    ceres_options.max_num_iterations = 2;
+	//    ceres_options.max_num_iterations = 100;
 	CeresManager ceres_manager;
 	std::ofstream log_file;  //output file
 	// Wolf manager initialization
@@ -900,7 +776,7 @@ int main(int argc, char** argv)
 	Eigen::VectorXs odom_trajectory(n_execution*3); //all true poses
 	Eigen::VectorXs odom_readings(n_execution*2); // all odometry readings
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
-	std::queue<StateXShPtr> new_state_units; // new state units in wolf that must be added to ceres
+	std::queue<StateBaseShPtr> new_state_units; // new state units in wolf that must be added to ceres
 	std::queue<CorrespondenceXShPtr> new_correspondences; // new correspondences in wolf that must be added to ceres
 
 	// Initial pose
@@ -910,7 +786,6 @@ int main(int argc, char** argv)
 	odom_trajectory.head(3) = pose_true;
 
 	// SENSOR DATA ============================================================================================
-	// Ground truth
 	for (unsigned int ii = 1; ii<n_execution; ii++)
 	{
 		// inventing odometry ground truth
@@ -953,16 +828,8 @@ int main(int argc, char** argv)
 		// adding new state units and correspondences to ceres
 		ceres_manager.addStateUnits(new_state_units);
 		ceres_manager.addCorrespondences(new_correspondences);
-
-		// print data
-		if (print)
-		{
-			std::cout << " ========= STEP " << step << "===========" << std::endl;
-			std::cout << "odom : " << odom_inc_true.segment(step*2,2).transpose() << std::endl;
-			std::cout << "gps measurement : " << gps_fix_readings.segment(step*3,3).transpose() << std::endl;
-			std::cout << "ground_truth : " << ground_truth.segment(step*3,3).transpose() << std::endl << std::endl;
-		}
 	}
+
     // SOLVE OPTIMIZATION ============================================================================================
 	ceres::Solver::Summary summary = ceres_manager.solve(ceres_options);
 	t2=clock();
@@ -996,14 +863,16 @@ int main(int argc, char** argv)
 					 << "\t" << odom_trajectory.segment(ii*3,3).transpose()
 					 << "\t" << gps_fix_readings.segment(ii*3,3).transpose() << std::endl;
 		log_file.close(); //close log file
-		std::cout << std::endl << " Result file " << filepath << std::endl;
+		std::cout << std::endl << "Result file " << filepath << std::endl;
 	}
 	else
-		std::cout << std::endl << " Failed to write the file " << filepath << std::endl;
+		std::cout << std::endl << "Failed to write the file " << filepath << std::endl;
 
     std::cout << " ========= END ===========" << std::endl << std::endl;
-
+    ceres_manager.removeCorrespondences();
     delete wolf_manager;
+    std::cout << "wolf_manager deleted!\n";
+
     //exit
     return 0;
 }

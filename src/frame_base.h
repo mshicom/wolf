@@ -18,6 +18,7 @@ class CaptureBase;
 #include "node_linked.h"
 #include "node_terminus.h"
 #include "capture_base.h"
+#include "state_base.h"
 
 //class FrameBase
 class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
@@ -25,26 +26,38 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
     protected:
         FrameType type_; //type of frame. Either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
         TimeStamp time_stamp_; //frame time stamp
-        Eigen::Vector3s state_; //TBD: Instead , It could be a vector/list/map of pointers to state units
+        //Eigen::Vector3s state_; //TBD: Instead , It could be a vector/list/map of pointers to state units
+		StateBaseShPtr p_ptr_; // Position state unit pointer
+		StateBaseShPtr o_ptr_; // Orientation state unit pointer
+		StateBaseShPtr v_ptr_; // Velocity state unit pointer
+		StateBaseShPtr w_ptr_; // Angular velocity state unit pointer
+		//TBD: accelerations?
         
     public:
         /** \brief Constructor with only time stamp
          * 
          * Constructor with only time stamp
          * \param _tp indicates frame type. Generally either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
+         * \param _p_ptr StateBase pointer to the position (default: nullptr)
+         * \param _o_ptr StateBase pointer to the orientation (default: nullptr)
+         * \param _v_ptr StateBase pointer to the velocity (default: nullptr)
+         * \param _w_ptr StateBase pointer to the angular velocity (default: nullptr)
          * 
          **/
-        FrameBase(const WolfScalar & _ts);
+        FrameBase(const WolfScalar & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
 
         /** \brief Constructor with type, time stamp and state pointer
          * 
          * Constructor with type, time stamp and state pointer
          * \param _tp indicates frame type. Generally either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
          * \param _ts is the time stamp associated to this frame, provided in seconds
-         * \param _st a pointer to the state block marking this frame 
+         * \param _p_ptr StateBase pointer to the position (default: nullptr)
+         * \param _o_ptr StateBase pointer to the orientation (default: nullptr)
+         * \param _v_ptr StateBase pointer to the velocity (default: nullptr)
+         * \param _w_ptr StateBase pointer to the angular velocity (default: nullptr)
          * 
          **/        
-        FrameBase(const FrameType & _tp, const WolfScalar & _ts);
+        FrameBase(const FrameType & _tp, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
         
         /** \brief Destructor
          * 
@@ -72,7 +85,15 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
 
         const CaptureBaseList & captureList() const;
 
-        const Eigen::Vector3s & state() const;
+        //const Eigen::Vector3s & state() const;
+
+        StateBaseShPtr getPPtr() const;
+
+        StateBaseShPtr getOPtr() const;
+
+        StateBaseShPtr getVPtr() const;
+
+        StateBaseShPtr getWPtr() const;
 
         virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
         

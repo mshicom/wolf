@@ -67,7 +67,7 @@ class StateBase
 			return state_ptr_;
 		}
 
-		virtual parametrizationType getParametrizationType() const = 0;
+		virtual parametrizationType getStateType() const = 0;
 
 		virtual void print() const = 0;
 };

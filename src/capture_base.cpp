@@ -10,6 +10,7 @@ CaptureBase::CaptureBase(double _ts, const SensorBasePtr _sensor_ptr) :
 
 CaptureBase::~CaptureBase()
 {
+	std::cout << "Destroying capture...\n";
     
 }
 
