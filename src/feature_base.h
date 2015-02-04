@@ -19,7 +19,7 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
 {
     protected:
         Eigen::VectorXs measurement_;
-        // TODO: Eigen::MatrixXs meas_covariance_; ///< Noise of the measurement
+        Eigen::MatrixXs meas_covariance_; ///< Noise of the measurement
         
     public:
         /** \brief Constructor
