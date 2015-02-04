@@ -1,10 +1,10 @@
 #include "correspondence_base.h"
 
-CorrespondenceBase::CorrespondenceBase(CorrespondenceType _tp) : 
-    NodeLinked(BOTTOM, "CORRESPONDENCE"),
+CorrespondenceBase::CorrespondenceBase(const FeatureBaseShPtr& _ftr_ptr, CorrespondenceType _tp) :
+    NodeLinked(BOTTOM, "CORRESPONDENCE", _ftr_ptr.get()),
     type_(_tp)
 {
-    //
+	//
 }
 
 CorrespondenceBase::~CorrespondenceBase()

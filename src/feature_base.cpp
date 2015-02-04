@@ -1,7 +1,7 @@
 #include "feature_base.h"
 
 FeatureBase::FeatureBase(const CaptureBaseShPtr& _capt_ptr, unsigned int _dim_measurement) : 
-    NodeLinked(MID, "FEATURE"),
+    NodeLinked(MID, "FEATURE", _capt_ptr.get()),
     measurement_(_dim_measurement)
 {
     //

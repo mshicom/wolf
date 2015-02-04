@@ -20,6 +20,8 @@ class SensorBase
 {
     protected:
         Eigen::VectorXs sensor_pose_;//sensor pose in the vehicle frame
+        // TODO: bool generate_prior_; //flag indicating if this sensor generates the prior or not
+        // TODO: VectorXs params_;
     
     public:
         SensorBase(const Eigen::VectorXs & _sp) : 
@@ -48,7 +50,6 @@ int main(int argc, char** argv)
     SensorBase sensor1(sp); //just one sensor. This will be owned by the manager
     sp << 0.2,0.2,0.2,0,0,0;
     SensorBase sensor2(sp); //just another sensor. This will be owned by the manager
-    std::shared_ptr<CaptureBase> capture; //specialized class will be placed on each ROS callback
     TimeStamp ros_ts; //this plays the role of ros::Time
     Eigen::VectorXs sensor_reading(4); //this plays the role of the ROS message content (sensor reading). Reading of dim=4 (example)
     
@@ -61,12 +62,12 @@ int main(int argc, char** argv)
         //1. a new sensor data arrives (this part will be placed on ROS callbacks)
         ros_ts.setToNow();
         sensor_reading << 1,2,3,4;
-        capture.reset( new CaptureBase(ros_ts.get(), &sensor1) ); 
-        capture->setData(sensor_reading.size(), sensor_reading.data());
-        capture->processCapture(); //This should create features
+        std::shared_ptr<CaptureBase> capture( new CaptureBase(ros_ts.get(), &sensor1) );
+        capture->setData(sensor_reading.size(), sensor_reading.data());//modify constructor to allow setData at it
         //TODO: add capture to the recent_captures_list
         
         //2. Process recent_captures_list, deciding for each new capture wheter a Frame has to be created or they have to be linked to the last one
+        capture->processCapture(); //This should create features
         
         //3. Stablish correspondences
         

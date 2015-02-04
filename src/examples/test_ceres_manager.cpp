@@ -323,7 +323,7 @@ class CaptureXBase
 		{
 		}
 
-		virtual captureType getCaptureType() const = 0;
+		virtual captureType getCaptureType() const = 0; // TODO: Change to sensor_type
 
 		WolfScalar* getPtr()
 		{
@@ -547,24 +547,25 @@ class CeresManager
 	protected:
 
 		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceXShPtr>> correspondence_list_;
-		ceres::Problem ceres_problem_;
+		ceres::Problem* ceres_problem_;
 
 	public:
-		CeresManager()
+		CeresManager(ceres::Problem* _ceres_problem) :
+			ceres_problem_(_ceres_problem)
 		{
 		}
 
 		~CeresManager()
 		{
-			std::vector<double*> state_units;
-			ceres_problem_.GetParameterBlocks(&state_units);
-
-			for (uint i = 0; i< state_units.size(); i++)
-				removeStateUnit(state_units.at(i));
-
-			std::cout << "all state units removed! \n";
-			std::cout << "residuals: " << ceres_problem_.NumResiduals() << "\n";
-			std::cout << "parameters: " << ceres_problem_.NumParameters() << "\n";
+//			std::vector<double*> state_units;
+//			ceres_problem_->GetParameterBlocks(&state_units);
+//
+//			for (uint i = 0; i< state_units.size(); i++)
+//				removeStateUnit(state_units.at(i));
+//
+//			std::cout << "all state units removed! \n";
+			std::cout << "residuals: " << ceres_problem_->NumResiduals() << "\n";
+			std::cout << "parameters: " << ceres_problem_->NumParameters() << "\n";
 		}
 
 		ceres::Solver::Summary solve(const ceres::Solver::Options& _ceres_options)
@@ -573,7 +574,7 @@ class CeresManager
 			ceres::Solver::Summary ceres_summary_;
 
 			// run Ceres Solver
-			ceres::Solve(_ceres_options, &ceres_problem_, &ceres_summary_);
+			ceres::Solve(_ceres_options, ceres_problem_, &ceres_summary_);
 
 			//display results
 			return ceres_summary_;
@@ -593,15 +594,15 @@ class CeresManager
 		{
 			for (uint i = 0; i<correspondence_list_.size(); i++)
 			{
-				ceres_problem_.RemoveResidualBlock(correspondence_list_.at(i).first);
+				ceres_problem_->RemoveResidualBlock(correspondence_list_.at(i).first);
 			}
 			correspondence_list_.clear();
-			std::cout << ceres_problem_.NumResidualBlocks() << " residual blocks \n";
+			std::cout << ceres_problem_->NumResidualBlocks() << " residual blocks \n";
 		}
 
 		void addCorrespondence(const CorrespondenceXShPtr& _corr_ptr)
 		{
-			ceres::ResidualBlockId blockIdx = ceres_problem_.AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
+			ceres::ResidualBlockId blockIdx = ceres_problem_->AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
 			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceXShPtr>(blockIdx,_corr_ptr));
 		}
 
@@ -616,7 +617,7 @@ class CeresManager
 
 		void removeStateUnit(WolfScalar* _st_ptr)
 		{
-			ceres_problem_.RemoveParameterBlock(_st_ptr);
+			ceres_problem_->RemoveParameterBlock(_st_ptr);
 		}
 
 		void addStateUnit(const StateBaseShPtr& _st_ptr)
@@ -629,34 +630,34 @@ class CeresManager
 				case ST_COMPLEX_ANGLE:
 				{
 					//std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
-					//ceres_problem_.SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
-					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr.get())->BLOCK_SIZE, new ComplexAngleParameterization);
+					//ceres_problem_->SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr.get())->BLOCK_SIZE, new ComplexAngleParameterization);
 					break;
 				}
 //				case PARAM_QUATERNION:
 //				{
 //					std::cout << "Adding Quaternion Local Parametrization to the List... " << std::endl;
-//					ceres_problem_.SetParameterization(_st_ptr->getPtr(), new EigenQuaternionParameterization);
-//					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StateQuaternion*)_st_ptr.get())->BLOCK_SIZE, new QuaternionParameterization);
+//					ceres_problem_->SetParameterization(_st_ptr->getPtr(), new EigenQuaternionParameterization);
+//					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StateQuaternion*)_st_ptr.get())->BLOCK_SIZE, new QuaternionParameterization);
 //					break;
 //				}
 				case ST_POINT_1D:
 				case ST_THETA:
 				{
 					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StatePoint1D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint1D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
 					break;
 				}
 				case ST_POINT_2D:
 				{
 					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StatePoint2D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint2D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
 					break;
 				}
 				case ST_POINT_3D:
 				{
 					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_.AddParameterBlock(_st_ptr->getPtr(), ((StatePoint3D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint3D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
 					break;
 				}
 				default:
@@ -763,7 +764,8 @@ int main(int argc, char** argv)
 	//    ceres_options.minimizer_progress_to_stdout = false;
 	//    ceres_options.line_search_direction_type = ceres::LBFGS;
 	//    ceres_options.max_num_iterations = 100;
-	CeresManager ceres_manager;
+	ceres::Problem* ceres_problem = new ceres::Problem();
+	CeresManager* ceres_manager = new CeresManager(ceres_problem);
 	std::ofstream log_file;  //output file
 	// Wolf manager initialization
 	WolfManager* wolf_manager = new WolfManager(n_execution * (complex_angle ? 4 : 3), complex_angle);
@@ -826,12 +828,12 @@ int main(int argc, char** argv)
 		wolf_manager->update(new_state_units, new_correspondences);
 
 		// adding new state units and correspondences to ceres
-		ceres_manager.addStateUnits(new_state_units);
-		ceres_manager.addCorrespondences(new_correspondences);
+		ceres_manager->addStateUnits(new_state_units);
+		ceres_manager->addCorrespondences(new_correspondences);
 	}
 
     // SOLVE OPTIMIZATION ============================================================================================
-	ceres::Solver::Summary summary = ceres_manager.solve(ceres_options);
+	ceres::Solver::Summary summary = ceres_manager->solve(ceres_options);
 	t2=clock();
 	double seconds = ((double)t2-t1)/CLOCKS_PER_SEC;
 
@@ -869,9 +871,13 @@ int main(int argc, char** argv)
 		std::cout << std::endl << "Failed to write the file " << filepath << std::endl;
 
     std::cout << " ========= END ===========" << std::endl << std::endl;
-    ceres_manager.removeCorrespondences();
+    //ceres_manager->removeCorrespondences();
     delete wolf_manager;
-    std::cout << "wolf_manager deleted!\n";
+    std::cout << "everything deleted!\n";
+    delete ceres_manager;
+    std::cout << "...deleted!\n";
+    delete ceres_problem;
+    std::cout << "amost... deleted!\n";
 
     //exit
     return 0;

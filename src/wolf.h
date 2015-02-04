@@ -226,7 +226,7 @@ typedef TransSensorMap::iterator TransSensorIter;
 
 // - State Pose
 typedef std::shared_ptr<StateBase> StateBaseShPtr;
-typedef StateBase* StatePtr;
+typedef StateBase* StateBasePtr;
 
 typedef StatePoint<1> StateTheta;
 typedef StatePoint<1> StatePoint1D;
