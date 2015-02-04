@@ -61,8 +61,10 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         const FeatureBaseList & getFeatureList() const;
         
         WolfScalar getTimeStamp() const;
-        
+
         SensorBasePtr getSensorPtr() const;
+        
+        SensorType getSensorType() const;
         
         void setTimeStamp(const WolfScalar & _ts);
         

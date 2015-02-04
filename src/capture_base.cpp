@@ -44,6 +44,11 @@ inline SensorBasePtr CaptureBase::getSensorPtr() const
     return sensor_ptr_;
 }
 
+inline SensorType CaptureBase::getSensorType() const
+{
+	return sensor_ptr_->getSensorType();
+}
+
 inline void CaptureBase::setTimeStamp(const WolfScalar & _ts)
 {
     time_stamp_ = _ts;

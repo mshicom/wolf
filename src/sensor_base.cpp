@@ -16,3 +16,8 @@ const Eigen::VectorXs * SensorBase::getSensorPose() const
 {   
     return & sensor_pose_;
 }
+
+const SensorType SensorBase::getSensorType() const
+{
+	return type_;
+}

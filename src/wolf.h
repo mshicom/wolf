@@ -131,6 +131,24 @@ typedef enum
 	ST_QUATERNION		///< A 3D orientation represented by a quaternion.
 } stateType;
 
+/** \brief Enumeration of all possible sensor types
+ *
+ * Enumeration of all possible sensor types.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ *
+ */
+typedef enum
+{
+    ODOM_2D,	///< Odometry measurement from encoders: displacement and rotation.
+    IMU,		///< Inertial measurement unit with 3 acceleros, 3 gyros
+    CAMERA,		///< Regular pinhole camera
+    GPS_FIX,	///< GPS receiver, with fixes, pseudo ranges, and/or doppler velocities
+    LIDAR,		///< Laser Range Finder, 2D
+    RADAR,		///< Radar
+    ABSOLUTE_POSE ///< Full absolute pose (XYZ+quaternion)
+} SensorType;
+
 /////////////////////////////////////////////////////////////////////////
 //      TYPEDEFS FOR POINTERS AND ITERATORS IN THE WOLF TREE
 /////////////////////////////////////////////////////////////////////////
@@ -211,23 +229,6 @@ typedef StatePoint<3> StatePoint3D;
 typedef PinHole* PinHolePtr;
 
 
-/** \brief Enumeration of all possible sensor types
- *
- * Enumeration of all possible sensor types.
- *
- * You may add items to this list as needed. Be concise with names, and document your entries.
- *
- */
-typedef enum
-{
-    ODOM,	///< Odometry measurement from encoders: displacement and rotation.
-    IMU,	///< Inertial measurement unit with 3 acceleros, 3 gyros
-    CAMERA,	///< Regular pinhole camera
-    GPS,	///< GPS receiver, with fixes, pseudo ranges, and/or doppler velocities
-    LIDAR,	///< Laser Range Finder, 2D
-    RADAR,	///< Radar
-    ABSOLUTE_POSE ///< Full absolute pose (XYZ+quaternion)
-} SensorType;
 
 ///** \brief Enumeration of all possible feature types
 // *

@@ -23,6 +23,8 @@ class SensorBase
         
         const Eigen::VectorXs * getSensorPose() const;
         
+        const SensorType getSensorType() const;
+
 };
 #endif
 

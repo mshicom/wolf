@@ -345,7 +345,7 @@ class CaptureOdom2D : public CaptureXBase
 
 		virtual SensorType getSensorType() const
 		{
-			return CAPT_ODOM_2D;
+			return ODOM_2D;
 		}
 };
 
@@ -363,7 +363,7 @@ class CaptureGPS2D : public CaptureXBase
 
 		virtual SensorType getSensorType() const
 		{
-			return CAPT_GPS_FIX_2D;
+			return GPS_FIX;
 		}
 };
 
@@ -508,11 +508,11 @@ class WolfManager
         	{
         		switch (new_captures_.front()->getSensorType())
         		{
-        			case CAPT_GPS_FIX_2D:
+        			case GPS_FIX:
         				computeGPSCapture(new_captures_.front());
         				new_correspondences.push(correspondences_.back());
         				break;
-        			case CAPT_ODOM_2D:
+        			case ODOM_2D:
         				computeOdomCapture(new_captures_.front());
         				new_correspondences.push(correspondences_.back());
         				new_state_units.push(frames_.back()->getPPtr());
