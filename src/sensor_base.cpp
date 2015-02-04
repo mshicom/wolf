@@ -1,7 +1,8 @@
 #include "sensor_base.h"
 
-SensorBase::SensorBase(const Eigen::VectorXs & _sp) : 
-    sensor_pose_(_sp)
+SensorBase::SensorBase(const SensorType & _tp, const Eigen::VectorXs & _sp) :
+	sensor_pose_(_sp),
+	type_(_tp)
 {
     //
 }

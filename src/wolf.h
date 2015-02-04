@@ -114,32 +114,6 @@ typedef enum
     
 } CorrespondenceType;
 
-/** \brief Enumeration of all possible captures
- *
- * Enumeration of all possible captures.
- *
- * You may add items to this list as needed. Be concise with names, and document your entries.
- *
- */
-typedef enum
-{
-	CAPT_GPS_FIX_2D,	///< marks a 2D GPS Fix capture: X, Y.
-	CAPT_ODOM_2D		///< marks a 2D Odometry capture: displacement + rotation.
-} captureType;
-
-/** \brief Enumeration of all possible cost function types
- *
- * Enumeration of all possible cost function types.
- *
- * You may add items to this list as needed. Be concise with names, and document your entries.
- *
- */
-typedef enum
-{
-	AUTO,		///< Auto-computed jacobians (see ceres::jet).
-	NUMERIC		///< Numerically computed jacobians.
-} costFunctionType;
-
 /** \brief Enumeration of all possible state parametrizations
  *
  * Enumeration of all possible state parametrizations.
@@ -237,22 +211,23 @@ typedef StatePoint<3> StatePoint3D;
 typedef PinHole* PinHolePtr;
 
 
-///** \brief Enumeration of all possible sensor types
-// *
-// * Enumeration of all possible sensor types.
-// *
-// * You may add items to this list as needed. Be concise with names, and document your entries.
-// *
-// */
-//typedef enum
-//{
-//    IMU,    ///< Inertial measurement unit with 3 acceleros, 3 gyros
-//    CAMERA, ///< Regular pinhole camera
-//    GPS,    ///< GPS receiver, with fixes, pseudo ranges, and/or doppler velocities
-//    LIDAR,  ///< Laser Range Finder, 2D
-//    RADAR,   ///< Radar
-//    ABSOLUTE_POSE ///< Full absolute pose (XYZ+quaternion)
-//} SensorType;
+/** \brief Enumeration of all possible sensor types
+ *
+ * Enumeration of all possible sensor types.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ *
+ */
+typedef enum
+{
+    ODOM,	///< Odometry measurement from encoders: displacement and rotation.
+    IMU,	///< Inertial measurement unit with 3 acceleros, 3 gyros
+    CAMERA,	///< Regular pinhole camera
+    GPS,	///< GPS receiver, with fixes, pseudo ranges, and/or doppler velocities
+    LIDAR,	///< Laser Range Finder, 2D
+    RADAR,	///< Radar
+    ABSOLUTE_POSE ///< Full absolute pose (XYZ+quaternion)
+} SensorType;
 
 ///** \brief Enumeration of all possible feature types
 // *

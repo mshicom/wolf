@@ -22,9 +22,9 @@ int main(int argc, char** argv)
     std::queue<FrameBase> trajectory; //this will be the main object of the wolf manager 
     Eigen::VectorXs sp(6);
     sp << 0.1,0.1,0.1,0,0,0;
-    SensorBase sensor1(sp); //just one sensor. This will be owned by the manager
+    SensorBase sensor1(ABSOLUTE_POSE,sp); //just one sensor. This will be owned by the manager
     sp << 0.2,0.2,0.2,0,0,0;
-    SensorBase sensor2(sp); //just another sensor. This will be owned by the manager
+    SensorBase sensor2(ABSOLUTE_POSE,sp); //just another sensor. This will be owned by the manager
     TimeStamp ros_ts; //this plays the role of ros::Time
     Eigen::VectorXs sensor_reading(4); //this plays the role of the ROS message content (sensor reading). Reading of dim=4 (example)
     

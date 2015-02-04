@@ -323,7 +323,7 @@ class CaptureXBase
 		{
 		}
 
-		virtual captureType getCaptureType() const = 0; // TODO: Change to sensor_type
+		virtual SensorType getSensorType() const = 0; // TODO: Change to sensor_type
 
 		WolfScalar* getPtr()
 		{
@@ -343,7 +343,7 @@ class CaptureOdom2D : public CaptureXBase
 		{
 		}
 
-		virtual captureType getCaptureType() const
+		virtual SensorType getSensorType() const
 		{
 			return CAPT_ODOM_2D;
 		}
@@ -361,7 +361,7 @@ class CaptureGPS2D : public CaptureXBase
 		{
 		}
 
-		virtual captureType getCaptureType() const
+		virtual SensorType getSensorType() const
 		{
 			return CAPT_GPS_FIX_2D;
 		}
@@ -506,7 +506,7 @@ class WolfManager
         {
         	while (!new_captures_.empty())
         	{
-        		switch (new_captures_.front()->getCaptureType())
+        		switch (new_captures_.front()->getSensorType())
         		{
         			case CAPT_GPS_FIX_2D:
         				computeGPSCapture(new_captures_.front());
@@ -733,10 +733,10 @@ int main(int argc, char** argv)
 	std::cout << " ========= 2D Robot with odometry and GPS ===========\n\n";
 
     // USER INPUT ============================================================================================
-	if (argc!=3)
+	if (argc!=3 || atoi(argv[1])<1 || atoi(argv[2]) < 0 || atoi(argv[2]) > 1)
 	{
 		std::cout << "Please call me with: [./test_ceres_manager NI PRINT ORIENTATION_MODE], where:" << std::endl;
-		std::cout << "     - NI is the number of iterations" << std::endl;
+		std::cout << "     - NI is the number of iterations (NI > 0)" << std::endl;
 		std::cout << "     - ORIENTATION_MODE: 0 for theta, 1 for complex angle" << std::endl;
 		std::cout << "EXIT due to bad user input" << std::endl << std::endl;
 		return -1;

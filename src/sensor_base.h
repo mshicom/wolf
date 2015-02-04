@@ -12,11 +12,12 @@ class SensorBase
 {
     protected:
         Eigen::VectorXs sensor_pose_;//sensor pose in the vehicle frame
+        SensorType type_;
         // TODO: VectorXs params_;
         bool generate_prior_; //flag indicating if this sensor generates the prior or not
     
     public:
-        SensorBase(const Eigen::VectorXs & _sp);
+        SensorBase(const SensorType & _tp, const Eigen::VectorXs & _sp);
 
         ~SensorBase();
         
