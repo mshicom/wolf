@@ -14,33 +14,8 @@
 #include "wolf.h"
 #include "time_stamp.h"
 #include "capture_base.h"
+#include "sensor_base.h"
 
-
-class SensorBase
-{
-    protected:
-        Eigen::VectorXs sensor_pose_;//sensor pose in the vehicle frame
-        // TODO: bool generate_prior_; //flag indicating if this sensor generates the prior or not
-        // TODO: VectorXs params_;
-    
-    public:
-        SensorBase(const Eigen::VectorXs & _sp) : 
-            sensor_pose_(_sp)
-        {
-            //
-        };
-        
-        ~SensorBase()
-        {
-            //
-        };
-        
-        const Eigen::VectorXs * getSensorPose() const
-        {   
-            return & sensor_pose_;
-        };
-        
-};
 
 int main(int argc, char** argv) 
 {    
