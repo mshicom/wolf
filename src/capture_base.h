@@ -37,7 +37,7 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
          * 
          * Set link to Frame
          *
-         **/        
+         **/
         void linkToFrame(const FrameBaseShPtr& _frm_ptr);
         
         /** \brief Adds a Feature to the down node list

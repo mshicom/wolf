@@ -488,7 +488,6 @@ class WolfManager
         		}
         		new_captures_.pop();
         	}
-
         }
 
         VectorXs getState()
