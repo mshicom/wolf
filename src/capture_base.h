@@ -15,6 +15,7 @@ class FeatureBase;
 #include "node_linked.h"
 #include "frame_base.h"
 #include "feature_base.h"
+#include "sensor_base.h"
 
 //class CaptureBase
 class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
@@ -22,13 +23,13 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
     protected:
         TimeStamp time_stamp_; ///< Time stamp        
         Eigen::VectorXs data_; ///< raw data
+        Eigen::MatrixXs data_covariance_; ///< Noise of the capture
         SensorBasePtr sensor_ptr_; ///< Pointer to sensor
-        // TODO: Eigen::MatrixXs data_covariance_; ///< Noise of the capture
         Eigen::Vector3s sensor_pose_global_; ///< Sensor pose in world frame: composition of the frame pose and the sensor pose. TODO: use state units
         Eigen::Vector3s inverse_sensor_pose_; ///< World pose in the sensor frame: inverse of the global_pose_. TODO: use state units
         
     public:
-        CaptureBase(double _ts, const SensorBasePtr _sensor_ptr);
+        CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr);
         
         virtual ~CaptureBase();
         

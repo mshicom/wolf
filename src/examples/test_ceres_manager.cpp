@@ -18,6 +18,7 @@
 #include "glog/logging.h"
 
 //Wolf includes
+#include "sensor_base.h"
 #include "frame_base.h"
 #include "state_point.h"
 #include "state_complex_angle.h"
@@ -311,11 +312,13 @@ class CaptureXBase
 {
 	public:
 		VectorXs capture;
-		WolfScalar time_stamp;
+		TimeStamp time_stamp;
+		SensorBaseShPtr sensor_ptr_; ///< Pointer to sensor
 
-		CaptureXBase(const VectorXs& _capture, const WolfScalar& _time_stamp) :
+		CaptureXBase(const VectorXs& _capture, const WolfScalar& _time_stamp, const SensorBaseShPtr& _sensor_ptr) :
 			capture(_capture),
-			time_stamp(_time_stamp)
+			time_stamp(_time_stamp),
+			sensor_ptr_(_sensor_ptr)
 		{
 		}
 
@@ -323,47 +326,14 @@ class CaptureXBase
 		{
 		}
 
-		virtual SensorType getSensorType() const = 0; // TODO: Change to sensor_type
+		const SensorType getSensorType() const
+		{
+			return sensor_ptr_->getSensorType();
+		}
 
 		WolfScalar* getPtr()
 		{
 			return capture.data();
-		}
-};
-
-class CaptureOdom2D : public CaptureXBase
-{
-	public:
-	CaptureOdom2D(const VectorXs& _capture, const WolfScalar& _time_stamp) :
-			CaptureXBase(_capture, _time_stamp)
-		{
-		}
-
-		virtual ~CaptureOdom2D()
-		{
-		}
-
-		virtual SensorType getSensorType() const
-		{
-			return ODOM_2D;
-		}
-};
-
-class CaptureGPS2D : public CaptureXBase
-{
-	public:
-	CaptureGPS2D(const VectorXs& _capture, const WolfScalar& _time_stamp) :
-			CaptureXBase(_capture, _time_stamp)
-		{
-		}
-
-		virtual ~CaptureGPS2D()
-		{
-		}
-
-		virtual SensorType getSensorType() const
-		{
-			return GPS_FIX;
 		}
 };
 
@@ -417,19 +387,19 @@ class WolfManager
         	return correspondences_.size();
         }
 
-        void createFrame(const VectorXs& _frame_state, const WolfScalar& _time_stamp)
+        void createFrame(const VectorXs& _frame_state, const TimeStamp& _time_stamp)
         {
         	// Store in state_
         	state_.segment(first_empty_state_, use_complex_angles_ ? 4 : 3) << _frame_state;
 
         	// Create frame
         	if (use_complex_angles_)
-				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp,
+				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp.get(),
 															   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
 															   StateBaseShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2)))));
 
         	else
-				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp,
+				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp.get(),
 						   	   	   	   	   	   	   	   	   	   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
 															   StateBaseShPtr(new StateTheta(state_.data()+first_empty_state_+2)))));
 
@@ -437,14 +407,9 @@ class WolfManager
         	first_empty_state_ += use_complex_angles_ ? 4 : 3;
         }
 
-        void addOdomCapture(const VectorXs& _odom_capture, const WolfScalar& _time_stamp)
+        void addCapture(const VectorXs& _odom_capture, const WolfScalar& _time_stamp, const SensorBaseShPtr& _sensor_ptr)
         {
-        	new_captures_.push(CaptureXShPtr(new CaptureOdom2D(_odom_capture, _time_stamp)));
-        }
-
-        void addGPSCapture(const VectorXs& _gps_capture, const WolfScalar& _time_stamp)
-        {
-        	new_captures_.push(CaptureXShPtr(new CaptureGPS2D(_gps_capture, _time_stamp)));
+        	new_captures_.push(CaptureXShPtr(new CaptureXBase(_odom_capture, _time_stamp, _sensor_ptr)));
         }
 
         void computeOdomCapture(const CaptureXShPtr& _odom_capture)
@@ -780,6 +745,8 @@ int main(int argc, char** argv)
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
 	std::queue<StateBaseShPtr> new_state_units; // new state units in wolf that must be added to ceres
 	std::queue<CorrespondenceXShPtr> new_correspondences; // new correspondences in wolf that must be added to ceres
+	SensorBaseShPtr odom_sensor = SensorBaseShPtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1)));
+	SensorBaseShPtr gps_sensor = SensorBaseShPtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1)));
 
 	// Initial pose
 	pose_true << 0,0,0;
@@ -815,14 +782,15 @@ int main(int argc, char** argv)
 		pose_odom(2) = pose_odom(2) + odom_readings(ii*2+1);
 		odom_trajectory.segment(ii*3,3) << pose_odom;
 	}
+	std::cout << "sensor data created!\n";
 
 	// START TRAJECTORY ============================================================================================
     new_state_units = wolf_manager->getStateUnitsPtrs(0); // First pose to be added in ceres
     for (uint step=1; step < n_execution; step++)
 	{
     	// adding sensor captures
-		wolf_manager->addOdomCapture(odom_readings.segment(step*2,2),step);
-		wolf_manager->addGPSCapture(gps_fix_readings.segment(step*3,3),step);
+		wolf_manager->addCapture(odom_readings.segment(step*2,2),step,odom_sensor);
+		wolf_manager->addCapture(gps_fix_readings.segment(step*3,3),step,gps_sensor);
 
 		// updating problem
 		wolf_manager->update(new_state_units, new_correspondences);
