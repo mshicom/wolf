@@ -58,12 +58,22 @@ int main(int argc, char** argv)
     //main loop
     for (unsigned int ii = 0; ii<10; ii++)
     {
-        //a new sensor data arrives (this part will be placed on ROS callbacks)
+        //1. a new sensor data arrives (this part will be placed on ROS callbacks)
         ros_ts.setToNow();
         sensor_reading << 1,2,3,4;
         capture.reset( new CaptureBase(ros_ts.get(), &sensor1) ); 
         capture->setData(sensor_reading.size(), sensor_reading.data());
-        capture->processCapture();
+        capture->processCapture(); //This should create features
+        //TODO: add capture to the recent_captures_list
+        
+        //2. Process recent_captures_list, deciding for each new capture wheter a Frame has to be created or they have to be linked to the last one
+        
+        //3. Stablish correspondences
+        
+        //4. Call ceres solver
+        
+        //5. publish results
+        
     }
     
     //End message
