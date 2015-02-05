@@ -22,13 +22,30 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
         Eigen::MatrixXs meas_covariance_; ///< Noise of the measurement
         
     public:
-        /** \brief Constructor
+        /** \brief Constructor from capture pointer and measure dim
          * 
          * \param _capt_ptr a shared pointer to the Capture up node
          * \param _dim_measurement the dimension of the measurement space
          * 
          */
         FeatureBase(const CaptureBaseShPtr& _capt_ptr, unsigned int _dim_measurement);
+
+        /** \brief Constructor from capture pointer and measure
+         *
+         * \param _capt_ptr a shared pointer to the Capture up node
+         * \param _measurement the measurement
+         *
+         */
+        FeatureBase(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorXs& _measurement);
+
+        /** \brief Constructor from capture pointer and measure
+         *
+         * \param _capt_ptr a shared pointer to the Capture up node
+         * \param _measurement the measurement
+         * \param _meas_covariance the noise of the measurement
+         *
+         */
+        FeatureBase(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance);
 
         virtual ~FeatureBase();
         
@@ -44,6 +61,8 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
         
         void setMeasurement(const Eigen::VectorXs & _meas);
         
+        void setMeasurementCov(const Eigen::MatrixXs & _meas_cov);
+
         /** \brief Generic interface to find correspondences
          * 
          * TBD
@@ -58,7 +77,6 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
          * 
          **/
         virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
-        
         
 };
 #endif

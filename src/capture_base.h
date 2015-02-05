@@ -21,16 +21,20 @@ class FeatureBase;
 class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
 {
     protected:
-        TimeStamp time_stamp_; ///< Time stamp        
+        TimeStamp time_stamp_; ///< Time stamp
+        SensorBasePtr sensor_ptr_; ///< Pointer to sensor
         Eigen::VectorXs data_; ///< raw data
         Eigen::MatrixXs data_covariance_; ///< Noise of the capture
-        SensorBasePtr sensor_ptr_; ///< Pointer to sensor
         Eigen::Vector3s sensor_pose_global_; ///< Sensor pose in world frame: composition of the frame pose and the sensor pose. TODO: use state units
         Eigen::Vector3s inverse_sensor_pose_; ///< World pose in the sensor frame: inverse of the global_pose_. TODO: use state units
         
     public:
         CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr);
         
+        CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data);
+
+        CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance);
+
         virtual ~CaptureBase();
         
         /** \brief Set link to Frame
@@ -70,8 +74,12 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         void setTimeStamp(const WolfScalar & _ts);
         
         void setTimeStampToNow();
-        
+
         void setData(unsigned int _size, const WolfScalar *_data);
+        
+        void setData(const Eigen::VectorXs& _data);
+
+        void setDataCovariance(const Eigen::MatrixXs& _data_cov);
         
         virtual void processCapture();// = 0;
 

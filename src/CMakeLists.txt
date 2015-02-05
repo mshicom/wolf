@@ -18,9 +18,11 @@ ENDIF(Ceres_FOUND)
 #headers
 SET(HDRS
     capture_base.h
+    capture_gps_fix.h
     correspondence_base.h
     correspondence_sparse.h
     feature_base.h
+    feature_gps_fix.h
     frame_base.h
     node_base.h
     node_terminus.h
@@ -35,8 +37,10 @@ SET(HDRS
 #sources
 SET(SRCS
     capture_base.cpp
+    capture_gps_fix.cpp
     correspondence_base.cpp
     feature_base.cpp
+    feature_gps_fix.cpp
     frame_base.cpp
     node_base.cpp
     node_terminus.cpp

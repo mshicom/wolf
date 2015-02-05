@@ -8,10 +8,28 @@ CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr) :
     //
 }
 
+CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data) :
+	NodeLinked(MID, "CAPTURE"),
+	time_stamp_(_ts),
+	sensor_ptr_(_sensor_ptr),
+	data_(_data)
+{
+	//
+}
+
+CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance) :
+	NodeLinked(MID, "CAPTURE"),
+	time_stamp_(_ts),
+	sensor_ptr_(_sensor_ptr),
+	data_(_data),
+	data_covariance_(_data_covariance)
+{
+	//
+}
+
 CaptureBase::~CaptureBase()
 {
-	std::cout << "Destroying capture...\n";
-    
+	//std::cout << "Destroying capture...\n";
 }
 
 inline void CaptureBase::linkToFrame(const FrameBaseShPtr& _frm_ptr)
@@ -19,7 +37,8 @@ inline void CaptureBase::linkToFrame(const FrameBaseShPtr& _frm_ptr)
     linkToUpperNode(_frm_ptr.get());
 }
 
-inline void CaptureBase::addFeature(FeatureBaseShPtr & _ft_ptr)
+// TODO: Why the linker throws an error when this function is inline...
+void CaptureBase::addFeature(FeatureBaseShPtr & _ft_ptr)
 {
     addDownNode(_ft_ptr);
 }
@@ -63,6 +82,16 @@ void CaptureBase::setData(unsigned int _size, const WolfScalar *_data)
 {
     data_.resize(_size);
     for (unsigned int ii=0; ii<_size; ii++) data_(ii) = *(&_data[ii]);
+}
+
+void CaptureBase::setData(const Eigen::VectorXs& _data)
+{
+    data_=_data;
+}
+
+void CaptureBase::setDataCovariance(const Eigen::MatrixXs& _data_cov)
+{
+    data_covariance_ = _data_cov;
 }
 
 inline void CaptureBase::processCapture()
