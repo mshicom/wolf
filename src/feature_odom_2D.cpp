@@ -23,7 +23,7 @@ FeatureOdom2D::~FeatureOdom2D()
     //
 }
 
-void FeatureGPSFix::findCorrespondences()
+void FeatureOdom2D::findCorrespondences()
 {
 	//TODO: find previous frame
 }
