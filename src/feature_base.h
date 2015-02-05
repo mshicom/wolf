@@ -19,7 +19,7 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
 {
     protected:
         Eigen::VectorXs measurement_;
-        Eigen::MatrixXs meas_covariance_; ///< Noise of the measurement
+        Eigen::MatrixXs measurement_covariance_; ///< Noise of the measurement
         
     public:
         /** \brief Constructor from capture pointer and measure dim
@@ -54,14 +54,18 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
         void addCorrespondence(CorrespondenceBaseShPtr& _co_ptr);
 
         const CaptureBasePtr getCapturePtr() const;
+
+        const FrameBasePtr getFramePtr() const;
         
         const CorrespondenceBaseList & getCorrespondenceList() const;
         
-        const Eigen::VectorXs * getMeasurement() const;
+        const Eigen::VectorXs * getMeasurementPtr();
         
+        const Eigen::MatrixXs * getMeasurementCovariancePtr();
+
         void setMeasurement(const Eigen::VectorXs & _meas);
         
-        void setMeasurementCov(const Eigen::MatrixXs & _meas_cov);
+        void setMeasurementCovariance(const Eigen::MatrixXs & _meas_cov);
 
         /** \brief Generic interface to find correspondences
          * 

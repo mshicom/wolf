@@ -17,7 +17,7 @@ FeatureBase::FeatureBase(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorX
 FeatureBase::FeatureBase(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance) :
 	NodeLinked(MID, "FEATURE", _capt_ptr.get()),
 	measurement_(_measurement),
-	meas_covariance_(_meas_covariance)
+	measurement_covariance_(_meas_covariance)
 {
 	//
 }
@@ -42,14 +42,24 @@ inline const CaptureBasePtr FeatureBase::getCapturePtr() const
     return upperNodePtr();    
 }
 
+inline const FrameBasePtr FeatureBase::getFramePtr() const
+{
+    return upperNodePtr()->upperNodePtr();
+}
+
 inline const CorrespondenceBaseList & FeatureBase::getCorrespondenceList() const
 {
     return downNodeList();
 }
 
-inline const Eigen::VectorXs * FeatureBase::getMeasurement() const
+const Eigen::VectorXs * FeatureBase::getMeasurementPtr()
 {
     return & measurement_;
+}
+
+const Eigen::MatrixXs * FeatureBase::getMeasurementCovariancePtr()
+{
+    return & measurement_covariance_;
 }
 
 inline void FeatureBase::setMeasurement(const Eigen::VectorXs & _meas)
@@ -57,9 +67,9 @@ inline void FeatureBase::setMeasurement(const Eigen::VectorXs & _meas)
     measurement_ = _meas;
 }
 
-inline void FeatureBase::setMeasurementCov(const Eigen::MatrixXs & _meas_cov)
+inline void FeatureBase::setMeasurementCovariance(const Eigen::MatrixXs & _meas_cov)
 {
-    meas_covariance_ = _meas_cov;
+	measurement_covariance_ = _meas_cov;
 }
 
 void FeatureBase::printSelf(unsigned int _ntabs, std::ostream & _ost) const

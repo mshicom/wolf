@@ -25,5 +25,5 @@ FeatureGPSFix::~FeatureGPSFix()
 
 void FeatureGPSFix::findCorrespondences()
 {
-	//
+	//addCorrespondence(CorrespondenceBaseShPtr(new CorrespondenceGPSFix(upperNode()->upperNode()->getPPtr())));
 }

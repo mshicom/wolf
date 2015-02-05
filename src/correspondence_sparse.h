@@ -49,8 +49,8 @@ class CorrespondenceSparse: public CorrespondenceBase
          * Constructor with state pointer array
          * 
          **/               
-        CorrespondenceSparse(CorrespondenceType _tp, WolfScalar** _blockPtrArray) :
-            CorrespondenceBase(_tp),
+        CorrespondenceSparse(const FeatureBaseShPtr& _ftr_ptr, CorrespondenceType _tp, WolfScalar** _blockPtrArray) :
+            CorrespondenceBase(_ftr_ptr,_tp),
             state_block_ptr_vector_(10),
             state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
@@ -73,7 +73,8 @@ class CorrespondenceSparse: public CorrespondenceBase
          * Constructor with state pointers separated
          * 
          **/        
-        CorrespondenceSparse(CorrespondenceType _tp, 
+        CorrespondenceSparse(const FeatureBaseShPtr& _ftr_ptr,
+        					 CorrespondenceType _tp,
                              WolfScalar* _state0Ptr,
                              WolfScalar* _state1Ptr = nullptr,
                              WolfScalar* _state2Ptr = nullptr,
@@ -84,13 +85,13 @@ class CorrespondenceSparse: public CorrespondenceBase
                              WolfScalar* _state7Ptr = nullptr,
                              WolfScalar* _state8Ptr = nullptr,
                              WolfScalar* _state9Ptr = nullptr ) :
-            CorrespondenceBase(_tp),
+            CorrespondenceBase(_ftr_ptr,_tp),
             state_block_ptr_vector_({_state0Ptr,_state1Ptr,_state2Ptr,_state3Ptr,_state4Ptr,_state5Ptr,_state6Ptr,_state7Ptr,_state8Ptr,_state9Ptr}),
             state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
             for (uint ii = 0; ii<state_block_sizes_vector_.size(); ii++)
             {
-                if ( (state_block_ptr_vector_ == nullptr) && (state_block_sizes_vector_.at(i) == 0) )
+                if ( (state_block_ptr_vector_.at(ii) == nullptr) && (state_block_sizes_vector_.at(ii) == 0) )
                 {
                     state_block_sizes_vector_.resize(ii);
                     state_block_ptr_vector_.resize(ii);
@@ -98,8 +99,8 @@ class CorrespondenceSparse: public CorrespondenceBase
                 }
                 else // check error cases
                 {
-                    assert(state_block_ptr_vector_ != nullptr);
-                    assert(state_block_sizes_vector_ != 0);
+                    assert(state_block_ptr_vector_.at(ii) != nullptr);
+                    assert(state_block_sizes_vector_.at(ii) != 0);
                 }
             }
         }
@@ -121,7 +122,7 @@ class CorrespondenceSparse: public CorrespondenceBase
          **/
         virtual const std::vector<WolfScalar*> getStateBlockPtrVector()
         {
-            return & state_block_ptr_vector_;
+            return state_block_ptr_vector_;
         }
         
         /** \brief Returns a pointer to the mesaurement associated to this correspondence

@@ -22,6 +22,7 @@ SET(HDRS
     capture_odom_2D.h
     correspondence_base.h
     correspondence_sparse.h
+    correspondence_gps_2D.h
     feature_base.h
     feature_gps_fix.h
     feature_odom_2D.h
@@ -42,6 +43,7 @@ SET(SRCS
     capture_gps_fix.cpp
     capture_odom_2D.cpp
     correspondence_base.cpp
+    correspondence_gps_2D.cpp
     feature_base.cpp
     feature_gps_fix.cpp
     feature_odom_2D.cpp
