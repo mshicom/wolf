@@ -1,10 +1,10 @@
 # NodeLinked class test
 ADD_EXECUTABLE(test_node_linked test_node_linked.cpp)
-TARGET_LINK_LIBRARIES(test_node_linked ${CERES_LIBRARIES} ${PROJECT_NAME})
+TARGET_LINK_LIBRARIES(test_node_linked ${PROJECT_NAME})
 
 # numeric test
-ADD_EXECUTABLE(test_ceres_wrapper_numeric test_ceres_wrapper_numeric.cpp)
-TARGET_LINK_LIBRARIES(test_ceres_wrapper_numeric ${CERES_LIBRARIES} ${PROJECT_NAME})
+#ADD_EXECUTABLE(test_ceres_wrapper_numeric test_ceres_wrapper_numeric.cpp)
+#TARGET_LINK_LIBRARIES(test_ceres_wrapper_numeric ${CERES_LIBRARIES} ${PROJECT_NAME})
 
 # jet test
 ADD_EXECUTABLE(test_ceres_wrapper_jet test_ceres_wrapper_jet.cpp)

@@ -6,7 +6,7 @@
 #include <random>
 #include <typeinfo>
 #include <ctime>
-#include <queue>          // std::queue
+#include <queue>
 
 // Eigen includes
 #include <eigen3/Eigen/Dense>
@@ -25,6 +25,9 @@
 #include "capture_base.h"
 #include "state_base.h"
 #include "wolf.h"
+
+// ceres wrapper includes
+//#include "ceres_wrapper/complex_angle_parametrization.h"
 
 /**
  * This test implements an optimization using CERES of a vehicle trajectory using odometry and GPS simulated data.
@@ -708,6 +711,8 @@ int main(int argc, char** argv)
 
 	clock_t t1, t2;
 	t1=clock();
+
+	NodeLinked<NodeTerminus,NodeTerminus> node(TOP,"TRAJECTORY");
 
 	unsigned int n_execution = (unsigned int) atoi(argv[1]); //number of iterations of the whole execution
 	bool complex_angle = (bool) atoi(argv[2]);

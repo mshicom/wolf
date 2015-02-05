@@ -1,18 +1,42 @@
 //std includes
+#include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <random>
+#include <typeinfo>
+#include <ctime>
+#include <queue>
 
 // Eigen includes
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 
 //Ceres includes
+#include "ceres/jet.h"
 #include "ceres/ceres.h"
 #include "glog/logging.h"
 
 //Wolf includes
+#include "sensor_base.h"
+#include "frame_base.h"
+#include "state_point.h"
+#include "state_complex_angle.h"
+#include "capture_base.h"
+#include "state_base.h"
 #include "wolf.h"
+
+// ceres wrapper includes
+#include "ceres_wrapper/complex_angle_parametrization.h"
+
+//Wolf includes
+#include "wolf.h"
+#include "node_terminus.h"
+#include "node_linked.h"
+
+//namespaces
+using namespace std;
+using namespace Eigen;
 
 /**
  * This class emulates a Wolf top tree node class, such as vehicle. 
@@ -23,7 +47,6 @@
  *      - a method to compute the error from the state
  * 
  **/
-using namespace Eigen;
 
 class WolfVehicle
 {
@@ -132,7 +155,9 @@ class WolfVehicle
 int main(int argc, char** argv) 
 {
     std::cout << " ========= Static Numeric case ===========" << std::endl << std::endl;
-    
+
+//    NodeLinked<NodeTerminus,NodeTerminus> node(TOP,"TRAJECTORY");
+
     //dimension 
     const unsigned int STATE_DIM = 5; //just to test, all will be DIM-dimensional
     const unsigned int MEASUREMENT_DIM = 1; //just to test, all will be DIM-dimensional
