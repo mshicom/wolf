@@ -11,9 +11,9 @@
 class SensorBase
 {
     protected:
-        Eigen::VectorXs sensor_pose_;//sensor pose in the vehicle frame
-        SensorType type_;
-        // TODO: VectorXs params_;
+        SensorType type_;//indicates sensor type. Enum defined at wolf.h
+        Eigen::VectorXs sensor_pose_vehicle_;//sensor pose in the vehicle frame
+        Eigen::VectorXs params_;//sensor intrinsic params: offsets, scale factors, sizes, ... 
         bool generate_prior_; //flag indicating if this sensor generates the prior or not
     
     public:
@@ -21,9 +21,9 @@ class SensorBase
 
         ~SensorBase();
         
-        const Eigen::VectorXs * getSensorPose() const;
-        
         const SensorType getSensorType() const;
+        
+        const Eigen::VectorXs * getSensorPose() const;
 
 };
 #endif

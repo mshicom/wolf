@@ -143,7 +143,8 @@ typedef enum
     ODOM_2D,	///< Odometry measurement from encoders: displacement and rotation.
     IMU,		///< Inertial measurement unit with 3 acceleros, 3 gyros
     CAMERA,		///< Regular pinhole camera
-    GPS_FIX,	///< GPS receiver, with fixes, pseudo ranges, and/or doppler velocities
+    GPS_FIX,	///< GPS fix calculated from a GPS receiver
+    GPS_RAW,    ///< GPS pseudo ranges, doppler and satellite ephemerides
     LIDAR,		///< Laser Range Finder, 2D
     RADAR,		///< Radar
     ABSOLUTE_POSE ///< Full absolute pose (XYZ+quaternion)
