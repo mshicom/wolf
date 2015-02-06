@@ -38,7 +38,7 @@ class NodeLinked : public NodeBase
         
     protected:        
         typedef LowerType* LowerNodePtr;
-        typedef std::shared_ptr<UpperType> UpperNodeShPtr;		
+        //typedef std::shared_ptr<UpperType> UpperNodeShPtr;
         typedef std::shared_ptr<LowerType> LowerNodeShPtr;
         typedef std::list<LowerNodeShPtr> LowerNodeList;
         typedef typename LowerNodeList::iterator LowerNodeIter;
