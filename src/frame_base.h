@@ -2,7 +2,7 @@
 #ifndef FRAME_BASE_H_
 #define FRAME_BASE_H_
 
-class NodeTerminus;
+class TrajectoryBase;
 class CaptureBase;
 
 //std includes
@@ -16,12 +16,12 @@ class CaptureBase;
 #include "wolf.h"
 #include "time_stamp.h"
 #include "node_linked.h"
-#include "node_terminus.h"
+#include "trajectory_base.h"
 #include "capture_base.h"
 #include "state_base.h"
 
 //class FrameBase
-class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
+class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
 {
     protected:
         FrameType type_; //type of frame. Either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
@@ -82,6 +82,8 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
         void getTimeStamp(WolfScalar & _ts) const;
 
         void addCapture(CaptureBaseShPtr& _capt_ptr);
+        
+        const TrajectoryBasePtr getTrajectoryPtr() const;
 
         const CaptureBaseList & captureList() const;
 

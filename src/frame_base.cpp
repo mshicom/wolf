@@ -61,6 +61,11 @@ inline void FrameBase::addCapture(CaptureBaseShPtr & _capt_ptr)
     addDownNode(_capt_ptr);
 }
 
+inline const FrameBase::TrajectoryBasePtr getTrajectoryPtr() const
+{
+    return upperNodePtr();
+}
+
 inline const CaptureBaseList & FrameBase::captureList() const
 {
     return downNodeList();
