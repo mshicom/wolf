@@ -195,10 +195,10 @@ class WolfManager
         	captures_.push_back(_gps_capture);
 
 			// CORRESPONDENCE GPS
-			correspondences_.push_back(CorrespondenceXShPtr(new CorrespondenceGPS2D(_gps_capture->getPtr(), frames_.back()->getPPtr()->getPtr())));
+			correspondences_.push_back(CorrespondencePtr(new CorrespondenceGPS2D(_gps_capture->getPtr(), frames_.back()->getPPtr()->getPtr())));
 		}
 
-        void update(std::queue<StateBaseShPtr>& new_state_units, std::queue<CorrespondenceShPtr>& new_correspondences)
+        void update(std::queue<StateBaseShPtr>& new_state_units, std::queue<CorrespondenceBasePtr>& new_correspondences)
         {
         	while (!new_captures_.empty())
         	{
@@ -217,6 +217,17 @@ class WolfManager
 
         		// COMPUTE CAPTURE (features, correspondences)
         		computeCapture(new_captures_.front());
+
+        		for (CaptureBaseIter capture_list_iter=frames_.back()->getCaptureList().begin(); capture_list_iter!=frames_.back()->getCaptureList().end(); capture_list_iter++)
+        		{
+        			for (FeatureBaseIter feature_list_iter=capture_list_iter->getFeatureList().begin(); feature_list_iter!=capture_list_iter->getFeatureList().end(); feature_list_iter++)
+        			{
+        				for (CorrespondenceBaseIter correspondence_list_iter=feature_list_iter->getCorrespondenceList().begin(); correspondence_list_iter!=feature_list_iter->getCorrespondenceList().end(); correspondence_list_iter++)
+        				{
+        					new_correspondences.push(&(*correspondence_list_iter));
+        				}
+        			}
+        		}
 
         		CorrespondenceBaseList new_correspondences = new_capture->getCorrespondenceList();
 

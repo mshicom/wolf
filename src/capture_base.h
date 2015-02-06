@@ -90,6 +90,13 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         
         virtual void processCapture();// = 0;
 
+        /** \brief Generic interface to find correspondences
+         *
+         * Generic interface to find correspondences between its features and a map (static/slam) or a previous feature
+         *
+         **/
+        virtual void findCorrespondences() = 0;
+
         virtual void printSelf(unsigned int _ntabs = 0, std::ostream & _ost = std::cout) const;
 };
 #endif

@@ -66,14 +66,6 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
         void setMeasurement(const Eigen::VectorXs & _meas);
         
         void setMeasurementCovariance(const Eigen::MatrixXs & _meas_cov);
-
-        /** \brief Generic interface to find correspondences
-         * 
-         * TBD
-         * Generic interface to find correspondences between this feature and a map (static/slam) or a previous feature
-         *
-         **/
-        virtual void findCorrespondences() = 0;
         
         /** \brief prints object's info
          * 

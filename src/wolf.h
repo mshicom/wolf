@@ -200,6 +200,7 @@ typedef FeatureBaseList::iterator FeatureBaseIter;
 
 // - Correspondence
 typedef std::shared_ptr<CorrespondenceBase> CorrespondenceBaseShPtr;
+typedef CorrespondenceBase* CorrespondenceBasePtr;
 typedef std::list<CorrespondenceBaseShPtr> CorrespondenceBaseList;
 typedef CorrespondenceBaseList::iterator CorrespondenceBaseIter;
 
