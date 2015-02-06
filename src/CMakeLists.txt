@@ -57,12 +57,18 @@ SET(SRCS
 
 #optional HDRS and SRCS
 IF (Ceres_FOUND)
-#    SET(SRCS ${SRCS} ceres_wrapper/complex_angle_parametrization.cpp)
-#    SET(HDRS ${HDRS} ceres_wrapper/complex_angle_parametrization.h)
+    SET(SRCS ${SRCS} ceres_wrapper/complex_angle_parametrization.cpp)
+    SET(HDRS ${HDRS} ceres_wrapper/complex_angle_parametrization.h)
 ENDIF(Ceres_FOUND)
 
 # create the shared library
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRCS})
+
+#Link the created library with ceres
+IF (Ceres_FOUND)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CERES_LIBRARIES})
+ENDIF(Ceres_FOUND)
+
 
 #install library
 INSTALL(TARGETS ${PROJECT_NAME}

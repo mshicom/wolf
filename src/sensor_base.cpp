@@ -1,8 +1,8 @@
 #include "sensor_base.h"
 
 SensorBase::SensorBase(const SensorType & _tp, const Eigen::VectorXs & _spv) :
-	sensor_pose_vehicle_(_sp),
-	type_(_tp)
+    type_(_tp), 
+	sensor_pose_vehicle_(_spv)
 {
     //
 }
@@ -19,5 +19,5 @@ const SensorType SensorBase::getSensorType() const
 
 const Eigen::VectorXs * SensorBase::getSensorPose() const
 {   
-    return & sensor_pose_vehicle;
+    return & sensor_pose_vehicle_;
 }
