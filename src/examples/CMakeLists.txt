@@ -4,7 +4,7 @@ TARGET_LINK_LIBRARIES(test_node_linked ${PROJECT_NAME})
 
 # numeric test
 #ADD_EXECUTABLE(test_ceres_wrapper_numeric test_ceres_wrapper_numeric.cpp)
-#TARGET_LINK_LIBRARIES(test_ceres_wrapper_numeric  ${PROJECT_NAME})
+#TARGET_LINK_LIBRARIES(test_ceres_wrapper_numeric ${PROJECT_NAME})
 
 # jet test
 ADD_EXECUTABLE(test_ceres_wrapper_jet test_ceres_wrapper_jet.cpp)
@@ -20,7 +20,7 @@ TARGET_LINK_LIBRARIES(test_ceres_wrapper_jet_2_sensors ${PROJECT_NAME})
 
 # jet test different bla
 # ADD_EXECUTABLE(test_ceres_wrapper_state_units test_ceres_wrapper_state_units.cpp)
-# TARGET_LINK_LIBRARIES(test_ceres_wrapper_state_units  ${PROJECT_NAME})
+# TARGET_LINK_LIBRARIES(test_ceres_wrapper_state_units ${PROJECT_NAME})
 
 # jet test manager
 ADD_EXECUTABLE(test_ceres_manager test_ceres_manager.cpp)

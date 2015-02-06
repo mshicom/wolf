@@ -49,7 +49,7 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
 
         virtual ~FeatureBase();
         
-        void linkToCapture(const CaptureBaseShPtr& _capt_ptr);
+        //void linkToCapture(const CaptureBaseShPtr& _capt_ptr); //JVN: inútil, el constructor ja crea el feature penjant d'una captura
         
         void addCorrespondence(CorrespondenceBaseShPtr& _co_ptr);
 

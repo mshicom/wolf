@@ -47,6 +47,7 @@ class CorrespondenceSparse: public CorrespondenceBase
          /** \brief Contructor with state pointer array
          * 
          * Constructor with state pointer array
+         * JVN: Potser aquest constructor no l'utilitzarem mai.. no?
          * 
          **/               
         CorrespondenceSparse(const FeatureBaseShPtr& _ftr_ptr, CorrespondenceType _tp, WolfScalar** _blockPtrArray) :

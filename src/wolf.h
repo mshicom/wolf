@@ -108,9 +108,9 @@ typedef enum
  */
 typedef enum 
 {
-    CORR_GPS_FIX_2D,		///< marks a 2D GPS Fix correspondence.
-	CORR_ODOM_2D_COMPLEX,	///< marks a 2D Odometry using complex angles.
-	CORR_ODOM_2D_THETA		///< marks a 2D Odometry using theta angles.
+    CORR_GPS_FIX_2D,			///< marks a 2D GPS Fix correspondence.
+	CORR_ODOM_2D_COMPLEX_ANGLE,	///< marks a 2D Odometry using complex angles.
+	CORR_ODOM_2D_THETA			///< marks a 2D Odometry using theta angles.
     
 } CorrespondenceType;
 

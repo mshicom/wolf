@@ -27,10 +27,10 @@ FeatureBase::~FeatureBase()
     //
 }
 
-inline void FeatureBase::linkToCapture(const CaptureBaseShPtr& _capt_ptr)
-{
-    linkToUpperNode(_capt_ptr.get());
-}
+//inline void FeatureBase::linkToCapture(const CaptureBaseShPtr& _capt_ptr)
+//{
+//    linkToUpperNode(_capt_ptr.get());
+//}
 
 inline void FeatureBase::addCorrespondence(CorrespondenceBaseShPtr& _co_ptr)
 {

@@ -1,23 +1,29 @@
-#include "correspondence_gps_2D.h"
+#include "correspondence_odom_2D_theta.h"
 
-CorrespondenceGPS2D::CorrespondenceGPS2D(const FeatureBaseShPtr& _ftr_ptr, WolfScalar* _statePtr) :
-	CorrespondenceSparse<2,2>(_ftr_ptr,CORR_GPS_FIX_2D, _statePtr)
+CorrespondenceOdom2DTheta::CorrespondenceOdom2DTheta(const FeatureBaseShPtr& _ftr_ptr,  WolfScalar* _block0Ptr, WolfScalar* _block1Ptr, WolfScalar* _block2Ptr, WolfScalar* _block3Ptr) :
+	CorrespondenceSparse<2,2,1,2,1>(_ftr_ptr,CORR_ODOM_2D_THETA, _block0Ptr, _block1Ptr, _block2Ptr, _block3Ptr)
 {
 }
 
-CorrespondenceGPS2D::CorrespondenceGPS2D(const FeatureBaseShPtr& _ftr_ptr, const StateBaseShPtr& _statePtr) :
-	CorrespondenceSparse<2,2>(_ftr_ptr,CORR_GPS_FIX_2D, _statePtr->getPtr())
+CorrespondenceOdom2DTheta::CorrespondenceOdom2DTheta(const FeatureBaseShPtr& _ftr_ptr, const StateBaseShPtr& _state0Ptr, const StateBaseShPtr& _state1Ptr, const StateBaseShPtr& _state2Ptr, const StateBaseShPtr& _state3Ptr) :
+	CorrespondenceSparse<2,2,1,2,1>(_ftr_ptr,CORR_ODOM_2D_THETA,  _state0Ptr->getPtr(), _state1Ptr->getPtr(),_state2Ptr->getPtr(), _state3Ptr->getPtr())
 {
 }
 
-CorrespondenceGPS2D::~CorrespondenceGPS2D()
+CorrespondenceOdom2DTheta::~CorrespondenceOdom2DTheta()
 {
 }
 
 template <typename T>
-bool CorrespondenceGPS2D::operator()(const T* const _x, T* _residuals) const
+bool CorrespondenceOdom2DTheta::operator()(const T* const _p1, const T* const _o1, const T* const _p2, const T* const _o2, T* _residuals) const
 {
-	_residuals[0] = ((T(*measurement_ptr_)(0))   - _x[0]) / T((*measurement_covariance_ptr_)(0,0));
-	_residuals[1] = ((T(*measurement_ptr_)(1)) - _x[1]) / T((*measurement_covariance_ptr_)(1,1));
+	// Expected measurement
+	T expected_range = (_p2[0]-_p1[0])*(_p2[0]-_p1[0]) + (_p2[1]-_p1[1])*(_p2[1]-_p1[1]); //square of the range
+	T expected_rotation = _o2[0]-_o1[0];
+
+	// Residuals
+	_residuals[0] = (expected_range - T((*measurement_ptr_)(0))*T((*measurement_ptr_)(0))) / T((*measurement_covariance_ptr_)(0,0));
+	_residuals[1] = (expected_rotation - T((*measurement_ptr_)(1))) / T((*measurement_covariance_ptr_)(1,1));
+
 	return true;
 }

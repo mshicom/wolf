@@ -35,14 +35,14 @@ class FrameBase : public NodeLinked<NodeTerminus,CaptureBase>
         
     public:
         /** \brief Constructor with only time stamp
-         * 
+         *
          * Constructor with only time stamp
          * \param _tp indicates frame type. Generally either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
          * \param _p_ptr StateBase pointer to the position (default: nullptr)
          * \param _o_ptr StateBase pointer to the orientation (default: nullptr)
          * \param _v_ptr StateBase pointer to the velocity (default: nullptr)
          * \param _w_ptr StateBase pointer to the angular velocity (default: nullptr)
-         * 
+         *
          **/
         FrameBase(const WolfScalar & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
 

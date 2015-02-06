@@ -15,7 +15,7 @@ FrameBase::FrameBase(const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const
 
 FrameBase::FrameBase(const FrameType & _tp, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
             NodeLinked(TOP, "FRAME"),
-            type_(REGULAR_FRAME),
+            type_(_tp),
             time_stamp_(_ts),
 			p_ptr_(_p_ptr),
 			o_ptr_(_o_ptr),
