@@ -65,7 +65,14 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
          **/                        
         const FeatureBaseList & getFeatureList() const;
         
-        WolfScalar getTimeStamp() const;
+        /** \brief Gets a const reference to correspondence list
+         *
+         * Gets a const reference to correspondence list
+         *
+         **/
+        const CorrespondenceBaseList getCorrespondenceList() const;
+
+        TimeStamp getTimeStamp() const;
 
         SensorBasePtr getSensorPtr() const;
         

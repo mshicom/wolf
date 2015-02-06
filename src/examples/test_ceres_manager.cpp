@@ -27,7 +27,7 @@
 #include "wolf.h"
 
 // ceres wrapper includes
-//#include "ceres_wrapper/complex_angle_parametrization.h"
+#include "ceres_wrapper/complex_angle_parametrization.h"
 
 /**
  * This test implements an optimization using CERES of a vehicle trajectory using odometry and GPS simulated data.
@@ -41,44 +41,44 @@ class CorrespondenceXBase;
 typedef std::shared_ptr<CorrespondenceXBase> CorrespondenceXShPtr;
 typedef std::shared_ptr<CaptureXBase> CaptureXShPtr;
 
-class ComplexAngleParameterization : public ceres::LocalParameterization
-{
-	public:
-		virtual ~ComplexAngleParameterization()
-		{
-		}
-
-		virtual bool Plus(const double* x_raw, const double* delta_raw, double* x_plus_delta_raw) const
-		{
-			x_plus_delta_raw[0] = x_raw[0] * cos(delta_raw[0]) - x_raw[1] * sin(delta_raw[0]);
-			x_plus_delta_raw[1] = x_raw[1] * cos(delta_raw[0]) + x_raw[0] * sin(delta_raw[0]);
-
-			//normalize
-			//double norm = sqrt(x_plus_delta_raw[0] * x_plus_delta_raw[0] + x_plus_delta_raw[1] * x_plus_delta_raw[1]);
-			//std::cout << "(before normalization) norm = " << norm << std::endl;
-			//x_plus_delta_raw[0] /= norm;
-			//x_plus_delta_raw[1] /= norm;
-
-			return true;
-		}
-
-		virtual bool ComputeJacobian(const double* x, double* jacobian) const
-		{
-			jacobian[0] = -x[1];
-			jacobian[1] =  x[0];
-			return true;
-		}
-
-		virtual int GlobalSize() const
-		{
-			return 2;
-		}
-
-		virtual int LocalSize() const
-		{
-			return 1;
-		}
-};
+//class ComplexAngleParameterization : public ceres::LocalParameterization
+//{
+//	public:
+//		virtual ~ComplexAngleParameterization()
+//		{
+//		}
+//
+//		virtual bool Plus(const double* x_raw, const double* delta_raw, double* x_plus_delta_raw) const
+//		{
+//			x_plus_delta_raw[0] = x_raw[0] * cos(delta_raw[0]) - x_raw[1] * sin(delta_raw[0]);
+//			x_plus_delta_raw[1] = x_raw[1] * cos(delta_raw[0]) + x_raw[0] * sin(delta_raw[0]);
+//
+//			//normalize
+//			//double norm = sqrt(x_plus_delta_raw[0] * x_plus_delta_raw[0] + x_plus_delta_raw[1] * x_plus_delta_raw[1]);
+//			//std::cout << "(before normalization) norm = " << norm << std::endl;
+//			//x_plus_delta_raw[0] /= norm;
+//			//x_plus_delta_raw[1] /= norm;
+//
+//			return true;
+//		}
+//
+//		virtual bool ComputeJacobian(const double* x, double* jacobian) const
+//		{
+//			jacobian[0] = -x[1];
+//			jacobian[1] =  x[0];
+//			return true;
+//		}
+//
+//		virtual int GlobalSize() const
+//		{
+//			return 2;
+//		}
+//
+//		virtual int LocalSize() const
+//		{
+//			return 1;
+//		}
+//};
 
 class CorrespondenceXBase
 {

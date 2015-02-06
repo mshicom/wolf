@@ -53,9 +53,17 @@ inline const FeatureBaseList & CaptureBase::getFeatureList() const
     return downNodeList();
 }
 
-inline WolfScalar CaptureBase::getTimeStamp() const
+const CorrespondenceBaseList CaptureBase::getCorrespondenceList() const
 {
-    return time_stamp_.get();
+	CorrespondenceBaseList corr_list;
+//	for (FeatureBaseIter it=downNodeList().begin(); it!=downNodeList().end();it++)
+//		corr_list.merge(*(*it)->getCorrespondenceList());
+
+	return corr_list;
+}
+inline TimeStamp CaptureBase::getTimeStamp() const
+{
+    return time_stamp_;
 }
 
 inline SensorBasePtr CaptureBase::getSensorPtr() const

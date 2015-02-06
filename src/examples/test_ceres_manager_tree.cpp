@@ -36,11 +36,6 @@
 
 using namespace Eigen;
 
-class CaptureXBase;
-class CorrespondenceXBase;
-typedef std::shared_ptr<CorrespondenceXBase> CorrespondenceXShPtr;
-typedef std::shared_ptr<CaptureXBase> CaptureXShPtr;
-
 class ComplexAngleParameterization : public ceres::LocalParameterization
 {
 	public:
@@ -87,19 +82,17 @@ class WolfManager
 		unsigned int first_empty_state_;
 		bool use_complex_angles_;
 		std::vector<FrameBaseShPtr> frames_;
-        std::vector<CorrespondenceXShPtr> correspondences_;
         std::vector<VectorXs> odom_captures_;
         std::vector<VectorXs> gps_captures_;
-        std::queue<CaptureXShPtr> new_captures_;
-        std::vector<CaptureXShPtr> captures_;
+        std::queue<CaptureBaseShPtr> new_captures_;
+        std::vector<CaptureBaseShPtr> captures_;
 
     public: 
         WolfManager(const unsigned int& _state_length=1000, const bool _complex_angle=false) :
         	state_(_state_length),
 			first_empty_state_(0),
         	use_complex_angles_(_complex_angle),
-        	frames_(0),
-			correspondences_(0)
+        	frames_(0)
 		{
         	VectorXs init_frame(use_complex_angles_ ? 4 : 3);
         	if (use_complex_angles_)
@@ -125,11 +118,6 @@ class WolfManager
 //        	std::cout << "all cleared...\n";
         }
 
-        unsigned int getCorrespondencesSize()
-        {
-        	return correspondences_.size();
-        }
-
         void createFrame(const VectorXs& _frame_state, const TimeStamp& _time_stamp)
         {
         	// Store in state_
@@ -152,7 +140,7 @@ class WolfManager
 
         void addCapture(const VectorXs& _odom_capture, const WolfScalar& _time_stamp, const SensorBaseShPtr& _sensor_ptr)
         {
-        	new_captures_.push(CaptureShPtr(new CaptureBase(_odom_capture, _time_stamp, _sensor_ptr)));
+        	new_captures_.push(CaptureBaseShPtr(new CaptureBase(_odom_capture, _time_stamp, _sensor_ptr)));
         }
 
         void computeOdomCapture(const CaptureXShPtr& _odom_capture)
@@ -210,25 +198,30 @@ class WolfManager
 			correspondences_.push_back(CorrespondenceXShPtr(new CorrespondenceGPS2D(_gps_capture->getPtr(), frames_.back()->getPPtr()->getPtr())));
 		}
 
-        void update(std::queue<StateBaseShPtr>& new_state_units, std::queue<CorrespondenceXShPtr>& new_correspondences)
+        void update(std::queue<StateBaseShPtr>& new_state_units, std::queue<CorrespondenceShPtr>& new_correspondences)
         {
         	while (!new_captures_.empty())
         	{
-        		switch (new_captures_.front()->getSensorType())
+        		CaptureBaseShPtr new_capture = new_captures_.front();
+
+        		// NEW FRAME (if ODOM_2D)
+        		if (new_capture->getSensorType() == ODOM_2D)
         		{
-        			case GPS_FIX:
-        				computeGPSCapture(new_captures_.front());
-        				new_correspondences.push(correspondences_.back());
-        				break;
-        			case ODOM_2D:
-        				computeOdomCapture(new_captures_.front());
-        				new_correspondences.push(correspondences_.back());
-        				new_state_units.push(frames_.back()->getPPtr());
-        				new_state_units.push(frames_.back()->getOPtr());
-        				break;
-        			default:
-        				std::cout << "unknown capture...\n";
+        			VectorXs pose_predicted = new_capture->computePrior(frames_.back());
+					createFrame(pose_predicted, new_capture->getTimeStamp());
+
+					// TODO: Change by something like "frames_.back()->getStatePtrList()"
+					new_state_units.push(frames_.back()->getPPtr());
+					new_state_units.push(frames_.back()->getOPtr());
         		}
+
+        		// COMPUTE CAPTURE (features, correspondences)
+        		computeCapture(new_captures_.front());
+
+        		CorrespondenceBaseList new_correspondences = new_capture->getCorrespondenceList();
+
+        		new_correspondences.push();
+
         		new_captures_.pop();
         	}
         }
@@ -236,11 +229,6 @@ class WolfManager
         VectorXs getState()
         {
         	return state_;
-        }
-
-        CorrespondenceXShPtr getCorrespondencePrt(unsigned int i)
-        {
-        	return correspondences_.at(i);
         }
 
         std::queue<StateBaseShPtr> getStateUnitsPtrs(unsigned int i)

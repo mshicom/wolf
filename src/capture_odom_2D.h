@@ -6,11 +6,11 @@
 //
 
 //Wolf includes
-#include "capture_base.h"
+#include "capture_relative.h"
 #include "feature_odom_2D.h"
 
 //class CaptureGPSFix
-class CaptureOdom2D : public CaptureBase
+class CaptureOdom2D : public CaptureRelative
 {
     public:
 		CaptureOdom2D(double _ts, const SensorBasePtr& _sensor_ptr);
@@ -22,6 +22,8 @@ class CaptureOdom2D : public CaptureBase
         virtual ~CaptureOdom2D();
         
         virtual void processCapture();
+
+        virtual Eigen::VectorXs computePrior(const FrameBaseShPtr& _previous_frame) const;
 
         //virtual void printSelf(unsigned int _ntabs = 0, std::ostream & _ost = std::cout) const;
 };

@@ -18,6 +18,7 @@ ENDIF(Ceres_FOUND)
 #headers
 SET(HDRS
     capture_base.h
+    capture_relative.h
     capture_gps_fix.h
     capture_odom_2D.h
     correspondence_base.h
@@ -42,6 +43,7 @@ SET(HDRS
 #sources
 SET(SRCS
     capture_base.cpp
+    capture_relative.cpp
     capture_gps_fix.cpp
     capture_odom_2D.cpp
     correspondence_base.cpp
@@ -61,8 +63,8 @@ SET(SRCS
 
 #optional HDRS and SRCS
 IF (Ceres_FOUND)
-#    SET(SRCS ${SRCS} ceres_wrapper/complex_angle_parametrization.cpp)
-#    SET(HDRS ${HDRS} ceres_wrapper/complex_angle_parametrization.h)
+    SET(SRCS ${SRCS} ceres_wrapper/complex_angle_parametrization.cpp)
+    SET(HDRS ${HDRS} ceres_wrapper/complex_angle_parametrization.h)
 ENDIF(Ceres_FOUND)
 
 # create the shared library
