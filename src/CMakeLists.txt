@@ -38,6 +38,7 @@ SET(HDRS
     state_point.h
     state_complex_angle.h
     time_stamp.h
+    trajectory_base.h
     wolf.h)
     
 #sources

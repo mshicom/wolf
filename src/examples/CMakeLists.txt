@@ -35,6 +35,6 @@ ADD_EXECUTABLE(test_ceres_odom_iterative test_ceres_odom_iterative.cpp)
 TARGET_LINK_LIBRARIES(test_ceres_odom_iterative ${PROJECT_NAME})
 
 # Building and populating the wolf tree 
-ADD_EXECUTABLE(test_wolf_tree test_wolf_tree.cpp)
-TARGET_LINK_LIBRARIES(test_wolf_tree ${PROJECT_NAME})
+# ADD_EXECUTABLE(test_wolf_tree test_wolf_tree.cpp)
+# TARGET_LINK_LIBRARIES(test_wolf_tree ${PROJECT_NAME})
 

@@ -2,7 +2,7 @@
 #include "frame_base.h"
 
 FrameBase::FrameBase(const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
-            NodeLinked(TOP, "FRAME"),
+            NodeLinked(MID, "FRAME"),
             type_(REGULAR_FRAME),
             time_stamp_(_ts),
 			p_ptr_(_p_ptr),
@@ -14,7 +14,7 @@ FrameBase::FrameBase(const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const
 }
 
 FrameBase::FrameBase(const FrameType & _tp, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
-            NodeLinked(TOP, "FRAME"),
+            NodeLinked(MID, "FRAME"),
             type_(_tp),
             time_stamp_(_ts),
 			p_ptr_(_p_ptr),
@@ -61,7 +61,7 @@ inline void FrameBase::addCapture(CaptureBaseShPtr & _capt_ptr)
     addDownNode(_capt_ptr);
 }
 
-inline const FrameBase::TrajectoryBasePtr getTrajectoryPtr() const
+inline const TrajectoryBasePtr FrameBase::getTrajectoryPtr() const
 {
     return upperNodePtr();
 }

@@ -31,21 +31,24 @@ class TrajectoryBase : public NodeLinked<NodeTerminus,FrameBase>
          * Constructor
          *
          **/
-        TrajectoryBase();
+        TrajectoryBase() : NodeLinked(TOP, "TRAJECTORY")
+        {
+            //
+        };
 
         /** \brief Destructor
          *
          * Destructor
          *
          **/        
-        ~TrajectoryBase();
+        ~TrajectoryBase(){};
 
         /** \brief Prints self info to std out
          *
          * Prints self info to std out
          *
          **/        
-        virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const;
+        virtual void printSelf(unsigned int _ntabs = 0, std::ostream& _ost = std::cout) const {};
         
 };
 #endif
