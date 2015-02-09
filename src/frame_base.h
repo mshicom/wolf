@@ -45,7 +45,7 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
          * \param _w_ptr StateBase pointer to the angular velocity (default: nullptr)
          *
          **/
-        FrameBase(const TrajectoryBasePtr & _traj_ptr, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
+        FrameBase(const TrajectoryBasePtr & _traj_ptr, const TimeStamp& _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
 
         /** \brief Constructor with type, time stamp and state pointer
          * 
@@ -59,7 +59,7 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
          * \param _w_ptr StateBase pointer to the angular velocity (default: nullptr)
          * 
          **/        
-        FrameBase(const TrajectoryBasePtr & _traj_ptr, const FrameType & _tp, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
+        FrameBase(const TrajectoryBasePtr & _traj_ptr, const FrameType & _tp, const TimeStamp& _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
         
         /** \brief Destructor
          * 
@@ -77,11 +77,11 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
         
         void setType(FrameType _ft);
         
-        void setTimeStamp(const double & _ts);
+        void setTimeStamp(const TimeStamp& _ts);
         
-        WolfScalar getTimeStamp() const;
+        TimeStamp getTimeStamp() const;
         
-        void getTimeStamp(WolfScalar & _ts) const;
+        void getTimeStamp(TimeStamp & _ts) const;
 
         void addCapture(CaptureBaseShPtr& _capt_ptr);
         

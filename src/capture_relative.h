@@ -13,11 +13,11 @@
 class CaptureRelative : public CaptureBase
 {
     public:
-        CaptureRelative(double _ts, const SensorBasePtr& _sensor_ptr);
+        CaptureRelative(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr);
         
-        CaptureRelative(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data);
+        CaptureRelative(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data);
 
-        CaptureRelative(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance);
+        CaptureRelative(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance);
 
         virtual ~CaptureRelative();
         

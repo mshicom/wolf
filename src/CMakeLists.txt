@@ -30,6 +30,8 @@ SET(HDRS
     feature_gps_fix.h
     feature_odom_2D.h
     frame_base.h
+    landmark_base.h
+    map_base.h
     node_base.h
     node_terminus.h
     node_linked.h
@@ -56,6 +58,8 @@ SET(SRCS
     feature_gps_fix.cpp
     feature_odom_2D.cpp
     frame_base.cpp
+    landmark_base.cpp
+    map_base.cpp
     node_base.cpp
     node_terminus.cpp
     sensor_base.cpp

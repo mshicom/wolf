@@ -1,18 +1,18 @@
 #include "capture_odom_2D.h"
 
-CaptureOdom2D::CaptureOdom2D(double _ts, const SensorBasePtr& _sensor_ptr) :
+CaptureOdom2D::CaptureOdom2D(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr) :
     CaptureRelative(_ts, _sensor_ptr)
 {
     //
 }
 
-CaptureOdom2D::CaptureOdom2D(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data) :
+CaptureOdom2D::CaptureOdom2D(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data) :
 	CaptureRelative(_ts, _sensor_ptr, _data)
 {
 	//
 }
 
-CaptureOdom2D::CaptureOdom2D(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance) :
+CaptureOdom2D::CaptureOdom2D(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance) :
 	CaptureRelative(_ts, _sensor_ptr, _data, _data_covariance)
 {
 	//

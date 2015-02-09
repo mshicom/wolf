@@ -150,6 +150,20 @@ typedef enum
     ABSOLUTE_POSE ///< Full absolute pose (XYZ+quaternion)
 } SensorType;
 
+/** \brief Enumeration of all possible landmark types
+ *
+ * Enumeration of all possible landmark types.
+ *
+ * You may add items to this list as needed. Be concise with names, and document your entries.
+ *
+ */
+typedef enum
+{
+	LANDMARK_POINT,		///< A point landmark, either 3D or 2D
+	LANDMARK_CORNER,	///< A corner landmark (2D)
+	LANDMARK_CONTAINER	///< A container landmark
+} LandmarkType;
+
 /////////////////////////////////////////////////////////////////////////
 //      TYPEDEFS FOR POINTERS AND ITERATORS IN THE WOLF TREE
 /////////////////////////////////////////////////////////////////////////
@@ -242,6 +256,8 @@ typedef TransSensorMap::iterator TransSensorIter;
 // - State Pose
 typedef std::shared_ptr<StateBase> StateBaseShPtr;
 typedef StateBase* StateBasePtr;
+typedef std::list<StateBaseShPtr> StateBaseList;
+typedef StateBaseList::iterator StateBaseIter;
 
 typedef StatePoint<1> StateTheta;
 typedef StatePoint<1> StatePoint1D;

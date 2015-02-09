@@ -23,6 +23,7 @@ class FrameBase;
 class TrajectoryBase : public NodeLinked<NodeTerminus,FrameBase>
 {
     protected:
+		// JVN: No seria millor que la trajectòria de tamany fix fos una classe derivada? i implementar funcions virtuals de l'estil "manageFrames()" que elimini/remapegi
         unsigned int fixed_size_; // Limits the number of frames forming the trajectory
         
     public:

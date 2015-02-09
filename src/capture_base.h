@@ -29,11 +29,11 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         Eigen::Vector3s inverse_sensor_pose_; ///< World pose in the sensor frame: inverse of the global_pose_. TODO: use state units
         
     public:
-        CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr);
+        CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr);
         
-        CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data);
+        CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data);
 
-        CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance);
+        CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance);
 
         virtual ~CaptureBase();
         
@@ -80,7 +80,7 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         
         SensorType getSensorType() const;
         
-        void setTimeStamp(const WolfScalar & _ts);
+        void setTimeStamp(const TimeStamp & _ts);
         
         void setTimeStampToNow();
 

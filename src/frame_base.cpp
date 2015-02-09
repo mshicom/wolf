@@ -1,7 +1,7 @@
 
 #include "frame_base.h"
 
-FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
+FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const TimeStamp& _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
             NodeLinked(MID, "FRAME", _traj_ptr),
             type_(REGULAR_FRAME),
             time_stamp_(_ts),
@@ -13,7 +13,7 @@ FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const WolfScalar & _ts
     //
 }
 
-FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const FrameType & _tp, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
+FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const FrameType & _tp, const TimeStamp& _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
             NodeLinked(MID, "FRAME", _traj_ptr),
             type_(_tp),
             time_stamp_(_ts),
@@ -41,17 +41,17 @@ inline void FrameBase::setType(FrameType _ft)
     type_ = _ft;
 }
 
-inline void FrameBase::setTimeStamp(const WolfScalar & _ts)
+inline void FrameBase::setTimeStamp(const TimeStamp & _ts)
 {
     time_stamp_ = _ts;
 }
 
-inline WolfScalar FrameBase::getTimeStamp() const
+TimeStamp FrameBase::getTimeStamp() const
 {
     return time_stamp_.get();
 }
         
-inline void FrameBase::getTimeStamp(WolfScalar & _ts) const
+inline void FrameBase::getTimeStamp(TimeStamp & _ts) const
 {
     _ts = time_stamp_.get();
 }

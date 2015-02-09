@@ -9,7 +9,6 @@ class CorrespondenceBase;
 
 //Wolf includes
 #include "wolf.h"
-#include "time_stamp.h"
 #include "node_linked.h"
 #include "capture_base.h"
 #include "correspondence_base.h"

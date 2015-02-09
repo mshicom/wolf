@@ -1,6 +1,6 @@
 #include "capture_base.h"
 
-CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr) :
+CaptureBase::CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr) :
     NodeLinked(MID, "CAPTURE"),
     time_stamp_(_ts),
     sensor_ptr_(_sensor_ptr)
@@ -8,7 +8,7 @@ CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr) :
     //
 }
 
-CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data) :
+CaptureBase::CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data) :
 	NodeLinked(MID, "CAPTURE"),
 	time_stamp_(_ts),
 	sensor_ptr_(_sensor_ptr),
@@ -17,7 +17,7 @@ CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eig
 	//
 }
 
-CaptureBase::CaptureBase(double _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance) :
+CaptureBase::CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_covariance) :
 	NodeLinked(MID, "CAPTURE"),
 	time_stamp_(_ts),
 	sensor_ptr_(_sensor_ptr),
@@ -74,7 +74,7 @@ inline SensorType CaptureBase::getSensorType() const
 	return sensor_ptr_->getSensorType();
 }
 
-inline void CaptureBase::setTimeStamp(const WolfScalar & _ts)
+inline void CaptureBase::setTimeStamp(const TimeStamp & _ts)
 {
     time_stamp_ = _ts;
 }
