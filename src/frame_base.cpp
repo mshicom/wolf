@@ -71,6 +71,24 @@ inline const CaptureBaseList & FrameBase::captureList() const
     return downNodeList();
 }
 
+FrameBase* FrameBase::getPreviousFrame() const
+{
+    std::list<FrameBaseShPtr>::iterator f_it;
+    std::list<FrameBaseShPtr> & f_list = this->up_node_ptr_->frameList();
+
+    //look for the position of this node in the upper list (frame list of trajectory)
+    for ( f_it = f_list.begin(); f_it != f_list.end(); ++f_it )
+    {
+        if ( this->node_id_ == (f_it->get())->nodeId() ) break;
+    }
+    
+    //check degenerate case
+    if (f_it == f_list.begin()) 
+        return nullptr;
+    else 
+        return (f_it--)->get();
+}
+
 //inline const Eigen::Vector3s & FrameBase::state() const
 //{
 //    return state_;

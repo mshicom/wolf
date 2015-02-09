@@ -31,17 +31,21 @@ class TrajectoryBase : public NodeLinked<NodeTerminus,FrameBase>
          * Constructor
          *
          **/
-        TrajectoryBase() : NodeLinked(TOP, "TRAJECTORY")
-        {
-            //
-        };
+        TrajectoryBase();
 
         /** \brief Destructor
          *
          * Destructor
          *
          **/        
-        ~TrajectoryBase(){};
+        ~TrajectoryBase();
+        
+        /** \brief Returns Frame list
+         * 
+         * Returns FrameBase list
+         * 
+         **/
+        const FrameBaseList & frameList() const;
 
         /** \brief Prints self info to std out
          *

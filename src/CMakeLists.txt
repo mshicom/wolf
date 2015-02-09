@@ -60,7 +60,8 @@ SET(SRCS
     sensor_base.cpp
     state_base.cpp
     state_complex_angle.cpp
-    time_stamp.cpp)
+    time_stamp.cpp
+    trajectory_base.cpp)
 
 #optional HDRS and SRCS
 IF (Ceres_FOUND)
