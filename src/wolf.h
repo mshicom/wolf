@@ -158,6 +158,8 @@ typedef enum
 
 
 class NodeTerminus;
+class MapBase;
+class LandmarkBase;
 class TrajectoryBase;
 class FrameBase;
 class CaptureBase;
@@ -180,6 +182,18 @@ class PinHole;
 // typedef VehicleBase* VehiclePtr;
 // typedef std::list<VehicleShPtr> VehicleList;
 // typedef VehicleList::iterator VehicleIter;
+
+//Map
+typedef std::shared_ptr<MapBase> MapBaseShPtr;
+typedef MapBase* MapBasePtr;
+typedef std::list<MapBaseShPtr> MapBaseList;
+typedef MapBaseList::iterator MapBaseIter;
+
+//Landmark
+typedef std::shared_ptr<LandmarkBase> LandmarkBaseShPtr;
+typedef LandmarkBase* LandmarkBasePtr;
+typedef std::list<LandmarkBaseShPtr> LandmarkBaseList;
+typedef LandmarkBaseList::iterator LandmarkBaseIter;
 
 //Trajectory
 typedef std::shared_ptr<TrajectoryBase> TrajectoryBaseShPtr;

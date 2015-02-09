@@ -24,7 +24,7 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
     public:
         /** \brief Constructor from capture pointer and measure dim
          * 
-         * \param _capt_ptr a shared pointer to the Capture up node
+         * \param _capt_ptr a pointer to the Capture up node
          * \param _dim_measurement the dimension of the measurement space
          * 
          */
@@ -32,7 +32,7 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
 
         /** \brief Constructor from capture pointer and measure
          *
-         * \param _capt_ptr a shared pointer to the Capture up node
+         * \param _capt_ptr a pointer to the Capture up node
          * \param _measurement the measurement
          *
          */

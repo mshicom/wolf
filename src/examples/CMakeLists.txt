@@ -23,8 +23,8 @@ TARGET_LINK_LIBRARIES(test_ceres_wrapper_jet_2_sensors ${PROJECT_NAME})
 # TARGET_LINK_LIBRARIES(test_ceres_wrapper_state_units ${PROJECT_NAME})
 
 # jet test manager
-# ADD_EXECUTABLE(test_ceres_manager test_ceres_manager.cpp)
-# TARGET_LINK_LIBRARIES(test_ceres_manager ${PROJECT_NAME})
+ADD_EXECUTABLE(test_ceres_manager test_ceres_manager.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_manager ${PROJECT_NAME})
 
 # Testing a full wolf tree avoiding template classes for NodeLinked derived classes
 ADD_EXECUTABLE(test_ceres_odom_batch test_ceres_odom_batch.cpp)
@@ -39,5 +39,5 @@ TARGET_LINK_LIBRARIES(test_ceres_odom_iterative ${PROJECT_NAME})
 # TARGET_LINK_LIBRARIES(test_wolf_tree ${PROJECT_NAME})
 
 # test ceres manager, wolf manager and wolf tree
-# ADD_EXECUTABLE(test_ceres_manager_tree test_ceres_manager_tree.cpp)
-# TARGET_LINK_LIBRARIES(test_ceres_manager_tree ${PROJECT_NAME})
+ADD_EXECUTABLE(test_ceres_manager_tree test_ceres_manager_tree.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_manager_tree ${PROJECT_NAME})

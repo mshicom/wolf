@@ -86,7 +86,6 @@ class WolfManager
 		unsigned int first_empty_state_;
 		bool use_complex_angles_;
 		TrajectoryBasePtr trajectory_;
-		//std::vector<FrameBaseShPtr> frames_;
         std::vector<VectorXs> odom_captures_;
         std::vector<VectorXs> gps_captures_;
         std::queue<CaptureBaseShPtr> new_captures_;
@@ -468,7 +467,7 @@ int main(int argc, char** argv)
 
 	// Wolf manager initialization
 	SensorBasePtr odom_sensor = SensorBasePtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1)));
-	SensorBasePtr gps_sensor = SensorBasePtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1)));
+	SensorBasePtr gps_sensor  = SensorBasePtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1)));
 	WolfManager* wolf_manager = new WolfManager(odom_sensor, n_execution * (complex_angle ? 4 : 3), complex_angle);
 
 	// Initial pose
