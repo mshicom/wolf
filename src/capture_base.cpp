@@ -48,10 +48,16 @@ inline const FrameBasePtr CaptureBase::getFramePtr() const
     return upperNodePtr();
 }
 
-inline const FeatureBaseList & CaptureBase::getFeatureList() const
+// inline FeatureBaseList & CaptureBase::getFeatureList() const
+// {
+//     return downNodeList();
+// }
+
+inline FeatureBaseList* CaptureBase::getFeatureListPtr()
 {
-    return downNodeList();
+    return getDownNodeListPtr();
 }
+
 
 inline TimeStamp CaptureBase::getTimeStamp() const
 {

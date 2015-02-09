@@ -58,12 +58,21 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
          **/                
         const FrameBasePtr getFramePtr() const;
         
-        /** \brief Gets a const reference to feature list
+        /** \brief Gets a reference to feature list
          * 
-         * Gets a const reference to feature list
+         * Gets a reference to feature list
          *
          **/                        
-        const FeatureBaseList & getFeatureList() const;
+//         FeatureBaseList & getFeatureList() const;
+        
+        FeatureBaseList* getFeatureListPtr();
+        
+        /** \brief Gets a const reference to correspondence list
+         *
+         * Gets a const reference to correspondence list
+         *
+         **/
+        const CorrespondenceBaseList getCorrespondenceList() const;
 
         TimeStamp getTimeStamp() const;
 

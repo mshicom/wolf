@@ -127,14 +127,28 @@ class NodeLinked : public NodeBase
          * Gets a reference to down node list
          *
          */
-        LowerNodeList& downNodeList();
+        LowerNodeList& downNodeList() const;
 
         /** \brief Gets a constant reference to down node list
          *
          * Gets constant reference to down node list
          *
          */		
-        const LowerNodeList& downNodeList() const;
+//         const LowerNodeList& downNodeList() const;
+        
+        /** \brief Gets a pointer to down node list
+         *
+         * Gets a pointer to down node list
+         *
+         */
+        LowerNodeList* getDownNodeListPtr();
+
+        /** \brief Gets a const pointer to down node list
+         *
+         * Gets a const pointer to down node list
+         *
+         */     
+//         const LowerNodeList* downNodeListPtr() const;        
 
         /** \brief Removes a down node from list, given an iterator
          *
@@ -282,16 +296,28 @@ inline void NodeLinked<UpperType, LowerType>::addDownNode(LowerNodeShPtr& _ptr)
 }
 
 template<class UpperType, class LowerType>
-inline const typename NodeLinked<UpperType, LowerType>::LowerNodeList& NodeLinked<UpperType, LowerType>::downNodeList() const
+inline typename NodeLinked<UpperType, LowerType>::LowerNodeList& NodeLinked<UpperType, LowerType>::downNodeList() const
 {
     return down_node_list_;
 }
 
+// template<class UpperType, class LowerType>
+// inline const typename NodeLinked<UpperType, LowerType>::LowerNodeList& NodeLinked<UpperType, LowerType>::downNodeList() const
+// {
+//     return down_node_list_;
+// }
+
 template<class UpperType, class LowerType>
-inline typename NodeLinked<UpperType, LowerType>::LowerNodeList& NodeLinked<UpperType, LowerType>::downNodeList()
+inline typename NodeLinked<UpperType, LowerType>::LowerNodeList* NodeLinked<UpperType, LowerType>::getDownNodeListPtr()
 {
-    return down_node_list_;
+    return &down_node_list_;
 }
+
+// template<class UpperType, class LowerType>
+// inline const typename NodeLinked<UpperType, LowerType>::LowerNodeList* NodeLinked<UpperType, LowerType>::downNodeListPtr() const 
+// {
+//     return &down_node_list_;
+// }
 
 template<class UpperType, class LowerType>
 inline void NodeLinked<UpperType, LowerType>::removeDownNode(const unsigned int _id)

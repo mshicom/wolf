@@ -32,42 +32,47 @@ FeatureBase::~FeatureBase()
 //    linkToUpperNode(_capt_ptr.get());
 //}
 
-inline void FeatureBase::addCorrespondence(CorrespondenceBaseShPtr& _co_ptr)
+void FeatureBase::addCorrespondence(CorrespondenceBaseShPtr& _co_ptr)
 {
     addDownNode(_co_ptr);
 }
 
-inline const CaptureBasePtr FeatureBase::getCapturePtr() const
+const CaptureBasePtr FeatureBase::getCapturePtr() const
 {
     return upperNodePtr();    
 }
 
-inline const FrameBasePtr FeatureBase::getFramePtr() const
+const FrameBasePtr FeatureBase::getFramePtr() const
 {
     return upperNodePtr()->upperNodePtr();
 }
 
-inline const CorrespondenceBaseList & FeatureBase::getCorrespondenceList() const
+// inline const CorrespondenceBaseList & FeatureBase::getCorrespondenceList() const
+// {
+//     return downNodeList();
+// }
+
+CorrespondenceBaseList* FeatureBase::getCorrespondenceListPtr()
 {
-    return downNodeList();
+    return getDownNodeListPtr();
 }
 
 const Eigen::VectorXs * FeatureBase::getMeasurementPtr()
 {
-    return & measurement_;
+    return &measurement_;
 }
 
 const Eigen::MatrixXs * FeatureBase::getMeasurementCovariancePtr()
 {
-    return & measurement_covariance_;
+    return &measurement_covariance_;
 }
 
-inline void FeatureBase::setMeasurement(const Eigen::VectorXs & _meas)
+void FeatureBase::setMeasurement(const Eigen::VectorXs & _meas)
 {
     measurement_ = _meas;
 }
 
-inline void FeatureBase::setMeasurementCovariance(const Eigen::MatrixXs & _meas_cov)
+void FeatureBase::setMeasurementCovariance(const Eigen::MatrixXs & _meas_cov)
 {
 	measurement_covariance_ = _meas_cov;
 }

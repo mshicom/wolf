@@ -1,8 +1,8 @@
 
 #include "frame_base.h"
 
-FrameBase::FrameBase(const TrajectoryBasePtr& _traj_ptr, const TimeStamp & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
-            NodeLinked(MID, "FRAME", _traj_ptr),
+FrameBase::FrameBase(const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
+            NodeLinked(MID, "FRAME"),
             type_(REGULAR_FRAME),
             time_stamp_(_ts),
 			p_ptr_(_p_ptr),
@@ -13,8 +13,8 @@ FrameBase::FrameBase(const TrajectoryBasePtr& _traj_ptr, const TimeStamp & _ts, 
     //
 }
 
-FrameBase::FrameBase(const TrajectoryBasePtr& _traj_ptr, const FrameType & _tp, const TimeStamp & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
-            NodeLinked(MID, "FRAME", _traj_ptr),
+FrameBase::FrameBase(const FrameType & _tp, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
+            NodeLinked(MID, "FRAME"),
             type_(_tp),
             time_stamp_(_ts),
 			p_ptr_(_p_ptr),
@@ -66,24 +66,29 @@ inline const TrajectoryBasePtr FrameBase::getTrajectoryPtr() const
     return upperNodePtr();
 }
 
-inline const CaptureBaseList & FrameBase::getCaptureList() const
+// inline const CaptureBaseList & FrameBase::captureList() const
+// {
+//     return downNodeList();
+// }
+
+CaptureBaseList* FrameBase::getCaptureListPtr()
 {
-    return downNodeList();
+    return getDownNodeListPtr();
 }
 
 FrameBase* FrameBase::getPreviousFrame() const
 {
     std::list<FrameBaseShPtr>::iterator f_it;
-    std::list<FrameBaseShPtr> & f_list = this->up_node_ptr_->frameList();
+    std::list<FrameBaseShPtr>* f_list_ptr = this->up_node_ptr_->getFrameListPtr();
 
     //look for the position of this node in the upper list (frame list of trajectory)
-    for ( f_it = f_list.begin(); f_it != f_list.end(); ++f_it )
+    for ( f_it = f_list_ptr->begin(); f_it != f_list_ptr->end(); ++f_it )
     {
         if ( this->node_id_ == (f_it->get())->nodeId() ) break;
     }
     
     //check degenerate case
-    if (f_it == f_list.begin()) 
+    if (f_it == f_list_ptr->begin()) 
         return nullptr;
     else 
         return (f_it--)->get();

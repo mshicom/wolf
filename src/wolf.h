@@ -184,8 +184,8 @@ class PinHole;
 //Trajectory
 typedef std::shared_ptr<TrajectoryBase> TrajectoryBaseShPtr;
 typedef TrajectoryBase* TrajectoryBasePtr;
-typedef std::list<TrajectoryBaseShPtr> TrajectoryBaseList;
-typedef TrajectoryBaseList::iterator TrajectoryBaseIter;
+// typedef std::list<TrajectoryBaseShPtr> TrajectoryBaseList;
+// typedef TrajectoryBaseList::iterator TrajectoryBaseIter;
 
 // - Frame
 typedef std::shared_ptr<FrameBase> FrameBaseShPtr;

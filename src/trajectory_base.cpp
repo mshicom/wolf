@@ -11,12 +11,12 @@ TrajectoryBase::~TrajectoryBase()
     //
 }
 
-inline FrameBaseList & TrajectoryBase::frameList() const
+FrameBaseList* TrajectoryBase::getFrameListPtr()
 {
-    return downNodeList();
+    return getDownNodeListPtr();
 }
 
-const inline FrameBaseList & TrajectoryBase::frameList() const
-{
-    return downNodeList();
-}
+// const inline FrameBaseList* TrajectoryBase::frameList() const
+// {
+//     return downNodeListPtr();
+// }

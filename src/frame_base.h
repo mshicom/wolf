@@ -37,7 +37,6 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
         /** \brief Constructor with only time stamp
          *
          * Constructor with only time stamp
-         * \param _traj_ptr pointer to the trajectory.
          * \param _tp indicates frame type. Generally either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
          * \param _p_ptr StateBase pointer to the position (default: nullptr)
          * \param _o_ptr StateBase pointer to the orientation (default: nullptr)
@@ -45,12 +44,11 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
          * \param _w_ptr StateBase pointer to the angular velocity (default: nullptr)
          *
          **/
-        FrameBase(const TrajectoryBasePtr& _traj_ptr, const TimeStamp & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
+        FrameBase(const WolfScalar & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
 
         /** \brief Constructor with type, time stamp and state pointer
          * 
          * Constructor with type, time stamp and state pointer
-         * \param _traj_ptr pointer to the trajectory.
          * \param _tp indicates frame type. Generally either REGULAR_FRAME or KEY_FRAME. (types defined at wolf.h)
          * \param _ts is the time stamp associated to this frame, provided in seconds
          * \param _p_ptr StateBase pointer to the position (default: nullptr)
@@ -59,7 +57,7 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
          * \param _w_ptr StateBase pointer to the angular velocity (default: nullptr)
          * 
          **/        
-        FrameBase(const TrajectoryBasePtr& _traj_ptr, const FrameType & _tp, const TimeStamp & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
+        FrameBase(const FrameType & _tp, const WolfScalar & _ts, const StateBaseShPtr& _p_ptr = {}, const StateBaseShPtr& _o_ptr = {}, const StateBaseShPtr& _v_ptr = {}, const StateBaseShPtr& _w_ptr = {});
         
         /** \brief Destructor
          * 
@@ -87,7 +85,9 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
         
         const TrajectoryBasePtr getTrajectoryPtr() const;
 
-        const CaptureBaseList & getCaptureList() const;
+        //const CaptureBaseList & captureList() const;
+        
+        CaptureBaseList* getCaptureListPtr();
         
         FrameBase* getPreviousFrame() const;
 

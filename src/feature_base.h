@@ -57,7 +57,9 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
 
         const FrameBasePtr getFramePtr() const;
         
-        const CorrespondenceBaseList & getCorrespondenceList() const;
+//         const CorrespondenceBaseList & getCorrespondenceList() const;
+        
+        CorrespondenceBaseList* getCorrespondenceListPtr();
         
         const Eigen::VectorXs * getMeasurementPtr();
         
