@@ -11,9 +11,9 @@ class CorrespondenceGPS2D: public CorrespondenceSparse<2,2>
 	public:
 		static const unsigned int N_BLOCKS = 1;
 
-		CorrespondenceGPS2D(const FeatureBaseShPtr& _ftr_ptr, WolfScalar* _statePtr);
+		CorrespondenceGPS2D(const FeatureBasePtr& _ftr_ptr, WolfScalar* _statePtr);
 
-		CorrespondenceGPS2D(const FeatureBaseShPtr& _ftr_ptr, const StateBaseShPtr& _statePtr);
+		CorrespondenceGPS2D(const FeatureBasePtr& _ftr_ptr, const StateBaseShPtr& _statePtr);
 
 		virtual ~CorrespondenceGPS2D();
 

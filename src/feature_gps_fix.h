@@ -16,7 +16,7 @@ class FeatureGPSFix : public FeatureBase
          * \param _dim_measurement the dimension of the measurement space
          * 
          */
-		FeatureGPSFix(const CaptureBaseShPtr& _capt_ptr, unsigned int _dim_measurement);
+		FeatureGPSFix(const CaptureBasePtr& _capt_ptr, unsigned int _dim_measurement);
 
         /** \brief Constructor from capture pointer and measure
          *
@@ -24,7 +24,7 @@ class FeatureGPSFix : public FeatureBase
          * \param _measurement the measurement
          *
          */
-		FeatureGPSFix(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorXs& _measurement);
+		FeatureGPSFix(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement);
 
         /** \brief Constructor from capture pointer and measure
          *
@@ -33,7 +33,7 @@ class FeatureGPSFix : public FeatureBase
          * \param _meas_covariance the noise of the measurement
          *
          */
-		FeatureGPSFix(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance);
+		FeatureGPSFix(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance);
 
         virtual ~FeatureGPSFix();
 

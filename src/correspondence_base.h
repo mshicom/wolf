@@ -30,7 +30,7 @@ class CorrespondenceBase : public NodeLinked<FeatureBase,NodeTerminus>
          * Constructor
          * 
          **/                
-        CorrespondenceBase(const FeatureBaseShPtr& _ftr_ptr, CorrespondenceType _tp);
+        CorrespondenceBase(const FeatureBasePtr& _ftr_ptr, CorrespondenceType _tp);
 
         /** \brief Destructor
          * 

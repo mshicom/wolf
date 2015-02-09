@@ -38,3 +38,6 @@ TARGET_LINK_LIBRARIES(test_ceres_odom_iterative ${PROJECT_NAME})
 # ADD_EXECUTABLE(test_wolf_tree test_wolf_tree.cpp)
 # TARGET_LINK_LIBRARIES(test_wolf_tree ${PROJECT_NAME})
 
+# test ceres manager, wolf manager and wolf tree
+ADD_EXECUTABLE(test_ceres_manager_tree test_ceres_manager_tree.cpp)
+TARGET_LINK_LIBRARIES(test_ceres_manager_tree ${PROJECT_NAME})

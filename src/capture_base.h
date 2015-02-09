@@ -64,13 +64,6 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
          *
          **/                        
         const FeatureBaseList & getFeatureList() const;
-        
-        /** \brief Gets a const reference to correspondence list
-         *
-         * Gets a const reference to correspondence list
-         *
-         **/
-        const CorrespondenceBaseList getCorrespondenceList() const;
 
         TimeStamp getTimeStamp() const;
 
@@ -89,6 +82,8 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         void setDataCovariance(const Eigen::MatrixXs& _data_cov);
         
         virtual void processCapture();// = 0;
+
+        virtual Eigen::VectorXs computePrior() const = 0;
 
         /** \brief Generic interface to find correspondences
          *

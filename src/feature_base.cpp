@@ -1,21 +1,21 @@
 #include "feature_base.h"
 
-FeatureBase::FeatureBase(const CaptureBaseShPtr& _capt_ptr, unsigned int _dim_measurement) : 
-    NodeLinked(MID, "FEATURE", _capt_ptr.get()),
+FeatureBase::FeatureBase(const CaptureBasePtr& _capt_ptr, unsigned int _dim_measurement) :
+    NodeLinked(MID, "FEATURE", _capt_ptr),
     measurement_(_dim_measurement)
 {
     //
 }
 
-FeatureBase::FeatureBase(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorXs& _measurement) :
-	NodeLinked(MID, "FEATURE", _capt_ptr.get()),
+FeatureBase::FeatureBase(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement) :
+	NodeLinked(MID, "FEATURE", _capt_ptr),
 	measurement_(_measurement)
 {
 	//
 }
 
-FeatureBase::FeatureBase(const CaptureBaseShPtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance) :
-	NodeLinked(MID, "FEATURE", _capt_ptr.get()),
+FeatureBase::FeatureBase(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance) :
+	NodeLinked(MID, "FEATURE", _capt_ptr),
 	measurement_(_measurement),
 	measurement_covariance_(_meas_covariance)
 {

@@ -23,7 +23,8 @@ class FrameBase;
 class TrajectoryBase : public NodeLinked<NodeTerminus,FrameBase>
 {
     protected:
-        unsigned int fixed_size_; // Limits the number of frames forming the trajectory
+		// JVN: jo faria que això estigués en un derived: TrajectoryFixedSize
+        //unsigned int fixed_size_; // Limits the number of frames forming the trajectory
         
     public:
         /** \brief Constructor
@@ -46,6 +47,16 @@ class TrajectoryBase : public NodeLinked<NodeTerminus,FrameBase>
          * 
          **/
         const FrameBaseList & frameList() const;
+
+        /** \brief Get a list of all the frames of the trajectory
+         *
+         * Get a list of all the frames of the trajectory
+         *
+         **/
+        const FrameBaseList & getFrameList()
+        {
+        	return downNodeList();
+        }
 
         /** \brief Prints self info to std out
          *

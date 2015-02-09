@@ -1,11 +1,11 @@
 #include "correspondence_gps_2D.h"
 
-CorrespondenceGPS2D::CorrespondenceGPS2D(const FeatureBaseShPtr& _ftr_ptr, WolfScalar* _statePtr) :
+CorrespondenceGPS2D::CorrespondenceGPS2D(const FeatureBasePtr& _ftr_ptr, WolfScalar* _statePtr) :
 	CorrespondenceSparse<2,2>(_ftr_ptr,CORR_GPS_FIX_2D, _statePtr)
 {
 }
 
-CorrespondenceGPS2D::CorrespondenceGPS2D(const FeatureBaseShPtr& _ftr_ptr, const StateBaseShPtr& _statePtr) :
+CorrespondenceGPS2D::CorrespondenceGPS2D(const FeatureBasePtr& _ftr_ptr, const StateBaseShPtr& _statePtr) :
 	CorrespondenceSparse<2,2>(_ftr_ptr,CORR_GPS_FIX_2D, _statePtr->getPtr())
 {
 }

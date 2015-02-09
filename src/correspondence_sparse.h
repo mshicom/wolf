@@ -50,7 +50,7 @@ class CorrespondenceSparse: public CorrespondenceBase
          * JVN: Potser aquest constructor no l'utilitzarem mai.. no?
          * 
          **/               
-        CorrespondenceSparse(const FeatureBaseShPtr& _ftr_ptr, CorrespondenceType _tp, WolfScalar** _blockPtrArray) :
+        CorrespondenceSparse(const FeatureBasePtr& _ftr_ptr, CorrespondenceType _tp, WolfScalar** _blockPtrArray) :
             CorrespondenceBase(_ftr_ptr,_tp),
             state_block_ptr_vector_(10),
             state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
@@ -74,7 +74,7 @@ class CorrespondenceSparse: public CorrespondenceBase
          * Constructor with state pointers separated
          * 
          **/        
-        CorrespondenceSparse(const FeatureBaseShPtr& _ftr_ptr,
+        CorrespondenceSparse(const FeatureBasePtr& _ftr_ptr,
         					 CorrespondenceType _tp,
                              WolfScalar* _state0Ptr,
                              WolfScalar* _state1Ptr = nullptr,

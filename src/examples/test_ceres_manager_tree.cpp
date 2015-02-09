@@ -23,8 +23,12 @@
 #include "state_point.h"
 #include "state_complex_angle.h"
 #include "capture_base.h"
+#include "capture_relative.h"
 #include "state_base.h"
 #include "wolf.h"
+#include "correspondence_gps_2D.h"
+#include "correspondence_odom_2D_theta.h"
+#include "correspondence_odom_2D_complex_angle.h"
 
 // ceres wrapper includes
 //#include "ceres_wrapper/complex_angle_parametrization.h"
@@ -81,18 +85,19 @@ class WolfManager
 		VectorXs state_;
 		unsigned int first_empty_state_;
 		bool use_complex_angles_;
-		std::vector<FrameBaseShPtr> frames_;
+		TrajectoryBasePtr trajectory_;
+		//std::vector<FrameBaseShPtr> frames_;
         std::vector<VectorXs> odom_captures_;
         std::vector<VectorXs> gps_captures_;
         std::queue<CaptureBaseShPtr> new_captures_;
-        std::vector<CaptureBaseShPtr> captures_;
+        SensorBasePtr sensor_prior_;
 
     public: 
-        WolfManager(const unsigned int& _state_length=1000, const bool _complex_angle=false) :
+        WolfManager(const SensorBasePtr& _sensor_prior, const unsigned int& _state_length=1000, const bool _complex_angle=false) :
         	state_(_state_length),
 			first_empty_state_(0),
         	use_complex_angles_(_complex_angle),
-        	frames_(0)
+			sensor_prior_(_sensor_prior)
 		{
         	VectorXs init_frame(use_complex_angles_ ? 4 : 3);
         	if (use_complex_angles_)
@@ -125,115 +130,62 @@ class WolfManager
 
         	// Create frame
         	if (use_complex_angles_)
-				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp.get(),
-															   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
-															   StateBaseShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2)))));
+				new FrameBase(trajectory_,
+							  _time_stamp,
+							  StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+							  StateBaseShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2)));
 
         	else
-				frames_.push_back(FrameBaseShPtr(new FrameBase(_time_stamp.get(),
-						   	   	   	   	   	   	   	   	   	   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
-															   StateBaseShPtr(new StateTheta(state_.data()+first_empty_state_+2)))));
+        		new FrameBase(trajectory_,
+							  _time_stamp,
+							  StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+							  StateBaseShPtr(new StateTheta(state_.data()+first_empty_state_+2)));
 
         	// Update first free state location index
         	first_empty_state_ += use_complex_angles_ ? 4 : 3;
         }
 
-        void addCapture(const VectorXs& _odom_capture, const WolfScalar& _time_stamp, const SensorBaseShPtr& _sensor_ptr)
+        void addCapture(const CaptureBaseShPtr& _capture)
         {
-        	new_captures_.push(CaptureBaseShPtr(new CaptureBase(_odom_capture, _time_stamp, _sensor_ptr)));
+        	new_captures_.push(_capture);
         }
 
-        void computeOdomCapture(const CaptureXShPtr& _odom_capture)
-		{
-        	FrameBaseShPtr prev_frame_ptr = frames_.back();
-
-        	// STORE CAPTURE
-        	captures_.push_back(_odom_capture);
-        	VectorXs capture_data = _odom_capture->capture;
-
-        	// PRIOR
-        	VectorXs pose_predicted(use_complex_angles_ ? 4 : 3);
-        	Map<VectorXs> previous_pose(prev_frame_ptr->getPPtr()->getPtr(), use_complex_angles_ ? 4 : 3);
-        	if (use_complex_angles_)
-			{
-				double new_pose_predicted_2 = previous_pose(2) * cos(capture_data(1)) - previous_pose(3) * sin(capture_data(1));
-				double new_pose_predicted_3 = previous_pose(2) * sin(capture_data(1)) + previous_pose(3) * cos(capture_data(1));
-				pose_predicted(0) = previous_pose(0) + capture_data(0) * new_pose_predicted_2;
-				pose_predicted(1) = previous_pose(1) + capture_data(0) * new_pose_predicted_3;
-				pose_predicted(2) = new_pose_predicted_2;
-				pose_predicted(3) = new_pose_predicted_3;
-			}
-			else
-			{
-				pose_predicted(0) = previous_pose(0) + capture_data(0) * cos(previous_pose(2) + (capture_data(1)));
-				pose_predicted(1) = previous_pose(1) + capture_data(0) * sin(previous_pose(2) + (capture_data(1)));
-				pose_predicted(2) = previous_pose(2) + (capture_data(1));
-			}
-
-        	// NEW FRAME
-        	createFrame(pose_predicted, _odom_capture->time_stamp);
-
-			// CORRESPONDENCE ODOMETRY
-			if (use_complex_angles_)
-				correspondences_.push_back(CorrespondenceXShPtr(new Correspondence2DOdometry(_odom_capture->getPtr(),
-																						   prev_frame_ptr->getPPtr()->getPtr(),
-																						   prev_frame_ptr->getOPtr()->getPtr(),
-																						   frames_.back()->getPPtr()->getPtr(),
-																						   frames_.back()->getOPtr()->getPtr())));
-
-			else
-				correspondences_.push_back(CorrespondenceXShPtr(new Correspondence2DOdometryTheta(_odom_capture->getPtr(),
-																						   	    prev_frame_ptr->getPPtr()->getPtr(),
-																								prev_frame_ptr->getOPtr()->getPtr(),
-																								frames_.back()->getPPtr()->getPtr(),
-																								frames_.back()->getOPtr()->getPtr())));
-		}
-
-        void computeGPSCapture(const CaptureXShPtr& _gps_capture)
-		{
-			// STORE CAPTURE
-        	captures_.push_back(_gps_capture);
-
-			// CORRESPONDENCE GPS
-			correspondences_.push_back(CorrespondencePtr(new CorrespondenceGPS2D(_gps_capture->getPtr(), frames_.back()->getPPtr()->getPtr())));
-		}
-
-        void update(std::queue<StateBaseShPtr>& new_state_units, std::queue<CorrespondenceBasePtr>& new_correspondences)
+        void update(std::list<StateBasePtr>& new_state_units, std::list<CorrespondenceBasePtr>& new_correspondences)
         {
+        	// TODO: management due to time stamps
         	while (!new_captures_.empty())
         	{
+        		// EXTRACT NEW CAPTURE
         		CaptureBaseShPtr new_capture = new_captures_.front();
+        		new_captures_.pop();
 
-        		// NEW FRAME (if ODOM_2D)
-        		if (new_capture->getSensorType() == ODOM_2D)
+        		// NEW FRAME (if the specific sensor)
+        		// TODO: accumulate odometries
+        		if (new_capture->getSensorPtr() == sensor_prior_)
         		{
-        			VectorXs pose_predicted = new_capture->computePrior(frames_.back());
+        			VectorXs pose_predicted = new_capture->computePrior();
 					createFrame(pose_predicted, new_capture->getTimeStamp());
 
-					// TODO: Change by something like "frames_.back()->getStatePtrList()"
-					new_state_units.push(frames_.back()->getPPtr());
-					new_state_units.push(frames_.back()->getOPtr());
+					// TODO: Change by something like...
+					//new_state_units.insert(new_state_units.end(), trajectory_.getFrameList.back()->getStateList().begin(), trajectory_.getFrameList.back()->getStateList().end());
+					new_state_units.push_back(trajectory_->getFrameList().back()->getPPtr().get());
+					new_state_units.push_back(trajectory_->getFrameList().back()->getOPtr().get());
         		}
 
         		// COMPUTE CAPTURE (features, correspondences)
-        		computeCapture(new_captures_.front());
+        		new_capture->processCapture();
 
-        		for (CaptureBaseIter capture_list_iter=frames_.back()->getCaptureList().begin(); capture_list_iter!=frames_.back()->getCaptureList().end(); capture_list_iter++)
-        		{
-        			for (FeatureBaseIter feature_list_iter=capture_list_iter->getFeatureList().begin(); feature_list_iter!=capture_list_iter->getFeatureList().end(); feature_list_iter++)
-        			{
-        				for (CorrespondenceBaseIter correspondence_list_iter=feature_list_iter->getCorrespondenceList().begin(); correspondence_list_iter!=feature_list_iter->getCorrespondenceList().end(); correspondence_list_iter++)
-        				{
-        					new_correspondences.push(&(*correspondence_list_iter));
-        				}
-        			}
-        		}
+        		// LINK CAPTURE TO ITS FRAME
+        		new_capture->linkToFrame(trajectory_->getFrameList().back());
 
-        		CorrespondenceBaseList new_correspondences = new_capture->getCorrespondenceList();
-
-        		new_correspondences.push();
-
-        		new_captures_.pop();
+        		// ADD CORRESPONDENCES TO THE new_correspondences OUTPUT PARAM
+        		for (FeatureBaseIter feature_list_iter=new_capture->getFeatureList().begin(); feature_list_iter!=new_capture->getFeatureList().end(); feature_list_iter++)
+				{
+					for (CorrespondenceBaseIter correspondence_list_iter=(*feature_list_iter)->getCorrespondenceList().begin(); correspondence_list_iter!=(*feature_list_iter)->getCorrespondenceList().end(); correspondence_list_iter++)
+					{
+						new_correspondences.push_back((*correspondence_list_iter).get());
+					}
+				}
         	}
         }
 
@@ -242,17 +194,43 @@ class WolfManager
         	return state_;
         }
 
-        std::queue<StateBaseShPtr> getStateUnitsPtrs(unsigned int i)
+        std::list<StateBasePtr> getStateList()
 		{
-			return std::queue<StateBaseShPtr>({frames_.at(i)->getPPtr(),frames_.at(i)->getOPtr()});
+        	std::list<StateBasePtr> st_list;
+
+        	for (FrameBaseIter frame_list_iter=trajectory_->getFrameList().begin(); frame_list_iter!=trajectory_->getFrameList().end(); frame_list_iter++)
+			{
+        		//st_list.insert(st_list.end(), (*frame_list_iter)->getStateList().begin(), (*frame_list_iter)->getStateList().end());
+        		st_list.push_back((*frame_list_iter)->getPPtr().get());
+        		st_list.push_back((*frame_list_iter)->getOPtr().get());
+			}
+
+			return st_list;
 		}
+
+        std::list<CorrespondenceBaseShPtr> getCorrespondencesList()
+        {
+        	std::list<CorrespondenceBaseShPtr> corr_list;
+
+        	for (FrameBaseIter frame_list_iter=trajectory_->getFrameList().begin(); frame_list_iter!=trajectory_->getFrameList().end(); frame_list_iter++)
+			{
+				for (CaptureBaseIter capture_list_iter=(*frame_list_iter)->getCaptureList().begin(); capture_list_iter!=(*frame_list_iter)->getCaptureList().end(); capture_list_iter++)
+				{
+					for (FeatureBaseIter feature_list_iter=(*capture_list_iter)->getFeatureList().begin(); feature_list_iter!=(*capture_list_iter)->getFeatureList().end(); feature_list_iter++)
+					{
+						corr_list.insert(corr_list.end(),(*feature_list_iter)->getCorrespondenceList().begin(), (*feature_list_iter)->getCorrespondenceList().end());
+					}
+				}
+			}
+        	return corr_list;
+        }
 };
 
 class CeresManager
 {
 	protected:
 
-		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceXShPtr>> correspondence_list_;
+		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceBasePtr>> correspondence_list_;
 		ceres::Problem* ceres_problem_;
 
 	public:
@@ -286,7 +264,7 @@ class CeresManager
 			return ceres_summary_;
 		}
 
-		void addCorrespondences(std::queue<CorrespondenceXShPtr>& _new_correspondences)
+		void addCorrespondences(std::queue<CorrespondenceBasePtr>& _new_correspondences)
 		{
 			//std::cout << _new_correspondences.size() << " new correspondences\n";
 			while (!_new_correspondences.empty())
@@ -306,18 +284,18 @@ class CeresManager
 			std::cout << ceres_problem_->NumResidualBlocks() << " residual blocks \n";
 		}
 
-		void addCorrespondence(const CorrespondenceXShPtr& _corr_ptr)
+		void addCorrespondence(const CorrespondenceBasePtr& _corr_ptr)
 		{
 			ceres::ResidualBlockId blockIdx = ceres_problem_->AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
-			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceXShPtr>(blockIdx,_corr_ptr));
+			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceBasePtr>(blockIdx,_corr_ptr));
 		}
 
-		void addStateUnits(std::queue<StateBaseShPtr>& _new_state_units)
+		void addStateUnits(std::list<StateBasePtr>& _new_state_units)
 		{
 			while (!_new_state_units.empty())
 			{
 				addStateUnit(_new_state_units.front());
-				_new_state_units.pop();
+				_new_state_units.pop_front();
 			}
 		}
 
@@ -326,7 +304,7 @@ class CeresManager
 			ceres_problem_->RemoveParameterBlock(_st_ptr);
 		}
 
-		void addStateUnit(const StateBaseShPtr& _st_ptr)
+		void addStateUnit(const StateBasePtr& _st_ptr)
 		{
 			//std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
 			//_st_ptr->print();
@@ -337,7 +315,7 @@ class CeresManager
 				{
 					//std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
 					//ceres_problem_->SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr.get())->BLOCK_SIZE, new ComplexAngleParameterization);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr)->BLOCK_SIZE, new ComplexAngleParameterization);
 					break;
 				}
 //				case PARAM_QUATERNION:
@@ -351,19 +329,19 @@ class CeresManager
 				case ST_THETA:
 				{
 					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint1D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint1D*)_st_ptr)->BLOCK_SIZE, nullptr);
 					break;
 				}
 				case ST_POINT_2D:
 				{
 					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint2D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint2D*)_st_ptr)->BLOCK_SIZE, nullptr);
 					break;
 				}
 				case ST_POINT_3D:
 				{
 					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint3D*)_st_ptr.get())->BLOCK_SIZE, nullptr);
+					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint3D*)_st_ptr)->BLOCK_SIZE, nullptr);
 					break;
 				}
 				default:
@@ -371,13 +349,13 @@ class CeresManager
 			}
 		}
 
-		ceres::CostFunction* createCostFunction(const CorrespondenceXShPtr& _corrPtr)
+		ceres::CostFunction* createCostFunction(const CorrespondenceBasePtr& _corrPtr)
 		{
 			switch (_corrPtr->getType())
 			{
 				case CORR_GPS_FIX_2D:
 				{
-					CorrespondenceGPS2D* specific_ptr = (CorrespondenceGPS2D*)(_corrPtr.get());
+					CorrespondenceGPS2D* specific_ptr = (CorrespondenceGPS2D*)(_corrPtr);
 					return new ceres::AutoDiffCostFunction<CorrespondenceGPS2D,
 															specific_ptr->measurementSize,
 															specific_ptr->block0Size,
@@ -394,8 +372,8 @@ class CeresManager
 				}
 				case CORR_ODOM_2D_COMPLEX_ANGLE:
 				{
-					Correspondence2DOdometry* specific_ptr = (Correspondence2DOdometry*)(_corrPtr.get());
-					return new ceres::AutoDiffCostFunction<Correspondence2DOdometry,
+					CorrespondenceOdom2DComplexAngle* specific_ptr = (CorrespondenceOdom2DComplexAngle*)(_corrPtr);
+					return new ceres::AutoDiffCostFunction<CorrespondenceOdom2DComplexAngle,
 															specific_ptr->measurementSize,
 															specific_ptr->block0Size,
 															specific_ptr->block1Size,
@@ -411,8 +389,8 @@ class CeresManager
 				}
 				case CORR_ODOM_2D_THETA:
 				{
-					Correspondence2DOdometryTheta* specific_ptr = (Correspondence2DOdometryTheta*)(_corrPtr.get());
-					return new ceres::AutoDiffCostFunction<Correspondence2DOdometryTheta,
+					CorrespondenceOdom2DTheta* specific_ptr = (CorrespondenceOdom2DTheta*)(_corrPtr);
+					return new ceres::AutoDiffCostFunction<CorrespondenceOdom2DTheta,
 															specific_ptr->measurementSize,
 															specific_ptr->block0Size,
 															specific_ptr->block1Size,
@@ -475,8 +453,7 @@ int main(int argc, char** argv)
 	ceres::Problem* ceres_problem = new ceres::Problem();
 	CeresManager* ceres_manager = new CeresManager(ceres_problem);
 	std::ofstream log_file;  //output file
-	// Wolf manager initialization
-	WolfManager* wolf_manager = new WolfManager(n_execution * (complex_angle ? 4 : 3), complex_angle);
+
 
 	//variables
 	Eigen::VectorXs odom_inc_true(n_execution*2);//invented motion
@@ -486,10 +463,13 @@ int main(int argc, char** argv)
 	Eigen::VectorXs odom_trajectory(n_execution*3); //all true poses
 	Eigen::VectorXs odom_readings(n_execution*2); // all odometry readings
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
-	std::queue<StateBaseShPtr> new_state_units; // new state units in wolf that must be added to ceres
-	std::queue<CorrespondenceXShPtr> new_correspondences; // new correspondences in wolf that must be added to ceres
-	SensorBaseShPtr odom_sensor = SensorBaseShPtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1)));
-	SensorBaseShPtr gps_sensor = SensorBaseShPtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1)));
+	std::list<StateBasePtr> new_state_units; // new state units in wolf that must be added to ceres
+	std::list<CorrespondenceBasePtr> new_correspondences; // new correspondences in wolf that must be added to ceres
+
+	// Wolf manager initialization
+	SensorBasePtr odom_sensor = SensorBasePtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1)));
+	SensorBasePtr gps_sensor = SensorBasePtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1)));
+	WolfManager* wolf_manager = new WolfManager(odom_sensor, n_execution * (complex_angle ? 4 : 3), complex_angle);
 
 	// Initial pose
 	pose_true << 0,0,0;
@@ -528,12 +508,12 @@ int main(int argc, char** argv)
 	std::cout << "sensor data created!\n";
 
 	// START TRAJECTORY ============================================================================================
-    new_state_units = wolf_manager->getStateUnitsPtrs(0); // First pose to be added in ceres
+    new_state_units = wolf_manager->getStateList(); // First pose to be added in ceres
     for (uint step=1; step < n_execution; step++)
 	{
     	// adding sensor captures
-		wolf_manager->addCapture(odom_readings.segment(step*2,2),step,odom_sensor);
-		wolf_manager->addCapture(gps_fix_readings.segment(step*3,3),step,gps_sensor);
+		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureOdom2D(odom_readings.segment(step*2,2), TimeStamp(step_time), odom_sensor)));
+		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureGPSFix(gps_fix_readings.segment(step*3,3), TimeStamp(step_time), gps_sensor)));
 
 		// updating problem
 		wolf_manager->update(new_state_units, new_correspondences);

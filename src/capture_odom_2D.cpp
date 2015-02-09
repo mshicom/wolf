@@ -26,7 +26,7 @@ CaptureOdom2D::~CaptureOdom2D()
 inline void CaptureOdom2D::processCapture()
 {
     std::cout << "... processing GPS fix capture" << std::endl;
-    FeatureBaseShPtr new_feature(new FeatureOdom2D(CaptureBaseShPtr(this),this->data_));
+    FeatureBaseShPtr new_feature(new FeatureOdom2D(CaptureBasePtr(this),this->data_));
     addFeature(new_feature);
 }
 

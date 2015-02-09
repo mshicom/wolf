@@ -23,11 +23,16 @@ CaptureGPSFix::~CaptureGPSFix()
 	//std::cout << "Destroying GPS fix capture...\n";
 }
 
-inline void CaptureGPSFix::processCapture()
+void CaptureGPSFix::processCapture()
 {
     std::cout << "... processing GPS fix capture" << std::endl;
-    FeatureBaseShPtr new_feature(new FeatureGPSFix(CaptureBaseShPtr(this),this->data_));
+    FeatureBaseShPtr new_feature(new FeatureGPSFix(CaptureBasePtr(this),data_));
     addFeature(new_feature);
+}
+
+Eigen::VectorXs CaptureGPSFix::computePrior() const
+{
+	return data_;
 }
 
 //void CaptureGPSFix::printSelf(unsigned int _ntabs, std::ostream & _ost) const

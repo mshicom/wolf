@@ -53,14 +53,6 @@ inline const FeatureBaseList & CaptureBase::getFeatureList() const
     return downNodeList();
 }
 
-const CorrespondenceBaseList CaptureBase::getCorrespondenceList() const
-{
-	CorrespondenceBaseList corr_list;
-//	for (FeatureBaseIter it=downNodeList().begin(); it!=downNodeList().end();it++)
-//		corr_list.merge(*(*it)->getCorrespondenceList());
-
-	return corr_list;
-}
 inline TimeStamp CaptureBase::getTimeStamp() const
 {
     return time_stamp_;
