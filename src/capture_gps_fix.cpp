@@ -35,6 +35,11 @@ Eigen::VectorXs CaptureGPSFix::computePrior() const
 	return data_;
 }
 
+void CaptureGPSFix::findCorrespondences()
+{
+
+}
+
 //void CaptureGPSFix::printSelf(unsigned int _ntabs, std::ostream & _ost) const
 //{
 //    NodeLinked::printSelf(_ntabs, _ost);

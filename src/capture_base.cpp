@@ -32,7 +32,7 @@ CaptureBase::~CaptureBase()
 	//std::cout << "Destroying capture...\n";
 }
 
-inline void CaptureBase::linkToFrame(const FrameBaseShPtr& _frm_ptr)
+void CaptureBase::linkToFrame(const FrameBaseShPtr& _frm_ptr)
 {
     linkToUpperNode(_frm_ptr.get());
 }
@@ -43,43 +43,43 @@ void CaptureBase::addFeature(FeatureBaseShPtr & _ft_ptr)
     addDownNode(_ft_ptr);
 }
 
-inline const FrameBasePtr CaptureBase::getFramePtr() const
+const FrameBasePtr CaptureBase::getFramePtr() const
 {
     return upperNodePtr();
 }
 
-// inline FeatureBaseList & CaptureBase::getFeatureList() const
+// FeatureBaseList & CaptureBase::getFeatureList() const
 // {
 //     return downNodeList();
 // }
 
-inline FeatureBaseList* CaptureBase::getFeatureListPtr()
+FeatureBaseList* CaptureBase::getFeatureListPtr()
 {
     return getDownNodeListPtr();
 }
 
 
-inline TimeStamp CaptureBase::getTimeStamp() const
+TimeStamp CaptureBase::getTimeStamp() const
 {
     return time_stamp_;
 }
 
-inline SensorBasePtr CaptureBase::getSensorPtr() const
+SensorBasePtr CaptureBase::getSensorPtr() const
 {
     return sensor_ptr_;
 }
 
-inline SensorType CaptureBase::getSensorType() const
+SensorType CaptureBase::getSensorType() const
 {
 	return sensor_ptr_->getSensorType();
 }
 
-inline void CaptureBase::setTimeStamp(const TimeStamp & _ts)
+void CaptureBase::setTimeStamp(const TimeStamp & _ts)
 {
     time_stamp_ = _ts;
 }
 
-inline void CaptureBase::setTimeStampToNow()
+void CaptureBase::setTimeStampToNow()
 {
     time_stamp_.setToNow();
 }
@@ -100,7 +100,7 @@ void CaptureBase::setDataCovariance(const Eigen::MatrixXs& _data_cov)
     data_covariance_ = _data_cov;
 }
 
-inline void CaptureBase::processCapture()
+void CaptureBase::processCapture()
 {
     std::cout << "... processing capture" << std::endl;
 }

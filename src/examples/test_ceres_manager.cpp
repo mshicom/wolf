@@ -41,45 +41,6 @@ class CorrespondenceXBase;
 typedef std::shared_ptr<CorrespondenceXBase> CorrespondenceXShPtr;
 typedef std::shared_ptr<CaptureXBase> CaptureXShPtr;
 
-//class ComplexAngleParameterization : public ceres::LocalParameterization
-//{
-//	public:
-//		virtual ~ComplexAngleParameterization()
-//		{
-//		}
-//
-//		virtual bool Plus(const double* x_raw, const double* delta_raw, double* x_plus_delta_raw) const
-//		{
-//			x_plus_delta_raw[0] = x_raw[0] * cos(delta_raw[0]) - x_raw[1] * sin(delta_raw[0]);
-//			x_plus_delta_raw[1] = x_raw[1] * cos(delta_raw[0]) + x_raw[0] * sin(delta_raw[0]);
-//
-//			//normalize
-//			//double norm = sqrt(x_plus_delta_raw[0] * x_plus_delta_raw[0] + x_plus_delta_raw[1] * x_plus_delta_raw[1]);
-//			//std::cout << "(before normalization) norm = " << norm << std::endl;
-//			//x_plus_delta_raw[0] /= norm;
-//			//x_plus_delta_raw[1] /= norm;
-//
-//			return true;
-//		}
-//
-//		virtual bool ComputeJacobian(const double* x, double* jacobian) const
-//		{
-//			jacobian[0] = -x[1];
-//			jacobian[1] =  x[0];
-//			return true;
-//		}
-//
-//		virtual int GlobalSize() const
-//		{
-//			return 2;
-//		}
-//
-//		virtual int LocalSize() const
-//		{
-//			return 1;
-//		}
-//};
-
 class CorrespondenceXBase
 {
 	protected:
@@ -749,8 +710,8 @@ int main(int argc, char** argv)
 	Eigen::VectorXs gps_fix_readings(n_execution*3); //all GPS fix readings
 	std::queue<StateBaseShPtr> new_state_units; // new state units in wolf that must be added to ceres
 	std::queue<CorrespondenceXShPtr> new_correspondences; // new correspondences in wolf that must be added to ceres
-	SensorBaseShPtr odom_sensor = SensorBaseShPtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1)));
-	SensorBaseShPtr gps_sensor = SensorBaseShPtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1)));
+	SensorBaseShPtr odom_sensor = SensorBaseShPtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1),0));
+	SensorBaseShPtr gps_sensor = SensorBaseShPtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1),0));
 
 	// Initial pose
 	pose_true << 0,0,0;

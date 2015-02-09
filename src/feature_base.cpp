@@ -57,12 +57,12 @@ CorrespondenceBaseList* FeatureBase::getCorrespondenceListPtr()
     return getDownNodeListPtr();
 }
 
-const Eigen::VectorXs * FeatureBase::getMeasurementPtr()
+Eigen::VectorXs * FeatureBase::getMeasurementPtr()
 {
     return &measurement_;
 }
 
-const Eigen::MatrixXs * FeatureBase::getMeasurementCovariancePtr()
+Eigen::MatrixXs * FeatureBase::getMeasurementCovariancePtr()
 {
     return &measurement_covariance_;
 }

@@ -18,20 +18,23 @@
 #include "glog/logging.h"
 
 //Wolf includes
+#include "wolf.h"
 #include "sensor_base.h"
 #include "frame_base.h"
 #include "state_point.h"
 #include "state_complex_angle.h"
 #include "capture_base.h"
 #include "capture_relative.h"
+#include "capture_odom_2D.h"
+#include "capture_gps_fix.h"
 #include "state_base.h"
-#include "wolf.h"
+#include "correspondence_sparse.h"
 #include "correspondence_gps_2D.h"
 #include "correspondence_odom_2D_theta.h"
 #include "correspondence_odom_2D_complex_angle.h"
 
 // ceres wrapper includes
-//#include "ceres_wrapper/complex_angle_parametrization.h"
+#include "ceres_wrapper/complex_angle_parametrization.h"
 
 /**
  * This test implements an optimization using CERES of a vehicle trajectory using odometry and GPS simulated data.
@@ -39,45 +42,6 @@
  **/
 
 using namespace Eigen;
-
-class ComplexAngleParameterization : public ceres::LocalParameterization
-{
-	public:
-		virtual ~ComplexAngleParameterization()
-		{
-		}
-
-		virtual bool Plus(const double* x_raw, const double* delta_raw, double* x_plus_delta_raw) const
-		{
-			x_plus_delta_raw[0] = x_raw[0] * cos(delta_raw[0]) - x_raw[1] * sin(delta_raw[0]);
-			x_plus_delta_raw[1] = x_raw[1] * cos(delta_raw[0]) + x_raw[0] * sin(delta_raw[0]);
-
-			//normalize
-			//double norm = sqrt(x_plus_delta_raw[0] * x_plus_delta_raw[0] + x_plus_delta_raw[1] * x_plus_delta_raw[1]);
-			//std::cout << "(before normalization) norm = " << norm << std::endl;
-			//x_plus_delta_raw[0] /= norm;
-			//x_plus_delta_raw[1] /= norm;
-
-			return true;
-		}
-
-		virtual bool ComputeJacobian(const double* x, double* jacobian) const
-		{
-			jacobian[0] = -x[1];
-			jacobian[1] =  x[0];
-			return true;
-		}
-
-		virtual int GlobalSize() const
-		{
-			return 2;
-		}
-
-		virtual int LocalSize() const
-		{
-			return 1;
-		}
-};
 
 class WolfManager
 {
@@ -104,6 +68,8 @@ class WolfManager
         	else
         		init_frame << 0, 0, 0;
         	createFrame(init_frame, 0);
+
+    		std::cout << "first frame created\n";
 		}
 
         virtual ~WolfManager()
@@ -127,19 +93,23 @@ class WolfManager
         	// Store in state_
         	state_.segment(first_empty_state_, use_complex_angles_ ? 4 : 3) << _frame_state;
 
-        	// Create frame
+        	// Create frame and add it to the trajectory
         	if (use_complex_angles_)
-				new FrameBase(trajectory_,
-							  _time_stamp,
-							  StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
-							  StateBaseShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2)));
-
+        	{
+        		FrameBaseShPtr new_frame(new FrameBase(trajectory_,
+													   _time_stamp,
+													   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+													   StateBaseShPtr(new StateComplexAngle(state_.data()+first_empty_state_+2))));
+        		trajectory_->addFrame(new_frame);
+        	}
         	else
-        		new FrameBase(trajectory_,
-							  _time_stamp,
-							  StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
-							  StateBaseShPtr(new StateTheta(state_.data()+first_empty_state_+2)));
-
+        	{
+        		FrameBaseShPtr new_frame(new FrameBase(trajectory_,
+													   _time_stamp,
+													   StateBaseShPtr(new StatePoint2D(state_.data()+first_empty_state_)),
+													   StateBaseShPtr(new StateTheta(state_.data()+first_empty_state_+2))));
+        		trajectory_->addFrame(new_frame);
+        	}
         	// Update first free state location index
         	first_empty_state_ += use_complex_angles_ ? 4 : 3;
         }
@@ -167,20 +137,20 @@ class WolfManager
 
 					// TODO: Change by something like...
 					//new_state_units.insert(new_state_units.end(), trajectory_.getFrameList.back()->getStateList().begin(), trajectory_.getFrameList.back()->getStateList().end());
-					new_state_units.push_back(trajectory_->getFrameList().back()->getPPtr().get());
-					new_state_units.push_back(trajectory_->getFrameList().back()->getOPtr().get());
+					new_state_units.push_back(trajectory_->getFrameListPtr()->back()->getPPtr().get());
+					new_state_units.push_back(trajectory_->getFrameListPtr()->back()->getOPtr().get());
         		}
 
         		// COMPUTE CAPTURE (features, correspondences)
         		new_capture->processCapture();
 
         		// LINK CAPTURE TO ITS FRAME
-        		new_capture->linkToFrame(trajectory_->getFrameList().back());
+        		new_capture->linkToFrame(trajectory_->getFrameListPtr()->back());
 
         		// ADD CORRESPONDENCES TO THE new_correspondences OUTPUT PARAM
-        		for (FeatureBaseIter feature_list_iter=new_capture->getFeatureList().begin(); feature_list_iter!=new_capture->getFeatureList().end(); feature_list_iter++)
+        		for (FeatureBaseIter feature_list_iter=new_capture->getFeatureListPtr()->begin(); feature_list_iter!=new_capture->getFeatureListPtr()->end(); feature_list_iter++)
 				{
-					for (CorrespondenceBaseIter correspondence_list_iter=(*feature_list_iter)->getCorrespondenceList().begin(); correspondence_list_iter!=(*feature_list_iter)->getCorrespondenceList().end(); correspondence_list_iter++)
+					for (CorrespondenceBaseIter correspondence_list_iter=(*feature_list_iter)->getCorrespondenceListPtr()->begin(); correspondence_list_iter!=(*feature_list_iter)->getCorrespondenceListPtr()->end(); correspondence_list_iter++)
 					{
 						new_correspondences.push_back((*correspondence_list_iter).get());
 					}
@@ -195,9 +165,12 @@ class WolfManager
 
         std::list<StateBasePtr> getStateList()
 		{
+
+    		std::cout << "getStateList...\n";
+
         	std::list<StateBasePtr> st_list;
 
-        	for (FrameBaseIter frame_list_iter=trajectory_->getFrameList().begin(); frame_list_iter!=trajectory_->getFrameList().end(); frame_list_iter++)
+        	for (FrameBaseIter frame_list_iter=trajectory_->getFrameListPtr()->begin(); frame_list_iter!=trajectory_->getFrameListPtr()->end(); frame_list_iter++)
 			{
         		//st_list.insert(st_list.end(), (*frame_list_iter)->getStateList().begin(), (*frame_list_iter)->getStateList().end());
         		st_list.push_back((*frame_list_iter)->getPPtr().get());
@@ -211,13 +184,13 @@ class WolfManager
         {
         	std::list<CorrespondenceBaseShPtr> corr_list;
 
-        	for (FrameBaseIter frame_list_iter=trajectory_->getFrameList().begin(); frame_list_iter!=trajectory_->getFrameList().end(); frame_list_iter++)
+        	for (FrameBaseIter frame_list_iter=trajectory_->getFrameListPtr()->begin(); frame_list_iter!=trajectory_->getFrameListPtr()->end(); frame_list_iter++)
 			{
-				for (CaptureBaseIter capture_list_iter=(*frame_list_iter)->getCaptureList().begin(); capture_list_iter!=(*frame_list_iter)->getCaptureList().end(); capture_list_iter++)
+				for (CaptureBaseIter capture_list_iter=(*frame_list_iter)->getCaptureListPtr()->begin(); capture_list_iter!=(*frame_list_iter)->getCaptureListPtr()->end(); capture_list_iter++)
 				{
-					for (FeatureBaseIter feature_list_iter=(*capture_list_iter)->getFeatureList().begin(); feature_list_iter!=(*capture_list_iter)->getFeatureList().end(); feature_list_iter++)
+					for (FeatureBaseIter feature_list_iter=(*capture_list_iter)->getFeatureListPtr()->begin(); feature_list_iter!=(*capture_list_iter)->getFeatureListPtr()->end(); feature_list_iter++)
 					{
-						corr_list.insert(corr_list.end(),(*feature_list_iter)->getCorrespondenceList().begin(), (*feature_list_iter)->getCorrespondenceList().end());
+						corr_list.insert(corr_list.end(),(*feature_list_iter)->getCorrespondenceListPtr()->begin(), (*feature_list_iter)->getCorrespondenceListPtr()->end());
 					}
 				}
 			}
@@ -263,13 +236,13 @@ class CeresManager
 			return ceres_summary_;
 		}
 
-		void addCorrespondences(std::queue<CorrespondenceBasePtr>& _new_correspondences)
+		void addCorrespondences(std::list<CorrespondenceBasePtr>& _new_correspondences)
 		{
 			//std::cout << _new_correspondences.size() << " new correspondences\n";
 			while (!_new_correspondences.empty())
 			{
 				addCorrespondence(_new_correspondences.front());
-				_new_correspondences.pop();
+				_new_correspondences.pop_front();
 			}
 		}
 
@@ -285,7 +258,7 @@ class CeresManager
 
 		void addCorrespondence(const CorrespondenceBasePtr& _corr_ptr)
 		{
-			ceres::ResidualBlockId blockIdx = ceres_problem_->AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getBlockPtrVector());
+			ceres::ResidualBlockId blockIdx = ceres_problem_->AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getStateBlockPtrVector());
 			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceBasePtr>(blockIdx,_corr_ptr));
 		}
 
@@ -350,7 +323,7 @@ class CeresManager
 
 		ceres::CostFunction* createCostFunction(const CorrespondenceBasePtr& _corrPtr)
 		{
-			switch (_corrPtr->getType())
+			switch (_corrPtr->getCorrespondenceType())
 			{
 				case CORR_GPS_FIX_2D:
 				{
@@ -466,8 +439,8 @@ int main(int argc, char** argv)
 	std::list<CorrespondenceBasePtr> new_correspondences; // new correspondences in wolf that must be added to ceres
 
 	// Wolf manager initialization
-	SensorBasePtr odom_sensor = SensorBasePtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1)));
-	SensorBasePtr gps_sensor  = SensorBasePtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1)));
+	SensorBasePtr odom_sensor = SensorBasePtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1),0));
+	SensorBasePtr gps_sensor  = SensorBasePtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1),0));
 	WolfManager* wolf_manager = new WolfManager(odom_sensor, n_execution * (complex_angle ? 4 : 3), complex_angle);
 
 	// Initial pose
@@ -510,18 +483,20 @@ int main(int argc, char** argv)
     new_state_units = wolf_manager->getStateList(); // First pose to be added in ceres
     for (uint step=1; step < n_execution; step++)
 	{
-    	// adding sensor captures
-		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureOdom2D(odom_readings.segment(step*2,2), TimeStamp(step_time), odom_sensor)));
-		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureGPSFix(gps_fix_readings.segment(step*3,3), TimeStamp(step_time), gps_sensor)));
-
+    	std::cout << "adding new sensor captures...\n";
+    	// adding new sensor captures
+		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureOdom2D(TimeStamp(step*0.01), odom_sensor, odom_readings.segment(step*2,2))));
+		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureGPSFix(TimeStamp(step*0.01), gps_sensor, gps_fix_readings.segment(step*3,3))));
+		std::cout << "updating problem...\n";
 		// updating problem
 		wolf_manager->update(new_state_units, new_correspondences);
-
+		std::cout << "sadding new state units and correspondences to ceres...\n";
 		// adding new state units and correspondences to ceres
 		ceres_manager->addStateUnits(new_state_units);
 		ceres_manager->addCorrespondences(new_correspondences);
 	}
 
+	std::cout << "solving...\n";
     // SOLVE OPTIMIZATION ============================================================================================
 	ceres::Solver::Summary summary = ceres_manager->solve(ceres_options);
 	t2=clock();

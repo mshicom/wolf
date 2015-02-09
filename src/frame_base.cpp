@@ -10,7 +10,7 @@ FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const TimeStamp& _ts, 
 			v_ptr_(_v_ptr),
 			w_ptr_(_w_ptr)
 {
-    //
+	//
 }
 
 FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const FrameType & _tp, const TimeStamp& _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :

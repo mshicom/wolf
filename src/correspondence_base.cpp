@@ -14,7 +14,7 @@ CorrespondenceBase::~CorrespondenceBase()
 	//
 }
 
-inline CorrespondenceType CorrespondenceBase::getType() const
+CorrespondenceType CorrespondenceBase::getCorrespondenceType() const
 {
     return type_;
 }

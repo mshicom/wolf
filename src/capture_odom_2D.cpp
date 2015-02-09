@@ -30,8 +30,9 @@ inline void CaptureOdom2D::processCapture()
     addFeature(new_feature);
 }
 
-Eigen::VectorXs CaptureOdom2D::computePrior(const FrameBaseShPtr& _previous_frame) const
+Eigen::VectorXs CaptureOdom2D::computePrior() const
 {
+	FrameBasePtr _previous_frame = getFramePtr()->getPreviousFrame();
 
 	if (_previous_frame->getOPtr()->getStateType() == ST_COMPLEX_ANGLE)
 	{
@@ -57,6 +58,11 @@ Eigen::VectorXs CaptureOdom2D::computePrior(const FrameBaseShPtr& _previous_fram
 
 		return pose_predicted;
 	}
+}
+
+void CaptureOdom2D::findCorrespondences()
+{
+	//
 }
 
 //void CaptureOdom2D::printSelf(unsigned int _ntabs, std::ostream & _ost) const

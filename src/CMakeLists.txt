@@ -51,9 +51,6 @@ SET(SRCS
     capture_gps_fix.cpp
     capture_odom_2D.cpp
     correspondence_base.cpp
-    correspondence_gps_2D.cpp
-    correspondence_odom_2D_theta.cpp
-    correspondence_odom_2D_complex_angle.cpp
     feature_base.cpp
     feature_gps_fix.cpp
     feature_odom_2D.cpp

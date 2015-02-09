@@ -17,8 +17,7 @@ CaptureRelative::CaptureRelative(const TimeStamp& _ts, const SensorBasePtr& _sen
 {
 	//
 }
-
 CaptureRelative::~CaptureRelative()
 {
-	//std::cout << "Destroying relative capture...\n";
+	//
 }

@@ -21,8 +21,8 @@ class CorrespondenceBase : public NodeLinked<FeatureBase,NodeTerminus>
 {
     protected:
         CorrespondenceType type_; //type of correspondence (types defined at wolf.h)
-        const Eigen::VectorXs * measurement_ptr_; // TBD: pointer, map or copy of the feature measurement?
-        const Eigen::MatrixXs * measurement_covariance_ptr_; // TBD: pointer, map or copy of the feature measurement covariance?
+        Eigen::VectorXs * measurement_ptr_; // TBD: pointer, map or copy of the feature measurement?
+        Eigen::MatrixXs * measurement_covariance_ptr_; // TBD: pointer, map or copy of the feature measurement covariance?
         
     public:
         /** \brief Constructor
@@ -44,14 +44,14 @@ class CorrespondenceBase : public NodeLinked<FeatureBase,NodeTerminus>
          * Returns the correspondence type
          * 
          **/
-        CorrespondenceType getType() const;
+        CorrespondenceType getCorrespondenceType() const;
         
         /** \brief Returns a vector of scalar pointers to the first element of all state blocks involved in the correspondence
 		 *
 		 * Returns a vector of scalar pointers to the first element of all state blocks involved in the correspondence.
 		 *
 		 **/
-        virtual const std::vector<WolfScalar*> getBlockPtrVector() = 0;
+        virtual const std::vector<WolfScalar*> getStateBlockPtrVector() = 0;
 
         /** \brief Returns a pointer to the feature measurement
 		 *

@@ -60,9 +60,9 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
         
         CorrespondenceBaseList* getCorrespondenceListPtr();
         
-        const Eigen::VectorXs * getMeasurementPtr();
+        Eigen::VectorXs * getMeasurementPtr();
         
-        const Eigen::MatrixXs * getMeasurementCovariancePtr();
+        Eigen::MatrixXs * getMeasurementCovariancePtr();
 
         void setMeasurement(const Eigen::VectorXs & _meas);
         

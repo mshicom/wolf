@@ -41,6 +41,13 @@ class TrajectoryBase : public NodeLinked<NodeTerminus,FrameBase>
          **/        
         ~TrajectoryBase();
         
+        /** \brief Add a frame to the trajectory
+         *
+         * Add a frame to the trajectory
+         *
+         **/
+        void addFrame(FrameBaseShPtr& _frame_ptr);
+
         /** \brief Returns a pointer to Frame list
          * 
          * Returns a pointer to Frame list

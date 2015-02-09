@@ -23,7 +23,9 @@ class CaptureOdom2D : public CaptureRelative
         
         virtual void processCapture();
 
-        virtual Eigen::VectorXs computePrior(const FrameBaseShPtr& _previous_frame) const;
+        virtual Eigen::VectorXs computePrior() const;
+
+        virtual void findCorrespondences();
 
         //virtual void printSelf(unsigned int _ntabs = 0, std::ostream & _ost = std::cout) const;
 };

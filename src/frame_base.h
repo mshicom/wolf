@@ -91,7 +91,7 @@ class FrameBase : public NodeLinked<TrajectoryBase,CaptureBase>
         
         CaptureBaseList* getCaptureListPtr();
         
-        FrameBase* getPreviousFrame() const;
+        FrameBasePtr getPreviousFrame() const;
 
         //const Eigen::Vector3s & state() const;
 

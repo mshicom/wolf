@@ -5,6 +5,7 @@
 
 //Wolf includes
 #include "feature_base.h"
+#include "correspondence_gps_2D.h"
 
 //class FeatureGPSFix
 class FeatureGPSFix : public FeatureBase

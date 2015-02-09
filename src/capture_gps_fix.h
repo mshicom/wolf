@@ -23,7 +23,9 @@ class CaptureGPSFix : public CaptureBase
         
         virtual void processCapture();
 
-        virtual Eigen::VectorXs computePrior() const = 0;
+        virtual Eigen::VectorXs computePrior() const;
+
+        virtual void findCorrespondences();
 
         //virtual void printSelf(unsigned int _ntabs = 0, std::ostream & _ost = std::cout) const;
 };

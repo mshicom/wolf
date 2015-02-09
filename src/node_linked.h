@@ -35,11 +35,11 @@ class NodeLinked : public NodeBase
 {
     public: 
         typedef UpperType* UpperNodePtr;
+        typedef LowerType* LowerNodePtr; // JVN: era protected
+        typedef std::shared_ptr<LowerType> LowerNodeShPtr; // JVN: era protected
         
     protected:        
-        typedef LowerType* LowerNodePtr;
         //typedef std::shared_ptr<UpperType> UpperNodeShPtr;
-        typedef std::shared_ptr<LowerType> LowerNodeShPtr;
         typedef std::list<LowerNodeShPtr> LowerNodeList;
         typedef typename LowerNodeList::iterator LowerNodeIter;
 
@@ -262,7 +262,9 @@ inline void NodeLinked<UpperType, LowerType>::linkToUpperNode(UpperNodePtr _pptr
     if (isTop())
         up_node_ptr_ = nullptr;
     else
+    {
         up_node_ptr_ = _pptr;
+    }
 }
 
 template<class UpperType, class LowerType>
