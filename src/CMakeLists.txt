@@ -34,6 +34,7 @@ SET(HDRS
     node_terminus.h
     node_linked.h
     sensor_base.h
+    sensor_laser_2D.h
     state_base.h
     state_point.h
     state_complex_angle.h
@@ -58,6 +59,7 @@ SET(SRCS
     node_base.cpp
     node_terminus.cpp
     sensor_base.cpp
+    sensor_laser_2D.cpp
     state_base.cpp
     state_complex_angle.cpp
     time_stamp.cpp
