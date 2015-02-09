@@ -144,8 +144,9 @@ class WolfManager
         		// COMPUTE CAPTURE (features, correspondences)
         		new_capture->processCapture();
 
-        		// LINK CAPTURE TO ITS FRAME
-        		new_capture->linkToFrame(trajectory_->getFrameListPtr()->back());
+        		// ADD CAPTURE TO ITS FRAME
+        		trajectory_->getFrameListPtr()->back()->addCapture(new_capture);
+        		//new_capture->linkToFrame(trajectory_->getFrameListPtr()->back());
 
         		// ADD CORRESPONDENCES TO THE new_correspondences OUTPUT PARAM
         		for (FeatureBaseIter feature_list_iter=new_capture->getFeatureListPtr()->begin(); feature_list_iter!=new_capture->getFeatureListPtr()->end(); feature_list_iter++)

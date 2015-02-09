@@ -56,7 +56,7 @@ inline void FrameBase::getTimeStamp(TimeStamp & _ts) const
     _ts = time_stamp_.get();
 }
 
-inline void FrameBase::addCapture(CaptureBaseShPtr & _capt_ptr)
+void FrameBase::addCapture(CaptureBaseShPtr & _capt_ptr)
 {
     addDownNode(_capt_ptr);
 }
