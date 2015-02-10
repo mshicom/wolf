@@ -25,22 +25,5 @@ FeatureOdom2D::~FeatureOdom2D()
 
 void FeatureOdom2D::findCorrespondences()
 {
-	if (getCapturePtr()->getFramePtr()->getOPtr()->getStateType() == ST_THETA)
-	{
-		CorrespondenceBaseShPtr odom_correspondence(new CorrespondenceOdom2DTheta(this,
-																				  getCapturePtr()->getFramePtr()->getPreviousFrame()->getPPtr(),
-																				  getCapturePtr()->getFramePtr()->getPreviousFrame()->getOPtr(),
-																				  getCapturePtr()->getFramePtr()->getPPtr(),
-																				  getCapturePtr()->getFramePtr()->getOPtr()));
-		addCorrespondence(odom_correspondence);
-	}
-	else
-	{
-		CorrespondenceBaseShPtr odom_correspondence(new CorrespondenceOdom2DComplexAngle(this,
-																					 	 getCapturePtr()->getFramePtr()->getPreviousFrame()->getPPtr(),
-																						 getCapturePtr()->getFramePtr()->getPreviousFrame()->getOPtr(),
-																						 getCapturePtr()->getFramePtr()->getPPtr(),
-																						 getCapturePtr()->getFramePtr()->getOPtr()));
-		addCorrespondence(odom_correspondence);
-	}
+
 }

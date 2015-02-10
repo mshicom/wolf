@@ -26,7 +26,7 @@ CaptureGPSFix::~CaptureGPSFix()
 void CaptureGPSFix::processCapture()
 {
     std::cout << "... processing GPS fix capture" << std::endl;
-    FeatureBaseShPtr new_feature(new FeatureGPSFix(CaptureBasePtr(this),data_));
+    FeatureBaseShPtr new_feature = FeatureBaseShPtr(new FeatureGPSFix(CaptureBasePtr(this),data_));
     addFeature(new_feature);
 }
 
@@ -37,7 +37,8 @@ Eigen::VectorXs CaptureGPSFix::computePrior() const
 
 void CaptureGPSFix::findCorrespondences()
 {
-
+	CorrespondenceBaseShPtr gps_correspondence(new CorrespondenceGPS2D(getFeatureListPtr()->front().get(), getFramePtr()->getPPtr()));
+	getFeatureListPtr()->front()->addCorrespondence(gps_correspondence);
 }
 
 //void CaptureGPSFix::printSelf(unsigned int _ntabs, std::ostream & _ost) const

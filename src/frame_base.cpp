@@ -60,21 +60,14 @@ inline void FrameBase::getTimeStamp(TimeStamp & _ts) const
 
 void FrameBase::setState(const Eigen::VectorXs& _st)
 {
-	if (p_ptr_)
-		std::cout << "p_ptr_->getStateSize()" <<p_ptr_->getStateSize()<< std::endl;
-
-	std::cout << "set state " << _st.transpose() << std::endl;
-	std::cout << "state size " << ((!p_ptr_ ? 0 : p_ptr_->getStateSize()) +
-								  (!o_ptr_ ? 0 : o_ptr_->getStateSize()) +
-								  (!v_ptr_ ? 0 : v_ptr_->getStateSize()) +
-								  (!w_ptr_ ? 0 : w_ptr_->getStateSize())) << std::endl;
 	assert(_st.size() == ((!p_ptr_ ? 0 : p_ptr_->getStateSize()) +
 						  (!o_ptr_ ? 0 : o_ptr_->getStateSize()) +
 						  (!v_ptr_ ? 0 : v_ptr_->getStateSize()) +
-						  (!w_ptr_ ? 0 : w_ptr_->getStateSize())) && "In FrameBase::setState wrong state size");
+						  (!w_ptr_ ? 0 : w_ptr_->getStateSize())) &&
+						  "In FrameBase::setState wrong state size");
 	assert(!!p_ptr_ && "in FrameBase::setState(), p_ptr_ is nullptr");
+
 	Eigen::Map<Eigen::VectorXs> state_map(p_ptr_->getPtr(), _st.size());
-	std::cout << "state mapped" << state_map.transpose() << std::endl;
 	state_map = _st;
 }
 

@@ -263,12 +263,10 @@ inline void NodeLinked<UpperType, LowerType>::linkToUpperNode(UpperNodePtr _pptr
 {
     if (isTop())
     {
-    	std::cout << "link tu upper node: is Top!\n";
         up_node_ptr_ = nullptr;
     }
     else
     {
-    	std::cout << "link tu upper node\n";
         up_node_ptr_ = _pptr;
     }
 }
@@ -296,16 +294,9 @@ inline const UpperType& NodeLinked<UpperType, LowerType>::upperNode() const
 template<class UpperType, class LowerType>
 inline void NodeLinked<UpperType, LowerType>::addDownNode(LowerNodeShPtr& _ptr)
 {
-	std::cout << "add down node\n";
-    if (!isBottom())
-    {
-    	std::cout << "down_node_list_.size() = " << down_node_list_.size() <<"\n";
-        down_node_list_.push_back(_ptr);
-    	std::cout << "added to the list\n";
-        down_node_list_.back()->linkToUpperNode( (typename LowerType::UpperNodePtr)(this) );
-    }
-    else
-    	std::cout << "is bottom!\n";
+	assert(!isBottom() && "Trying to add a down node to a bottom node");
+	down_node_list_.push_back(_ptr);
+	down_node_list_.back()->linkToUpperNode( (typename LowerType::UpperNodePtr)(this) );
 }
 
 template<class UpperType, class LowerType>
