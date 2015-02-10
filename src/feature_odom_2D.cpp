@@ -6,11 +6,11 @@ FeatureOdom2D::FeatureOdom2D(const CaptureBasePtr& _capt_ptr, unsigned int _dim_
     //
 }
 
-FeatureOdom2D::FeatureOdom2D(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement) :
-	FeatureBase(_capt_ptr, _measurement)
-{
-	//
-}
+//FeatureOdom2D::FeatureOdom2D(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement) :
+//	FeatureBase(_capt_ptr, _measurement)
+//{
+//	//
+//}
 
 FeatureOdom2D::FeatureOdom2D(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance) :
 	FeatureBase(_capt_ptr, _measurement, _meas_covariance)

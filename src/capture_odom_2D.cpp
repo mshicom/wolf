@@ -25,8 +25,7 @@ CaptureOdom2D::~CaptureOdom2D()
 
 inline void CaptureOdom2D::processCapture()
 {
-    std::cout << "... processing odom 2D capture" << std::endl;
-    FeatureBaseShPtr new_feature(new FeatureOdom2D(CaptureBasePtr(this),this->data_));
+    FeatureBaseShPtr new_feature(new FeatureOdom2D(CaptureBasePtr(this),data_,data_covariance_));
     addFeature(new_feature);
 }
 

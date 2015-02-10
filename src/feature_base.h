@@ -35,7 +35,8 @@ class FeatureBase : public NodeLinked<CaptureBase,CorrespondenceBase>
          * \param _measurement the measurement
          *
          */
-        FeatureBase(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement);
+        // measurement ha d'anar amb covariance, si cal, posem Identity com a default...
+        //FeatureBase(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement);
 
         /** \brief Constructor from capture pointer and measure
          *

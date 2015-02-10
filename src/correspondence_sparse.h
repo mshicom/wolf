@@ -125,15 +125,16 @@ class CorrespondenceSparse: public CorrespondenceBase
         {
             return state_block_ptr_vector_;
         }
-        
+
+        // Ja és a correspondence_base...
         /** \brief Returns a pointer to the mesaurement associated to this correspondence
-         * 
+         *
          * Returns a pointer to the mesaurement associated to this correspondence.
          * Measurement is owned by upper-level feature
          **/
-        const Eigen::VectorXs * getMeasurement() const 
-        {
-            return upperNode().getMeasurement();
-        }
+//        const Eigen::VectorXs * getMeasurement() const
+//        {
+//            return upperNode().getMeasurement();
+//        }
 };
 #endif

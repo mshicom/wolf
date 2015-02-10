@@ -37,6 +37,8 @@ SET(HDRS
     node_linked.h
     sensor_base.h
     sensor_laser_2D.h
+    sensor_odom_2D.h
+    sensor_gps_fix.h
     state_base.h
     state_point.h
     state_complex_angle.h
@@ -61,6 +63,8 @@ SET(SRCS
     node_terminus.cpp
     sensor_base.cpp
     sensor_laser_2D.cpp
+    sensor_odom_2D.cpp
+    sensor_gps_fix.cpp
     state_base.cpp
     state_complex_angle.cpp
     time_stamp.cpp
@@ -70,6 +74,8 @@ SET(SRCS
 IF (Ceres_FOUND)
     SET(SRCS ${SRCS} ceres_wrapper/complex_angle_parametrization.cpp)
     SET(HDRS ${HDRS} ceres_wrapper/complex_angle_parametrization.h)
+    SET(SRCS ${SRCS} ceres_wrapper/ceres_manager.cpp)
+    SET(HDRS ${HDRS} ceres_wrapper/ceres_manager.h)
 ENDIF(Ceres_FOUND)
 
 # create the shared library

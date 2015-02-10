@@ -1,6 +1,6 @@
 #include "sensor_laser_2D.h"
 
-SensorLaser2D::SensorLaser2D(const Eigen::VectorXs & _sp, unsigned int _nrays, double _apert, double _rmin, double _rmax) :
+SensorLaser2D::SensorLaser2D(const Eigen::VectorXs & _sp, unsigned int _nrays, WolfScalar _apert, WolfScalar _rmin, WolfScalar _rmax) :
         SensorBase(LIDAR, _sp, 4)
 //         SensorBase(LIDAR, _sp,{(WolfScalar)(_nrays), _apert, _rmin, _rmax})
 {

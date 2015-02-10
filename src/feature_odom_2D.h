@@ -26,7 +26,7 @@ class FeatureOdom2D : public FeatureBase
          * \param _measurement the measurement
          *
          */
-		FeatureOdom2D(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement);
+		//FeatureOdom2D(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement);
 
         /** \brief Constructor from capture pointer and measure
          *

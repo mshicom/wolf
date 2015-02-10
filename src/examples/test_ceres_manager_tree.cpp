@@ -13,13 +13,14 @@
 #include <eigen3/Eigen/Geometry>
 
 //Ceres includes
-#include "ceres/jet.h"
 #include "ceres/ceres.h"
 #include "glog/logging.h"
 
 //Wolf includes
 #include "wolf.h"
 #include "sensor_base.h"
+#include "sensor_odom_2D.h"
+#include "sensor_gps_fix.h"
 #include "frame_base.h"
 #include "state_point.h"
 #include "state_complex_angle.h"
@@ -33,8 +34,8 @@
 #include "correspondence_odom_2D_theta.h"
 #include "correspondence_odom_2D_complex_angle.h"
 
-// ceres wrapper includes
-#include "ceres_wrapper/complex_angle_parametrization.h"
+// ceres wrapper include
+#include "ceres_wrapper/ceres_manager.h"
 
 /**
  * This test implements an optimization using CERES of a vehicle trajectory using odometry and GPS simulated data.
@@ -69,12 +70,11 @@ class WolfManager
         	else
         		init_frame << 0, 0, 0;
         	createFrame(init_frame, 0);
-
-    		std::cout << "first frame created\n";
 		}
 
         virtual ~WolfManager()
         {
+        	delete trajectory_;
 //        	std::cout << "Destroying WolfManager...\n";
 //        	std::cout << "Clearing correspondences_...\n";
 //        	correspondences_.clear();
@@ -165,10 +165,6 @@ class WolfManager
 						new_correspondences.push_back((*correspondence_list_iter).get());
 					}
 				}
-
-        		// PRINT TREE
-        		std::cout << "TREE AFTER ADDING A CAPTURE\n\n";
-        		trajectory_->print();
         	}
         }
 
@@ -179,9 +175,6 @@ class WolfManager
 
         std::list<StateBasePtr> getStateList()
 		{
-
-    		std::cout << "getStateList...\n";
-
         	std::list<StateBasePtr> st_list;
 
         	for (FrameBaseIter frame_list_iter=trajectory_->getFrameListPtr()->begin(); frame_list_iter!=trajectory_->getFrameListPtr()->end(); frame_list_iter++)
@@ -210,197 +203,16 @@ class WolfManager
 			}
         	return corr_list;
         }
-};
 
-class CeresManager
-{
-	protected:
-
-		std::vector<std::pair<ceres::ResidualBlockId, CorrespondenceBasePtr>> correspondence_list_;
-		ceres::Problem* ceres_problem_;
-
-	public:
-		CeresManager(ceres::Problem* _ceres_problem) :
-			ceres_problem_(_ceres_problem)
-		{
-		}
-
-		~CeresManager()
-		{
-//			std::vector<double*> state_units;
-//			ceres_problem_->GetParameterBlocks(&state_units);
-//
-//			for (uint i = 0; i< state_units.size(); i++)
-//				removeStateUnit(state_units.at(i));
-//
-//			std::cout << "all state units removed! \n";
-			std::cout << "residuals: " << ceres_problem_->NumResiduals() << "\n";
-			std::cout << "parameters: " << ceres_problem_->NumParameters() << "\n";
-		}
-
-		ceres::Solver::Summary solve(const ceres::Solver::Options& _ceres_options)
-		{
-			// create summary
-			ceres::Solver::Summary ceres_summary_;
-
-			// run Ceres Solver
-			ceres::Solve(_ceres_options, ceres_problem_, &ceres_summary_);
-
-			//display results
-			return ceres_summary_;
-		}
-
-		void addCorrespondences(std::list<CorrespondenceBasePtr>& _new_correspondences)
-		{
-			//std::cout << _new_correspondences.size() << " new correspondences\n";
-			while (!_new_correspondences.empty())
-			{
-				addCorrespondence(_new_correspondences.front());
-				_new_correspondences.pop_front();
-			}
-		}
-
-		void removeCorrespondences()
-		{
-			for (uint i = 0; i<correspondence_list_.size(); i++)
-			{
-				ceres_problem_->RemoveResidualBlock(correspondence_list_.at(i).first);
-			}
-			correspondence_list_.clear();
-			std::cout << ceres_problem_->NumResidualBlocks() << " residual blocks \n";
-		}
-
-		void addCorrespondence(const CorrespondenceBasePtr& _corr_ptr)
-		{
-			ceres::ResidualBlockId blockIdx = ceres_problem_->AddResidualBlock(createCostFunction(_corr_ptr), NULL, _corr_ptr->getStateBlockPtrVector());
-			correspondence_list_.push_back(std::pair<ceres::ResidualBlockId, CorrespondenceBasePtr>(blockIdx,_corr_ptr));
-		}
-
-		void addStateUnits(std::list<StateBasePtr>& _new_state_units)
-		{
-			while (!_new_state_units.empty())
-			{
-				addStateUnit(_new_state_units.front());
-				_new_state_units.pop_front();
-			}
-		}
-
-		void removeStateUnit(WolfScalar* _st_ptr)
-		{
-			ceres_problem_->RemoveParameterBlock(_st_ptr);
-		}
-
-		void addStateUnit(const StateBasePtr& _st_ptr)
-		{
-			//std::cout << "Adding a State Unit to wolf_problem... " << std::endl;
-			//_st_ptr->print();
-
-			switch (_st_ptr->getStateType())
-			{
-				case ST_COMPLEX_ANGLE:
-				{
-					//std::cout << "Adding Complex angle Local Parametrization to the List... " << std::endl;
-					//ceres_problem_->SetParameterization(_st_ptr->getPtr(), new ComplexAngleParameterization);
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StateComplexAngle*)_st_ptr)->BLOCK_SIZE, new ComplexAngleParameterization);
-					break;
-				}
-//				case PARAM_QUATERNION:
-//				{
-//					std::cout << "Adding Quaternion Local Parametrization to the List... " << std::endl;
-//					ceres_problem_->SetParameterization(_st_ptr->getPtr(), new EigenQuaternionParameterization);
-//					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StateQuaternion*)_st_ptr.get())->BLOCK_SIZE, new QuaternionParameterization);
-//					break;
-//				}
-				case ST_POINT_1D:
-				case ST_THETA:
-				{
-					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint1D*)_st_ptr)->BLOCK_SIZE, nullptr);
-					break;
-				}
-				case ST_POINT_2D:
-				{
-					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint2D*)_st_ptr)->BLOCK_SIZE, nullptr);
-					break;
-				}
-				case ST_POINT_3D:
-				{
-					//std::cout << "No Local Parametrization to be added" << std::endl;
-					ceres_problem_->AddParameterBlock(_st_ptr->getPtr(), ((StatePoint3D*)_st_ptr)->BLOCK_SIZE, nullptr);
-					break;
-				}
-				default:
-					std::cout << "Unknown  Local Parametrization type!" << std::endl;
-			}
-		}
-
-		ceres::CostFunction* createCostFunction(const CorrespondenceBasePtr& _corrPtr)
-		{
-			switch (_corrPtr->getCorrespondenceType())
-			{
-				case CORR_GPS_FIX_2D:
-				{
-					CorrespondenceGPS2D* specific_ptr = (CorrespondenceGPS2D*)(_corrPtr);
-					return new ceres::AutoDiffCostFunction<CorrespondenceGPS2D,
-															specific_ptr->measurementSize,
-															specific_ptr->block0Size,
-															specific_ptr->block1Size,
-															specific_ptr->block2Size,
-															specific_ptr->block3Size,
-															specific_ptr->block4Size,
-															specific_ptr->block5Size,
-															specific_ptr->block6Size,
-															specific_ptr->block7Size,
-															specific_ptr->block8Size,
-															specific_ptr->block9Size>(specific_ptr);
-					break;
-				}
-				case CORR_ODOM_2D_COMPLEX_ANGLE:
-				{
-					CorrespondenceOdom2DComplexAngle* specific_ptr = (CorrespondenceOdom2DComplexAngle*)(_corrPtr);
-					return new ceres::AutoDiffCostFunction<CorrespondenceOdom2DComplexAngle,
-															specific_ptr->measurementSize,
-															specific_ptr->block0Size,
-															specific_ptr->block1Size,
-															specific_ptr->block2Size,
-															specific_ptr->block3Size,
-															specific_ptr->block4Size,
-															specific_ptr->block5Size,
-															specific_ptr->block6Size,
-															specific_ptr->block7Size,
-															specific_ptr->block8Size,
-															specific_ptr->block9Size>(specific_ptr);
-					break;
-				}
-				case CORR_ODOM_2D_THETA:
-				{
-					CorrespondenceOdom2DTheta* specific_ptr = (CorrespondenceOdom2DTheta*)(_corrPtr);
-					return new ceres::AutoDiffCostFunction<CorrespondenceOdom2DTheta,
-															specific_ptr->measurementSize,
-															specific_ptr->block0Size,
-															specific_ptr->block1Size,
-															specific_ptr->block2Size,
-															specific_ptr->block3Size,
-															specific_ptr->block4Size,
-															specific_ptr->block5Size,
-															specific_ptr->block6Size,
-															specific_ptr->block7Size,
-															specific_ptr->block8Size,
-															specific_ptr->block9Size>(specific_ptr);
-					break;
-				}
-				default:
-					std::cout << "Unknown correspondence type! Please add it in the CeresWrapper::createCostFunction()" << std::endl;
-
-					return nullptr;
-			}
-		}
+        void printTree()
+        {
+        	trajectory_->print();
+        }
 };
 
 int main(int argc, char** argv) 
 {
-	std::cout << " ========= 2D Robot with odometry and GPS ===========\n\n";
+	std::cout << "\n ========= 2D Robot with odometry and GPS ===========\n";
 
     // USER INPUT ============================================================================================
 	if (argc!=3 || atoi(argv[1])<1 || atoi(argv[2]) < 0 || atoi(argv[2]) > 1)
@@ -422,9 +234,11 @@ int main(int argc, char** argv)
 
 	// INITIALIZATION ============================================================================================
 	//init random generators
+	WolfScalar odom_std= 0.01;
+	WolfScalar gps_std= 1;
 	std::default_random_engine generator(1);
-	std::normal_distribution<WolfScalar> distribution_odom(0.001,0.01); //odometry noise
-	std::normal_distribution<WolfScalar> distribution_gps(0.0,1); //GPS noise
+	std::normal_distribution<WolfScalar> distribution_odom(0.001, odom_std); //odometry noise
+	std::normal_distribution<WolfScalar> distribution_gps(0.0, gps_std); //GPS noise
 
 	//init google log
 	google::InitGoogleLogging(argv[0]);
@@ -453,9 +267,9 @@ int main(int argc, char** argv)
 	std::list<CorrespondenceBasePtr> new_correspondences; // new correspondences in wolf that must be added to ceres
 
 	// Wolf manager initialization
-	SensorBasePtr odom_sensor = SensorBasePtr(new SensorBase(ODOM_2D, Eigen::MatrixXs::Zero(3,1),0));
-	SensorBasePtr gps_sensor  = SensorBasePtr(new SensorBase(GPS_FIX, Eigen::MatrixXs::Zero(3,1),0));
-	WolfManager* wolf_manager = new WolfManager(odom_sensor, n_execution * (complex_angle ? 4 : 3), complex_angle);
+	SensorOdom2D odom_sensor(Eigen::MatrixXs::Zero(3,1), odom_std, odom_std);
+	SensorGPSFix gps_sensor(Eigen::MatrixXs::Zero(3,1), gps_std);
+	WolfManager* wolf_manager = new WolfManager(&odom_sensor, n_execution * (complex_angle ? 4 : 3), complex_angle);
 
 	// Initial pose
 	pose_true << 0,0,0;
@@ -491,26 +305,26 @@ int main(int argc, char** argv)
 		pose_odom(2) = pose_odom(2) + odom_readings(ii*2+1);
 		odom_trajectory.segment(ii*3,3) << pose_odom;
 	}
-	std::cout << "sensor data created!\n";
 
 	// START TRAJECTORY ============================================================================================
     new_state_units = wolf_manager->getStateList(); // First pose to be added in ceres
     for (uint step=1; step < n_execution; step++)
 	{
-    	std::cout << "adding new sensor captures...\n";
     	// adding new sensor captures
-		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureOdom2D(TimeStamp(step*0.01), odom_sensor, odom_readings.segment(step*2,2))));
-		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureGPSFix(TimeStamp(step*0.01), gps_sensor, gps_fix_readings.segment(step*3,3))));
-		std::cout << "updating problem...\n";
+		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureOdom2D(TimeStamp(step*0.01), &odom_sensor, odom_readings.segment(step*2,2), odom_std * MatrixXs::Identity(2,2))));
+		wolf_manager->addCapture(CaptureBaseShPtr(new CaptureGPSFix(TimeStamp(step*0.01), &gps_sensor, gps_fix_readings.segment(step*3,3), gps_std * MatrixXs::Identity(3,3))));
+
 		// updating problem
 		wolf_manager->update(new_state_units, new_correspondences);
-		std::cout << "sadding new state units and correspondences to ceres...\n";
+
 		// adding new state units and correspondences to ceres
 		ceres_manager->addStateUnits(new_state_units);
 		ceres_manager->addCorrespondences(new_correspondences);
 	}
 
-	std::cout << "solving...\n";
+	//std::cout << "Resulting tree:\n";
+	//wolf_manager->printTree();
+
     // SOLVE OPTIMIZATION ============================================================================================
 	ceres::Solver::Summary summary = ceres_manager->solve(ceres_options);
 	t2=clock();
@@ -550,13 +364,10 @@ int main(int argc, char** argv)
 		std::cout << std::endl << "Failed to write the file " << filepath << std::endl;
 
     std::cout << " ========= END ===========" << std::endl << std::endl;
-    //ceres_manager->removeCorrespondences();
-    delete wolf_manager;
-    std::cout << "everything deleted!\n";
+
     delete ceres_manager;
-    std::cout << "...deleted!\n";
     delete ceres_problem;
-    std::cout << "amost... deleted!\n";
+    delete wolf_manager;
 
     //exit
     return 0;

@@ -25,7 +25,7 @@ class SensorLaser2D : public SensorBase
          * \param _rmax maximum range [m]
          * 
          **/
-        SensorLaser2D(const Eigen::VectorXs & _sp, unsigned int _nrays, double _apert, double _rmin, double _rmax);
+        SensorLaser2D(const Eigen::VectorXs & _sp, unsigned int _nrays, WolfScalar _apert, WolfScalar _rmin, WolfScalar _rmax);
         
         /** \brief Destructor
          * 

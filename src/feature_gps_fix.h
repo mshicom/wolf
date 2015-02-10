@@ -25,7 +25,7 @@ class FeatureGPSFix : public FeatureBase
          * \param _measurement the measurement
          *
          */
-		FeatureGPSFix(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement);
+		//FeatureGPSFix(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement);
 
         /** \brief Constructor from capture pointer and measure
          *

@@ -25,8 +25,7 @@ CaptureGPSFix::~CaptureGPSFix()
 
 void CaptureGPSFix::processCapture()
 {
-    std::cout << "... processing GPS fix capture" << std::endl;
-    FeatureBaseShPtr new_feature = FeatureBaseShPtr(new FeatureGPSFix(CaptureBasePtr(this),data_));
+    FeatureBaseShPtr new_feature = FeatureBaseShPtr(new FeatureGPSFix(CaptureBasePtr(this),data_,data_covariance_));
     addFeature(new_feature);
 }
 

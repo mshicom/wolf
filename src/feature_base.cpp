@@ -7,12 +7,12 @@ FeatureBase::FeatureBase(const CaptureBasePtr& _capt_ptr, unsigned int _dim_meas
     //
 }
 
-FeatureBase::FeatureBase(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement) :
-	NodeLinked(MID, "FEATURE", _capt_ptr),
-	measurement_(_measurement)
-{
-	//
-}
+//FeatureBase::FeatureBase(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement) :
+//	NodeLinked(MID, "FEATURE", _capt_ptr),
+//	measurement_(_measurement)
+//{
+//	//
+//}
 
 FeatureBase::FeatureBase(const CaptureBasePtr& _capt_ptr, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance) :
 	NodeLinked(MID, "FEATURE", _capt_ptr),
@@ -82,4 +82,6 @@ void FeatureBase::printSelf(unsigned int _ntabs, std::ostream & _ost) const
     NodeLinked::printSelf(_ntabs, _ost);
     printTabs(_ntabs);
     _ost << "\tMeasurement: ( " << measurement_.transpose() << " )" << std::endl;
+    printTabs(_ntabs);
+    _ost << "\tMeasurement covariance: ( " << measurement_covariance_ << " )" << std::endl;
 }
