@@ -11,6 +11,7 @@ FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const TimeStamp& _ts, 
 			w_ptr_(_w_ptr)
 {
 	//
+	std::cout << "frame created\n";
 }
 
 FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const FrameType & _tp, const TimeStamp& _ts, const StateBaseShPtr& _p_ptr, const StateBaseShPtr& _o_ptr, const StateBaseShPtr& _v_ptr, const StateBaseShPtr& _w_ptr) :
@@ -23,6 +24,7 @@ FrameBase::FrameBase(const TrajectoryBasePtr & _traj_ptr, const FrameType & _tp,
 			w_ptr_(_w_ptr)
 {
     //
+	std::cout << "frame created\n";
 }
                 
 FrameBase::~FrameBase()
@@ -56,6 +58,26 @@ inline void FrameBase::getTimeStamp(TimeStamp & _ts) const
     _ts = time_stamp_.get();
 }
 
+void FrameBase::setState(const Eigen::VectorXs& _st)
+{
+	if (p_ptr_)
+		std::cout << "p_ptr_->getStateSize()" <<p_ptr_->getStateSize()<< std::endl;
+
+	std::cout << "set state " << _st.transpose() << std::endl;
+	std::cout << "state size " << ((!p_ptr_ ? 0 : p_ptr_->getStateSize()) +
+								  (!o_ptr_ ? 0 : o_ptr_->getStateSize()) +
+								  (!v_ptr_ ? 0 : v_ptr_->getStateSize()) +
+								  (!w_ptr_ ? 0 : w_ptr_->getStateSize())) << std::endl;
+	assert(_st.size() == ((!p_ptr_ ? 0 : p_ptr_->getStateSize()) +
+						  (!o_ptr_ ? 0 : o_ptr_->getStateSize()) +
+						  (!v_ptr_ ? 0 : v_ptr_->getStateSize()) +
+						  (!w_ptr_ ? 0 : w_ptr_->getStateSize())) && "In FrameBase::setState wrong state size");
+	assert(!!p_ptr_ && "in FrameBase::setState(), p_ptr_ is nullptr");
+	Eigen::Map<Eigen::VectorXs> state_map(p_ptr_->getPtr(), _st.size());
+	std::cout << "state mapped" << state_map.transpose() << std::endl;
+	state_map = _st;
+}
+
 void FrameBase::addCapture(CaptureBaseShPtr & _capt_ptr)
 {
     addDownNode(_capt_ptr);
@@ -84,14 +106,13 @@ FrameBase* FrameBase::getPreviousFrame() const
     //look for the position of this node in the upper list (frame list of trajectory)
     for ( f_it = f_list_ptr->begin(); f_it != f_list_ptr->end(); ++f_it )
     {
-        if ( this->node_id_ == (f_it->get())->nodeId() ) break;
+        if ( this->node_id_ == (f_it->get())->nodeId() ){
+        	f_it--;
+			return f_it->get();
+        }
     }
-    
-    //check degenerate case
-    if (f_it == f_list_ptr->begin()) 
-        return nullptr;
-    else 
-        return (f_it--)->get();
+    std::cout << "previous frame not found!" << std::endl;
+    return nullptr;
 }
 
 //inline const Eigen::Vector3s & FrameBase::state() const

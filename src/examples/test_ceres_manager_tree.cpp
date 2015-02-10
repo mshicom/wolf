@@ -60,6 +60,7 @@ class WolfManager
         	state_(_state_length),
 			first_empty_state_(0),
         	use_complex_angles_(_complex_angle),
+			trajectory_(new TrajectoryBase()),
 			sensor_prior_(_sensor_prior)
 		{
         	VectorXs init_frame(use_complex_angles_ ? 4 : 3);
@@ -90,8 +91,10 @@ class WolfManager
 
         void createFrame(const VectorXs& _frame_state, const TimeStamp& _time_stamp)
         {
+        	std::cout << "Creating frame...\n";
         	// Store in state_
         	state_.segment(first_empty_state_, use_complex_angles_ ? 4 : 3) << _frame_state;
+        	std::cout << "state segment stored\n";
 
         	// Create frame and add it to the trajectory
         	if (use_complex_angles_)
@@ -110,8 +113,12 @@ class WolfManager
 													   StateBaseShPtr(new StateTheta(state_.data()+first_empty_state_+2))));
         		trajectory_->addFrame(new_frame);
         	}
+        	std::cout << "frame created and added to the trajectory\n";
+        	trajectory_->print();
+
         	// Update first free state location index
         	first_empty_state_ += use_complex_angles_ ? 4 : 3;
+        	std::cout << "first empty index updated\n";
         }
 
         void addCapture(const CaptureBaseShPtr& _capture)
@@ -125,6 +132,7 @@ class WolfManager
         	while (!new_captures_.empty())
         	{
         		// EXTRACT NEW CAPTURE
+        		std::cout << "EXTRACT NEW CAPTURE\n";
         		CaptureBaseShPtr new_capture = new_captures_.front();
         		new_captures_.pop();
 
@@ -132,23 +140,36 @@ class WolfManager
         		// TODO: accumulate odometries
         		if (new_capture->getSensorPtr() == sensor_prior_)
         		{
-        			VectorXs pose_predicted = new_capture->computePrior();
-					createFrame(pose_predicted, new_capture->getTimeStamp());
+        			std::cout << "createFrame\n";
+					createFrame(VectorXs::Zero(use_complex_angles_ ? 4 : 3), new_capture->getTimeStamp());
+
+					// ADD CAPTURE TO THE NEW FRAME
+					std::cout << "ADD CAPTURE TO ITS FRAME\n";
+					trajectory_->getFrameListPtr()->back()->addCapture(new_capture);
+
+					// COMPUTE PRIOR
+        			std::cout << "computePrior\n";
+        			trajectory_->getFrameListPtr()->back()->setState(new_capture->computePrior());
 
 					// TODO: Change by something like...
 					//new_state_units.insert(new_state_units.end(), trajectory_.getFrameList.back()->getStateList().begin(), trajectory_.getFrameList.back()->getStateList().end());
+					std::cout << "NEW state units\n";
 					new_state_units.push_back(trajectory_->getFrameListPtr()->back()->getPPtr().get());
 					new_state_units.push_back(trajectory_->getFrameListPtr()->back()->getOPtr().get());
         		}
+        		else
+        		{
+        			// ADD CAPTURE TO THE NEW FRAME
+					std::cout << "ADD CAPTURE TO ITS FRAME\n";
+					trajectory_->getFrameListPtr()->back()->addCapture(new_capture);
+        		}
 
         		// COMPUTE CAPTURE (features, correspondences)
+        		std::cout << "COMPUTE CAPTURE\n";
         		new_capture->processCapture();
 
-        		// ADD CAPTURE TO ITS FRAME
-        		trajectory_->getFrameListPtr()->back()->addCapture(new_capture);
-        		//new_capture->linkToFrame(trajectory_->getFrameListPtr()->back());
-
         		// ADD CORRESPONDENCES TO THE new_correspondences OUTPUT PARAM
+        		std::cout << "ADD CORRESPONDENCES\n";
         		for (FeatureBaseIter feature_list_iter=new_capture->getFeatureListPtr()->begin(); feature_list_iter!=new_capture->getFeatureListPtr()->end(); feature_list_iter++)
 				{
 					for (CorrespondenceBaseIter correspondence_list_iter=(*feature_list_iter)->getCorrespondenceListPtr()->begin(); correspondence_list_iter!=(*feature_list_iter)->getCorrespondenceListPtr()->end(); correspondence_list_iter++)

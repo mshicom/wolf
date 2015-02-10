@@ -48,6 +48,13 @@ class StateComplexAngle : public StateBase
 		 **/
 		virtual stateType getStateType() const;
 
+		/** \brief Returns the state unit size
+		 *
+		 * Returns the parametrizationType (see wolf.h) of the state unit
+		 *
+		 **/
+		virtual unsigned int getStateSize() const;
+
         /** \brief Prints all the elements of the state unit
 		 *
 		 * Prints all the elements of the state unit

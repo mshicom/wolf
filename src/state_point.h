@@ -28,6 +28,7 @@ class StatePoint : public StateBase
 			StateBase(_st_remote, _idx)
 		{
 			//
+        	std::cout << "state point created\n";
 		}
 
         /** \brief Constructor with scalar pointer
@@ -68,6 +69,16 @@ class StatePoint : public StateBase
 				case 3:
 					return ST_POINT_3D;
 			}
+		}
+
+		/** \brief Returns the state unit size
+		 *
+		 * Returns the parametrizationType (see wolf.h) of the state unit
+		 *
+		 **/
+		virtual unsigned int getStateSize() const
+		{
+			return BLOCK_SIZE;
 		}
 
         /** \brief Prints all the elements of the state unit

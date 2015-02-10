@@ -13,6 +13,7 @@ TrajectoryBase::~TrajectoryBase()
 
 void TrajectoryBase::addFrame(FrameBaseShPtr& _frame_ptr)
 {
+	std::cout << "adding frame\n";
 	addDownNode(_frame_ptr);
 }
 

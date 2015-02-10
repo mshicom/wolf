@@ -35,10 +35,10 @@ class NodeLinked : public NodeBase
 {
     public: 
         typedef UpperType* UpperNodePtr;
-        typedef LowerType* LowerNodePtr; // JVN: era protected
-        typedef std::shared_ptr<LowerType> LowerNodeShPtr; // JVN: era protected
         
     protected:        
+        typedef LowerType* LowerNodePtr;
+        typedef std::shared_ptr<LowerType> LowerNodeShPtr;
         //typedef std::shared_ptr<UpperType> UpperNodeShPtr;
         typedef std::list<LowerNodeShPtr> LowerNodeList;
         typedef typename LowerNodeList::iterator LowerNodeIter;
@@ -219,14 +219,16 @@ template<class UpperType, class LowerType>
 NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _label) :
         NodeBase(_label), //
         location_(_loc), //
-        up_node_ptr_(nullptr)
+        up_node_ptr_(nullptr),
+		down_node_list_()
 {
 }
 
 template<class UpperType, class LowerType>
 NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _label, const UpperNodePtr& _up_node_ptr) :
         NodeBase(_label), //
-        location_(_loc)
+        location_(_loc),
+		down_node_list_()
 {
     linkToUpperNode(_up_node_ptr);
 }
@@ -260,9 +262,13 @@ template<class UpperType, class LowerType>
 inline void NodeLinked<UpperType, LowerType>::linkToUpperNode(UpperNodePtr _pptr)
 {
     if (isTop())
+    {
+    	std::cout << "link tu upper node: is Top!\n";
         up_node_ptr_ = nullptr;
+    }
     else
     {
+    	std::cout << "link tu upper node\n";
         up_node_ptr_ = _pptr;
     }
 }
@@ -290,11 +296,16 @@ inline const UpperType& NodeLinked<UpperType, LowerType>::upperNode() const
 template<class UpperType, class LowerType>
 inline void NodeLinked<UpperType, LowerType>::addDownNode(LowerNodeShPtr& _ptr)
 {
+	std::cout << "add down node\n";
     if (!isBottom())
     {
+    	std::cout << "down_node_list_.size() = " << down_node_list_.size() <<"\n";
         down_node_list_.push_back(_ptr);
+    	std::cout << "added to the list\n";
         down_node_list_.back()->linkToUpperNode( (typename LowerType::UpperNodePtr)(this) );
     }
+    else
+    	std::cout << "is bottom!\n";
 }
 
 template<class UpperType, class LowerType>

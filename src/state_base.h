@@ -54,6 +54,13 @@ class StateBase
 		 *
 		 **/
 		virtual stateType getStateType() const = 0;
+
+		/** \brief Returns the state unit size
+		 *
+		 * Returns the parametrizationType (see wolf.h) of the state unit
+		 *
+		 **/
+		virtual unsigned int getStateSize() const = 0;
         
         /** \brief Prints all the elements of the state unit
 		 *
