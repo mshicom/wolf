@@ -29,7 +29,7 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
         Eigen::Vector3s inverse_sensor_pose_; ///< World pose in the sensor frame: inverse of the global_pose_. TODO: use state units
         
     public:
-        CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr);
+        CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr);//TODO: to be removed ??
         
         CaptureBase(const TimeStamp& _ts, const SensorBasePtr& _sensor_ptr, const Eigen::VectorXs& _data);
 
@@ -58,21 +58,21 @@ class CaptureBase : public NodeLinked<FrameBase,FeatureBase>
          **/                
         const FrameBasePtr getFramePtr() const;
         
-        /** \brief Gets a reference to feature list
+        /** \brief Gets a pointer to feature list
          * 
-         * Gets a reference to feature list
+         * Gets a pointer to feature list
          *
          **/                        
-//         FeatureBaseList & getFeatureList() const;
-        
         FeatureBaseList* getFeatureListPtr();
         
-        /** \brief Gets a const reference to correspondence list
+        /** \brief Fills the provided list with all correspondences related to this capture
          *
-         * Gets a const reference to correspondence list
+         * Fills the provided list with all correspondences related to this capture
+         * 
          *
          **/
-        const CorrespondenceBaseList getCorrespondenceList() const;
+        //const CorrespondenceBaseList getCorrespondenceList() const;
+        void getCorrespondenceList(CorrespondenceBaseList & _corr_list);//TODO: Should be const
 
         TimeStamp getTimeStamp() const;
 

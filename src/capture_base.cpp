@@ -48,16 +48,26 @@ const FrameBasePtr CaptureBase::getFramePtr() const
     return upperNodePtr();
 }
 
-// FeatureBaseList & CaptureBase::getFeatureList() const
-// {
-//     return downNodeList();
-// }
-
 FeatureBaseList* CaptureBase::getFeatureListPtr()
 {
     return getDownNodeListPtr();
 }
 
+void CaptureBase::getCorrespondenceList(CorrespondenceBaseList & _corr_list)
+{
+    std::list<FeatureBaseShPtr>::iterator f_it;
+    std::list<CorrespondenceBaseShPtr>* c_list_ptr;
+    std::list<CorrespondenceBaseShPtr>::iterator c_it;
+    
+    for( f_it = down_node_list_.begin(); f_it != down_node_list_.end(); ++f_it)
+    {
+        c_list_ptr = (f_it->get())->getCorrespondenceListPtr();
+        for( c_it = c_list_ptr->begin(); c_it != c_list_ptr->end(); ++c_it)
+        {
+            _corr_list.push_back(*c_it);
+        }
+    }
+}
 
 TimeStamp CaptureBase::getTimeStamp() const
 {
@@ -102,7 +112,7 @@ void CaptureBase::setDataCovariance(const Eigen::MatrixXs& _data_cov)
 
 void CaptureBase::processCapture()
 {
-    std::cout << "... processing capture" << std::endl;
+    std::cout << "CaptureBase::processCapture()... processing capture" << std::endl;
 }
 
 void CaptureBase::printSelf(unsigned int _ntabs, std::ostream & _ost) const

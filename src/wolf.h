@@ -243,9 +243,10 @@ typedef CorrespondenceBaseList::iterator CorrespondenceBaseIter;
 typedef std::shared_ptr<RawBase> RawShPtr;
 typedef RawBase* RawPtr;
 
-// - Sensor
+// - Sensors
 typedef std::shared_ptr<SensorBase> SensorBaseShPtr;
 typedef SensorBase* SensorBasePtr;
+typedef SensorLaser2D* SensorLaser2DPtr;
 
 // - transSensor
 typedef std::shared_ptr<TransSensor> TransSensorShPtr;

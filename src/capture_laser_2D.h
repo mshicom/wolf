@@ -17,7 +17,7 @@ class CaptureLaser2D : public CaptureBase
          * Constructor
          * 
          **/
-        CaptureLaser2D(double _ts, const SensorLaser2D & _sensor_ptr, const Eigen::VectorXs& _ranges, const double & _std_dev);
+        CaptureLaser2D(const TimeStamp & _ts, const SensorLaser2DPtr & _sensor_ptr, const Eigen::VectorXs& _ranges);
 
         /** \brief Destructor
          * 
@@ -40,37 +40,4 @@ class CaptureLaser2D : public CaptureBase
          **/
         virtual void extractCorners();
 };
-
-////////////////////////////////
-// IMPLEMENTATION
-////////////////////////////////
-
-
-inline CaptureLaser2D::CaptureLaser2D(const FrameShPtr& _frm_ptr, const SensorShPtr& _sen_ptr, const NodeLocation _loc) :
-        Capture(_frm_ptr, _sen_ptr, _loc)
-{
-    // 
-}
-
-inline CaptureLaser2D::~CaptureLaser2D()
-{
-    //
-}
-
-inline void CaptureLaser2D::processCapture()
-{
-    extractCorners();
-}
-
-inline void CaptureLaser2D::extractCorners()
-{
-    std::cout << "Extracting corners ... " << std::endl;
-    //TODO by Andreu: create class FeatureCorner2D + main to test this method.
-    //TODO by Juan AC
-    // Laser ranges are at data_
-    // Scan size is data_.size()
-    // Corners should be created as FeatureCorner2D. Corner 3 params to be stored at FeatureBase::measurement_ 
-    // After creation, they have to be pushed back to down_node_list_ by means of the method Capture::addFeature(const FeatureShPtr& _f_ptr)  
-}
-
 #endif /* CAPTURE_LASER_2D_H_ */

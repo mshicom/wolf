@@ -23,9 +23,10 @@ class SensorLaser2D : public SensorBase
          * \param _apert angular aperture [rad]
          * \param _rmin minimum range [m]
          * \param _rmax maximum range [m]
+         * \param _range_stdev range standard deviation [m]
          * 
          **/
-        SensorLaser2D(const Eigen::VectorXs & _sp, unsigned int _nrays, WolfScalar _apert, WolfScalar _rmin, WolfScalar _rmax);
+        SensorLaser2D(const Eigen::VectorXs & _sp, unsigned int _nrays, WolfScalar _apert, WolfScalar _rmin, WolfScalar _rmax, WolfScalar _range_stdev);
         
         /** \brief Destructor
          * 

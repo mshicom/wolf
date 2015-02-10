@@ -20,6 +20,7 @@ SET(HDRS
     capture_base.h
     capture_relative.h
     capture_gps_fix.h
+    capture_laser_2D.h
     capture_odom_2D.h
     correspondence_base.h
     correspondence_sparse.h
@@ -51,6 +52,7 @@ SET(SRCS
     capture_base.cpp
     capture_relative.cpp
     capture_gps_fix.cpp
+    capture_laser_2D.cpp
     capture_odom_2D.cpp
     correspondence_base.cpp
     feature_base.cpp
