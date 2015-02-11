@@ -18,11 +18,5 @@ void CaptureLaser2D::processCapture()
 
 void CaptureLaser2D::extractCorners()
 {
-    std::cout << "Extracting corners ... " << std::endl;
-    //TODO by Andreu: create class FeatureCorner2D + main to test this method.
-    //TODO by Juan AC
-    // Laser ranges are at data_
-    // Scan size is data_.size()
-    // Corners should be created as FeatureCorner2D. Corner 3 params to be stored at FeatureBase::measurement_ 
-    // After creation, they have to be pushed back to down_node_list_ by means of the method Capture::addFeature(const FeatureShPtr& _f_ptr)  
+    
 }
