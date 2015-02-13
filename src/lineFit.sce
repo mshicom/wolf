@@ -2,10 +2,24 @@
 xdel(winsid());
 clear;
 
+//user inputs
+Nrays = 250;
+Aperture = %pi;
+r_max = 20;
+
+//create lines in the environment
+map
+
+//generate a scan
+for i=1:Nrays
+    azimuth = -Aperture/2 + (i/Nrays)*Aperture;
+    
+end
 
 //invent a set of points + noise
-points = [1 2 3 4 5 6;1 2 3 4 5 6];
-points = points + rand(points,"normal")*0.01;
+points = [-1 2 3 4 5 6;-1 2 3 4 5 6];
+//points = points(:,2:6);
+points = points + rand(points,"normal")*0.1;
 [xx N] = size(points);
 
 //build the system : Ax=0. Matrix A = a_ij
@@ -28,9 +42,21 @@ disp("line: ");disp(line);
 disp("m: ");disp(m);
 disp("xc: ");disp(xc);
 
+//error
+//line_norm = line./line(3);
+err = 0;
+for i=1:N
+    err = err + abs(line'*[points(:,i);1])/sqrt(line(1)^2+line(2)^2);
+end
+disp("error: "); disp(err/N);
+
 //plot
 fig1 = figure(0);
 fig1.background = 8;
 plot(points(1,:),points(2,:),"g.");
+point1 = [points(1,1) m*points(1,1)+xc];
+point2 = [points(1,N) m*points(1,N)+xc];
+xpoly([points(1,1) points(1,N)],[m*points(1,1)+xc m*points(1,N)+xc]);
+
 
 
