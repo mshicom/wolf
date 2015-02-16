@@ -1,27 +1,19 @@
+//info about 2D homogeneous lines and points: http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/BEARDSLEY/node2.html
+
 // clear all 
 xdel(winsid());
 clear;
 
-//user inputs
-Nrays = 250;
-Aperture = %pi;
-r_max = 20;
-r_stdev = 0.1;
+//User Tunning params
 Nw = 6; //window size
 theta_th = %pi/6;
+K = 3; //How many std_dev are tolerated to count that a point is supporting a line
+r_stdev = 0.1; //ranging std dev
 
 //init
 result_lines = [];
 line_indexes = [];
 corners = [];
-
-//create lines in the environment
-//map
-
-//generate a scan
-// for i=1:Nrays
-//     azimuth = -Aperture/2 + (i/Nrays)*Aperture;
-// end
 
 //invent a set of points + noise
 points = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24  25 26  27 28  29 30  31 32  33  34  35  36  37 38  39  40  41  42  43;
@@ -35,19 +27,27 @@ for (i = Nw:Np)
     points_w = points(:,(i-Nw+1):i)
 
     //Found the best fitting line over the window. Build the system: Ax=0. Matrix A = a_ij
+//    a_00 = sum( points_w(1,:).^2 );
+//    a_01 = sum( points_w(1,:).*points_w(2,:) );
+//    a_02 = sum( points_w(1,:) );
+//    a_10 = a_01;
+//    a_11 = sum( points_w(2,:).^2 );
+//    a_12 = sum( points_w(2,:) );
+//    a_20 = a_02;
+//    a_21 = a_12;
+//    a_22 = Nw;
+//    A = [a_00 a_01 a_02; a_10 a_11 a_12; a_20 a_21 a_22; 0 0 1];
     a_00 = sum( points_w(1,:).^2 );
     a_01 = sum( points_w(1,:).*points_w(2,:) );
     a_02 = sum( points_w(1,:) );
     a_10 = a_01;
     a_11 = sum( points_w(2,:).^2 );
     a_12 = sum( points_w(2,:) );
-    a_20 = a_02;
-    a_21 = a_12;
-    a_22 = Nw;
-    A = [a_00 a_01 a_02; a_10 a_11 a_12; a_20 a_21 a_22; 0 0 1];
+    A = [a_00 a_01 a_02; a_10 a_11 a_12; 0 0 1];
 
     //solve
-    line = pinv(A)*[zeros(3,1);1];
+//    line = pinv(A)*[zeros(3,1);1];
+    line = inv(A)*[0; 0; 1];
 
     //compute error
     err = 0;
@@ -58,7 +58,7 @@ for (i = Nw:Np)
     //disp("error: "); disp(err);
     
     //if error below stdev, add line to result set
-    if err < r_stdev then
+    if err < K*r_stdev then
         result_lines = [result_lines [line;points_w(:,1);points_w(:,$)]];
         line_indexes = [line_indexes i]; //ray index where the segment ends
     end    
