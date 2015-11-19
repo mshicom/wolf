@@ -1,8 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classCorrespondenceBase.html" title="CorrespondenceBase" alt="" coords="5,85,152,112"/>
-<area shape="rect" id="node2" href="$classCorrespondence1Sparse.html" title="Correspondence1Sparse\l\&lt; MEASUREMENT_SIZE, BLOCK\l_SIZE \&gt;" alt="" coords="200,5,429,61"/>
-<area shape="rect" id="node4" href="$classCorrespondence2Sparse.html" title="Correspondence2Sparse\l\&lt; MEASUREMENT_SIZE, BLOCK\l_1_SIZE, BLOCK_2_SIZE \&gt;" alt="" coords="200,136,429,192"/>
-<area shape="rect" id="node3" href="$classCorrespondence1SparseCeres.html" title="Correspondence1SparseCeres\l\&lt; MEASUREMENT_SIZE, BLOCK_SIZE \&gt;" alt="" coords="478,27,757,69"/>
-<area shape="rect" id="node5" href="$classCorrespondence2SparseCeres.html" title="Correspondence2SparseCeres\l\&lt; MEASUREMENT_SIZE, BLOCK\l_1_SIZE, BLOCK_2_SIZE \&gt;" alt="" coords="503,107,732,163"/>
-<area shape="rect" id="node6" href="$classCorrespondenceCeresBase.html" title="CorrespondenceCeresBase" alt="" coords="223,85,406,112"/>
-</map>

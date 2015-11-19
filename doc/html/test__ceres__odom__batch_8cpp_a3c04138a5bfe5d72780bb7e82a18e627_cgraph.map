@@ -1,6 +1,0 @@
-<map id="main" name="main">
-<area shape="rect" id="node2" href="$classCorrespondenceBaseX.html#ae1069abafd23d90d6777cbafb4a23286" title="CorrespondenceBaseX\l::getCostFunctionPtr" alt="" coords="111,5,267,46"/>
-<area shape="rect" id="node3" href="$classCorrespondenceGPSFix.html#a94784521f1c4e0811064b53dba98880e" title="CorrespondenceGPSFix\l::getLocation" alt="" coords="108,70,271,111"/>
-<area shape="rect" id="node4" href="$classCorrespondenceOdom2D.html#a429d78ea45862335e82b5f704e3f1620" title="CorrespondenceOdom2D\l::getPoseCurrentPtr" alt="" coords="105,135,274,177"/>
-<area shape="rect" id="node5" href="$classCorrespondenceOdom2D.html#acb1a0d44a9f1457f5cf8a136a3933da7" title="CorrespondenceOdom2D\l::getPosePreviousPtr" alt="" coords="105,201,274,242"/>
-</map>

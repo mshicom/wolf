@@ -1,6 +1,0 @@
-<map id="CaptureOdom2D::addConstraints" name="CaptureOdom2D::addConstraints">
-<area shape="rect" id="node2" href="$classCaptureBase.html#a1d08e83b5d2aff3e139bd9f24a4e89f7" title="Gets a pointer to feature list. " alt="" coords="270,25,477,52"/>
-<area shape="rect" id="node4" href="$classCaptureBase.html#a04de3a81803d93b08af9533041c06860" title="Gets up_node_ptr_. " alt="" coords="284,81,463,108"/>
-<area shape="rect" id="node3" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="525,5,728,61"/>
-<area shape="rect" id="node5" href="$classNodeLinked.html#a5ab61f1533b7b4137e040b5900e90223" title="Access the pointer to parent. " alt="" coords="527,85,727,126"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="WolfManager::update" name="WolfManager::update">
-<area shape="rect" id="node2" href="$classCaptureBase.html#a59d8d100cff2c73a8b2c7c2e5e65776c" title="CaptureBase::computePrior" alt="" coords="213,5,395,32"/>
-<area shape="rect" id="node3" href="$classCaptureBase.html#a1d08e83b5d2aff3e139bd9f24a4e89f7" title="Gets a pointer to feature list. " alt="" coords="201,56,407,83"/>
-<area shape="rect" id="node5" href="$classCaptureBase.html#a048c166c0787df262a0fb467c800a36a" title="CaptureBase::getSensorPtr" alt="" coords="213,107,395,133"/>
-<area shape="rect" id="node6" href="$classCaptureBase.html#a7cf93606f67c333befdfec207a69782f" title="CaptureBase::getTimeStamp" alt="" coords="209,157,399,184"/>
-<area shape="rect" id="node7" href="$classCaptureBase.html#a6083dbcf2ff84f106050c185157a08cb" title="CaptureBase::processCapture" alt="" coords="205,208,403,235"/>
-<area shape="rect" id="node4" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="456,41,659,97"/>
-</map>

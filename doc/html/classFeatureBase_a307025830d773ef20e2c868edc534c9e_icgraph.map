@@ -1,6 +1,0 @@
-<map id="FeatureBase::getFramePtr" name="FeatureBase::getFramePtr">
-<area shape="rect" id="node2" href="$classCaptureLaser2D.html#a79f3baf23d191f346343c57ab33028f4" title="CaptureLaser2D::computeMahalanobis\lDistance" alt="" coords="229,38,477,79"/>
-<area shape="rect" id="node3" href="$classCaptureLaser2D.html#a5fa5230f0c0ce2f49c79d9366f34d4de" title="Create constraints given current measured features and existing landmarks. " alt="" coords="526,5,703,46"/>
-<area shape="rect" id="node4" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="526,70,703,111"/>
-<area shape="rect" id="node5" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="753,77,970,104"/>
-</map>

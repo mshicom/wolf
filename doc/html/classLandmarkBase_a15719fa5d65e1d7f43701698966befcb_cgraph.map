@@ -1,5 +1,0 @@
-<map id="LandmarkBase::~LandmarkBase" name="LandmarkBase::~LandmarkBase">
-<area shape="rect" id="node2" href="$classNodeLinked.html#a281274ee60831fe8d23ef19120c6bc4a" title="Gets a pointer to the tree top node. " alt="" coords="271,5,441,46"/>
-<area shape="rect" id="node3" href="$classWolfProblem.html#a68248b594c7faab6e0d347aa421b50d1" title="Removes a new state unit of the state. " alt="" coords="267,71,445,97"/>
-<area shape="rect" id="node4" href="$classStateBase.html#a00a9c4c33332812a92a1127067390556" title="Returns the pointer to the first element of the state. " alt="" coords="494,71,621,97"/>
-</map>

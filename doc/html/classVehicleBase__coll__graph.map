@@ -1,5 +1,0 @@
-<map id="VehicleBase" name="VehicleBase">
-<area shape="rect" id="node2" href="$classNodeConstrainer.html" title="NodeConstrainer\&lt; NodeTerminus,\l Frame \&gt;" alt="" coords="195,190,416,231"/>
-<area shape="rect" id="node3" href="$classNodeLinked.html" title="NodeLinked\&lt; NodeTerminus,\l Frame \&gt;" alt="" coords="5,83,197,125"/>
-<area shape="rect" id="node4" href="$classNode.html" title="Base class for Nodes. " alt="" coords="75,5,128,32"/>
-</map>

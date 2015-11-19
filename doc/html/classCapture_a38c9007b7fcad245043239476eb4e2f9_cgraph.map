@@ -1,8 +1,0 @@
-<map id="Capture::printSelf" name="Capture::printSelf">
-<area shape="rect" id="node2" href="$classSensorBase.html#a5ea36c06a4016a5a67cb7eb10d63d4c6" title="SensorBase::intrinsic" alt="" coords="193,5,340,32"/>
-<area shape="rect" id="node3" href="$classStateBase.html#a4de9081b92ca491779741220d6181f24" title="StateBase::x" alt="" coords="427,31,525,57"/>
-<area shape="rect" id="node4" href="$classSensorBase.html#a4974103c3dcb2173e400dcd68f00a53e" title="SensorBase::pose" alt="" coords="202,107,331,133"/>
-<area shape="rect" id="node5" href="$classNode.html#a6f945020f1599b049f954760e23a93e5" title="prints a number of tabulations. " alt="" coords="413,157,539,184"/>
-<area shape="rect" id="node6" href="$classNodeConstrainer.html#a1194c42d96bb253b80f3190df6a3a339" title="Prints tabulated information about this node. " alt="" coords="179,208,355,235"/>
-<area shape="rect" id="node7" href="$classNodeLinked.html#aa97361985aec33ef130924a0173163d1" title="Prints tabulated information about this node. " alt="" coords="403,208,549,235"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="StateBase::getStateType" name="StateBase::getStateType">
-<area shape="rect" id="node2" href="$classSolverManager.html#a995560621d2a5c3f1001f815da5ce4dc" title="SolverManager::addStateUnit" alt="" coords="229,5,422,32"/>
-<area shape="rect" id="node4" href="$classCeresManager.html#ae205d5cf1e27001da9594928e5f6cb5f" title="CeresManager::addStateUnit" alt="" coords="230,56,421,83"/>
-<area shape="rect" id="node7" href="$classCaptureTwist2D.html#a564f2b2d7f28dd6086beb113ad687dd7" title="CaptureTwist2D::computePrior" alt="" coords="224,107,427,133"/>
-<area shape="rect" id="node8" href="$classLandmarkContainer.html#a22ef22f6108cf6bb538888a829304070" title="Constructor with type, time stamp and the position state pointer. " alt="" coords="254,158,397,199"/>
-<area shape="rect" id="node3" href="$classSolverManager.html#ac5c3830404c8018abf9555dc44912646" title="SolverManager::update" alt="" coords="475,5,631,32"/>
-<area shape="rect" id="node5" href="$classCeresManager.html#ab4e9f6f0392eb6796116692ca5fc47c7" title="CeresManager::update" alt="" coords="476,56,631,83"/>
-<area shape="rect" id="node6" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="680,56,731,83"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="StatePose::StatePose" name="StatePose::StatePose">
-<area shape="rect" id="node2" href="$classStatePose.html#a54597fb22d3a892bc01b48dffbefa29d" title="compose this pose with a base pose " alt="" coords="211,5,408,32"/>
-<area shape="rect" id="node3" href="$classStatePose.html#ad078588ececeeead963fc3c65eba3fbf" title="compose poses " alt="" coords="206,56,413,83"/>
-<area shape="rect" id="node4" href="$classStatePose.html#af174984579917f3922bb1c45bf29279e" title="compose this pose with a local pose " alt="" coords="208,107,411,133"/>
-</map>

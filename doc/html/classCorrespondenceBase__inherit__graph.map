@@ -1,6 +1,0 @@
-<map id="CorrespondenceBase" name="CorrespondenceBase">
-<area shape="rect" id="node2" href="$classCorrespondence1Sparse.html" title="Correspondence1Sparse\l\&lt; MEASUREMENT_SIZE, BLOCK\l_SIZE \&gt;" alt="" coords="200,4,429,60"/>
-<area shape="rect" id="node4" href="$classCorrespondence2Sparse.html" title="Correspondence2Sparse\l\&lt; MEASUREMENT_SIZE, BLOCK\l_1_SIZE, BLOCK_2_SIZE \&gt;" alt="" coords="200,84,429,140"/>
-<area shape="rect" id="node3" href="$classCorrespondence1SparseCeres.html" title="Correspondence1SparseCeres\l\&lt; MEASUREMENT_SIZE, BLOCK_SIZE \&gt;" alt="" coords="478,11,757,53"/>
-<area shape="rect" id="node5" href="$classCorrespondence2SparseCeres.html" title="Correspondence2SparseCeres\l\&lt; MEASUREMENT_SIZE, BLOCK\l_1_SIZE, BLOCK_2_SIZE \&gt;" alt="" coords="503,84,732,140"/>
-</map>

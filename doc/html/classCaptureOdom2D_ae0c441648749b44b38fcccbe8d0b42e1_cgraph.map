@@ -1,9 +1,0 @@
-<map id="CaptureOdom2D::processCapture" name="CaptureOdom2D::processCapture">
-<area shape="rect" id="node2" href="$classCaptureOdom2D.html#a3b314684e5abca3123952a91fd257574" title="CaptureOdom2D::addConstraints" alt="" coords="275,79,491,105"/>
-<area shape="rect" id="node7" href="$classCaptureBase.html#aa682ee3a7053fc5f7c972394cfbb045b" title="Adds a Feature to the down node list. " alt="" coords="297,133,468,160"/>
-<area shape="rect" id="node3" href="$classCaptureBase.html#a04de3a81803d93b08af9533041c06860" title="Gets up_node_ptr_. " alt="" coords="553,17,732,44"/>
-<area shape="rect" id="node5" href="$classCaptureBase.html#a1d08e83b5d2aff3e139bd9f24a4e89f7" title="Gets a pointer to feature list. " alt="" coords="539,79,746,105"/>
-<area shape="rect" id="node4" href="$classNodeLinked.html#a5ab61f1533b7b4137e040b5900e90223" title="Access the pointer to parent. " alt="" coords="796,5,996,46"/>
-<area shape="rect" id="node6" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="795,69,997,125"/>
-<area shape="rect" id="node8" href="$classNodeLinked.html#a7398e39d5f4647187659ce59eadf537f" title="Adds a down node. " alt="" coords="539,130,746,171"/>
-</map>

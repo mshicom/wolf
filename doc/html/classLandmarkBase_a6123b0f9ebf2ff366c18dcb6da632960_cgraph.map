@@ -1,5 +1,0 @@
-<map id="LandmarkBase::unfix" name="LandmarkBase::unfix">
-<area shape="rect" id="node2" href="$classStateBase.html#a08a508fe19ed0331ee060f1e2376bfc6" title="Set the status of the state unit. " alt="" coords="200,31,379,57"/>
-<area shape="rect" id="node3" href="$classNodeBase.html#a6020d2ae5191c6ad645562bfb44a3a47" title="Gets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="427,5,621,32"/>
-<area shape="rect" id="node4" href="$classNodeBase.html#ad812ef6535872d7769b127f2cd3a71e4" title="Sets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="427,56,621,83"/>
-</map>

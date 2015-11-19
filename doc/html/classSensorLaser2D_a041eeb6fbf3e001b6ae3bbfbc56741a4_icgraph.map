@@ -1,6 +1,0 @@
-<map id="SensorLaser2D::getScanParams" name="SensorLaser2D::getScanParams">
-<area shape="rect" id="node2" href="$classCaptureLaser2D.html#a54f4cab49d39407c5dccc3e8d5ccd74e" title="Extract corners and push&#45;back to Feature down list. " alt="" coords="267,31,477,57"/>
-<area shape="rect" id="node5" href="$classCaptureLaser2D.html#a80d5a39351cf7f8e94beab7541dfefec" title="Extract lines from the capture. " alt="" coords="274,81,470,108"/>
-<area shape="rect" id="node3" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="609,5,660,32"/>
-<area shape="rect" id="node4" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="526,56,743,83"/>
-</map>

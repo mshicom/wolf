@@ -1,6 +1,0 @@
-<map id="WolfManager::computeOdomCapture" name="WolfManager::computeOdomCapture">
-<area shape="rect" id="node2" href="$classFrameBase.html#acfe2dbfcffc3fca590fb2991f64eaaea" title="FrameBase::getOPtr" alt="" coords="250,5,393,32"/>
-<area shape="rect" id="node3" href="$classFrameBase.html#af4501c131cbf7bf37d73cd56f601fad9" title="FrameBase::getPPtr" alt="" coords="251,56,392,83"/>
-<area shape="rect" id="node4" href="$classStateBase.html#a00a9c4c33332812a92a1127067390556" title="Returns the pointer to the first element of the state. " alt="" coords="258,107,385,133"/>
-<area shape="rect" id="node5" href="$classCaptureXBase.html#ad54589af6ba7baabdc425dda80d7cf55" title="CaptureXBase::getPtr" alt="" coords="246,157,397,184"/>
-</map>

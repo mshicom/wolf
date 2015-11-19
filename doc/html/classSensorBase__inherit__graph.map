@@ -1,7 +1,0 @@
-<map id="SensorBase" name="SensorBase">
-<area shape="rect" id="node3" href="$classSensorGPSFix.html" title="SensorGPSFix" alt="" coords="5,155,115,181"/>
-<area shape="rect" id="node4" href="$classSensorLaser2D.html" title="SensorLaser2D" alt="" coords="139,155,249,181"/>
-<area shape="rect" id="node5" href="$classSensorOdom2D.html" title="SensorOdom2D" alt="" coords="275,155,389,181"/>
-<area shape="rect" id="node6" href="$classSensorTwist2D.html" title="SensorTwist2D" alt="" coords="413,155,524,181"/>
-<area shape="rect" id="node2" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="221,5,303,32"/>
-</map>

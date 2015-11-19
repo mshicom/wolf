@@ -1,7 +1,0 @@
-<map id="CorrespondenceBase::computeError" name="CorrespondenceBase::computeError">
-<area shape="rect" id="node2" href="$classCorrespondenceBase.html#aa656ca15a517a2eb3053166bf86a5205" title="Compute measurement expectation. " alt="" coords="217,5,367,46"/>
-<area shape="rect" id="node3" href="$classCorrespondenceBase.html#a0cfde3c16e580766405553392c362fbc" title="CorrespondenceBase\l::expectation" alt="" coords="219,70,365,111"/>
-<area shape="rect" id="node4" href="$classCorrespondenceBase.html#a6def82fb9ed909bb8dfc47d82f623531" title="CorrespondenceBase\l::featurePtr" alt="" coords="219,135,365,177"/>
-<area shape="rect" id="node6" href="$classFeatureBase.html#a5ca876e1efed119f47ed72ee055fd905" title="FeatureBase::measurement" alt="" coords="201,201,383,228"/>
-<area shape="rect" id="node5" href="$classNodeLinked.html#a51e6a99b8a3067ee7ba5e8315ab39dee" title="Access the pointer to parent. " alt="" coords="433,135,626,177"/>
-</map>

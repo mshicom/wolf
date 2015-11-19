@@ -1,5 +1,0 @@
-<map id="CaptureLaser2D::computeSquaredMahalanobisDistances" name="CaptureLaser2D::computeSquaredMahalanobisDistances">
-<area shape="rect" id="node2" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="545,5,722,46"/>
-<area shape="rect" id="node4" href="$classCaptureLaser2D.html#ac4e4bbc26e6ed9b711969f033048ca48" title="Tries to fit a container given a feature and all existing landmarks. " alt="" coords="277,37,496,64"/>
-<area shape="rect" id="node3" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="771,12,989,39"/>
-</map>

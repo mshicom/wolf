@@ -1,8 +1,0 @@
-<map id="FeatureBase" name="FeatureBase">
-<area shape="rect" id="node4" href="$classFeatureCorner2D.html" title="FeatureCorner2D" alt="" coords="5,245,128,272"/>
-<area shape="rect" id="node5" href="$classFeatureFix.html" title="FeatureFix" alt="" coords="153,245,236,272"/>
-<area shape="rect" id="node6" href="$classFeatureGPSFix.html" title="FeatureGPSFix" alt="" coords="261,245,372,272"/>
-<area shape="rect" id="node7" href="$classFeatureOdom2D.html" title="FeatureOdom2D" alt="" coords="397,245,515,272"/>
-<area shape="rect" id="node2" href="$classNodeLinked.html" title="NodeLinked\&lt; CaptureBase,\l ConstraintBase \&gt;" alt="" coords="165,81,347,122"/>
-<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="215,5,296,32"/>
-</map>

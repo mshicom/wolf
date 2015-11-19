@@ -1,7 +1,0 @@
-<map id="TrajectoryBase::addFrame" name="TrajectoryBase::addFrame">
-<area shape="rect" id="node2" href="$classWolfManager.html#a894b67e19e2aad764b5cdc849c5b15c4" title="WolfManager::createFrame" alt="" coords="230,56,410,83"/>
-<area shape="rect" id="node3" href="$classWolfManager.html#a03e99b73563636d07eda24e2b1c3ea3c" title="WolfManager::WolfManager" alt="" coords="459,5,643,32"/>
-<area shape="rect" id="node4" href="$classWolfManager.html#aba37ab728312020ddefbf66d0164af10" title="WolfManager::update" alt="" coords="477,56,624,83"/>
-<area shape="rect" id="node6" href="$classWolfManager.html#ab9c99add14c3a3fa740b018204590943" title="WolfManager::createFrame" alt="" coords="461,107,641,133"/>
-<area shape="rect" id="node5" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="691,56,741,83"/>
-</map>

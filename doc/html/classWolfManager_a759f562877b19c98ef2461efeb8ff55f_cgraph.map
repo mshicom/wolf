@@ -1,6 +1,0 @@
-<map id="WolfManager::getConstraintsList" name="WolfManager::getConstraintsList">
-<area shape="rect" id="node2" href="$classTrajectoryBase.html#a00e96176f63dc529ce72f940924d06d2" title="Returns a list of all constraints in the trajectory thru reference. " alt="" coords="267,12,485,39"/>
-<area shape="rect" id="node5" href="$classWolfProblem.html#a4279e89c0cb160e14b7ac86767afb039" title="Gets a pointer to map. " alt="" coords="277,63,475,89"/>
-<area shape="rect" id="node3" href="$classTrajectoryBase.html#ab175c9fc0089cbbe7d6b5266edec6ddc" title="Returns a pointer to Frame list. " alt="" coords="533,5,707,46"/>
-<area shape="rect" id="node4" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="755,5,989,46"/>
-</map>

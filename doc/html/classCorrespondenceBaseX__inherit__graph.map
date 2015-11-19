@@ -1,6 +1,0 @@
-<map id="CorrespondenceBaseX" name="CorrespondenceBaseX">
-<area shape="rect" id="node4" href="$classCorrespondenceGPSFix.html" title="CorrespondenceGPSFix" alt="" coords="5,245,168,272"/>
-<area shape="rect" id="node5" href="$classCorrespondenceOdom2D.html" title="CorrespondenceOdom2D" alt="" coords="193,245,361,272"/>
-<area shape="rect" id="node2" href="$classNodeLinked.html" title="NodeLinked\&lt; FeatureBaseX,\l NodeTerminus \&gt;" alt="" coords="86,81,276,122"/>
-<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="140,5,221,32"/>
-</map>

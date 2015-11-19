@@ -1,6 +1,0 @@
-<map id="Matrixx::resize" name="Matrixx::resize">
-<area shape="rect" id="node2" href="$classAssociationTree.html#a5fa6e20d1e908b00370b6b69fcb81138" title="Resizes the problem. " alt="" coords="169,12,327,39"/>
-<area shape="rect" id="node5" href="$classAssociationNNLS.html#a83a80ea521f467a9933dd354325d6e3f" title="Resizes the problem. " alt="" coords="163,63,333,89"/>
-<area shape="rect" id="node3" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="382,5,559,46"/>
-<area shape="rect" id="node4" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="609,12,826,39"/>
-</map>

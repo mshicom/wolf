@@ -1,6 +1,0 @@
-<map id="NodeLinked::upperNodePtr" name="NodeLinked::upperNodePtr">
-<area shape="rect" id="node2" href="$classConstraintBase.html#a2f80762f85f6cecb741f425159742925" title="Returns a pointer to its capture. " alt="" coords="233,44,434,71"/>
-<area shape="rect" id="node5" href="$classFeatureBase.html#a307025830d773ef20e2c868edc534c9e" title="FeatureBase::getFramePtr" alt="" coords="245,95,421,121"/>
-<area shape="rect" id="node3" href="$classConstraintContainer.html#a4862204e3b5a7bd37c120e0504cff143" title="ConstraintContainer\l::operator()" alt="" coords="499,5,637,46"/>
-<area shape="rect" id="node4" href="$classConstraintCorner2DTheta.html#a74ff7755074f0ceb201d8ac1a206adaa" title="ConstraintCorner2DTheta\l::operator()" alt="" coords="483,70,653,111"/>
-</map>

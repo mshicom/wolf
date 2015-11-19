@@ -1,8 +1,0 @@
-<map id="WolfProblem::getTrajectoryPtr" name="WolfProblem::getTrajectoryPtr">
-<area shape="rect" id="node2" href="$classCeresManager.html#aaf2823935e2d984e752abd25184a9617" title="CeresManager::computeCovariances" alt="" coords="254,5,493,32"/>
-<area shape="rect" id="node4" href="$classSolverManager.html#ac5c3830404c8018abf9555dc44912646" title="SolverManager::update" alt="" coords="295,56,451,83"/>
-<area shape="rect" id="node5" href="$classCeresManager.html#ab4e9f6f0392eb6796116692ca5fc47c7" title="CeresManager::update" alt="" coords="296,107,451,133"/>
-<area shape="rect" id="node6" href="$classSolverQR.html#aba696949640bce91e757cfeb900a0236" title="SolverQR::update" alt="" coords="310,157,437,184"/>
-<area shape="rect" id="node3" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="541,56,592,83"/>
-<area shape="rect" id="node7" href="$test__iQR__wolf2_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="541,157,592,184"/>
-</map>

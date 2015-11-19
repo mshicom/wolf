@@ -1,6 +1,0 @@
-<map id="FrameBase::getTrajectoryPtr" name="FrameBase::getTrajectoryPtr">
-<area shape="rect" id="node2" href="$classFrameBase.html#aa73aa6e7a764fbc289bef6d103bc8da5" title="FrameBase::getNextFrame" alt="" coords="257,5,437,32"/>
-<area shape="rect" id="node5" href="$classFrameBase.html#a7999f96cd20f057b647044f79ced9022" title="FrameBase::getPreviousFrame" alt="" coords="245,56,448,83"/>
-<area shape="rect" id="node3" href="$classCaptureTwist2D.html#a31d115c4a62cf575f28e54a865a6e78a" title="CaptureTwist2D::addConstraints" alt="" coords="496,5,709,32"/>
-<area shape="rect" id="node4" href="$classCaptureTwist2D.html#a684a199bdd7aae7afb007369acccc843" title="CaptureTwist2D::processCapture" alt="" coords="758,5,975,32"/>
-</map>

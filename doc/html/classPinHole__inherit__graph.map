@@ -1,5 +1,0 @@
-<map id="PinHole" name="PinHole">
-<area shape="rect" id="node2" href="$classSensorBase.html" title="Base class for all kind of sensors. " alt="" coords="48,171,141,197"/>
-<area shape="rect" id="node3" href="$classNodeLinked.html" title="NodeLinked\&lt; VehicleBase,\l NodeTerminus \&gt;" alt="" coords="5,81,184,122"/>
-<area shape="rect" id="node4" href="$classNode.html" title="Base class for Nodes. " alt="" coords="68,5,121,32"/>
-</map>

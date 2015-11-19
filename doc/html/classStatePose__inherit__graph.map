@@ -1,6 +1,0 @@
-<map id="StatePose" name="StatePose">
-<area shape="rect" id="node4" href="$classStatePQ.html" title="State pose with position and orientation only. " alt="" coords="5,229,77,256"/>
-<area shape="rect" id="node5" href="$classStatePQV.html" title="Class for 3D position, velocity and orientation states. " alt="" coords="102,229,183,256"/>
-<area shape="rect" id="node2" href="$classStateBase.html" title="Base class for regular states. " alt="" coords="51,80,132,107"/>
-<area shape="rect" id="node3" href="$classStateRootBase.html" title="Base class for all kind of states. " alt="" coords="37,5,147,32"/>
-</map>

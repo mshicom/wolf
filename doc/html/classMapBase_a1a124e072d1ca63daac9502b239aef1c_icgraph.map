@@ -1,7 +1,0 @@
-<map id="MapBase::getLandmarkListPtr" name="MapBase::getLandmarkListPtr">
-<area shape="rect" id="node2" href="$classCeresManager.html#aaf2823935e2d984e752abd25184a9617" title="CeresManager::computeCovariances" alt="" coords="254,5,493,32"/>
-<area shape="rect" id="node4" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="542,78,719,119"/>
-<area shape="rect" id="node6" href="$classCaptureLaser2D.html#ac4e4bbc26e6ed9b711969f033048ca48" title="Tries to fit a container given a feature and all existing landmarks. " alt="" coords="264,107,483,133"/>
-<area shape="rect" id="node3" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="605,5,656,32"/>
-<area shape="rect" id="node5" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="769,85,986,112"/>
-</map>

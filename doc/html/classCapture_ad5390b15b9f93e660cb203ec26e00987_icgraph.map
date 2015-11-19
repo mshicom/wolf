@@ -1,6 +1,0 @@
-<map id="Capture::inverseGlobalPose" name="Capture::inverseGlobalPose">
-<area shape="rect" id="node2" href="$classEpipolarConstraint.html#a4b3f3f610dab2b16b5cd9fcdca0455e9" title="Compute the expected epipolar line. " alt="" coords="267,5,416,46"/>
-<area shape="rect" id="node4" href="$classTransSensor.html#aacd97e23ad64ec7ea0e3dc0898a2c06c" title="TransSensor::precomputePose\lRelative" alt="" coords="240,70,443,111"/>
-<area shape="rect" id="node3" href="$classEpipolarConstraint.html#ae35d0a64e3924395a4c7852babb0c722" title="Compute the epipolar constraint error. " alt="" coords="515,5,645,46"/>
-<area shape="rect" id="node5" href="$classTransPinHole.html#abd00fe23767484b3a5c67d3ed99cf290" title="Compute Essential and Fundamental matrices. " alt="" coords="491,70,669,111"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Wolf::composeFrames" name="Wolf::composeFrames">
-<area shape="rect" id="node2" href="$classCapture.html#aee05c9315ed568e0cd607d626e56e1bf" title="Capture::precomputeGlobalPose" alt="" coords="208,5,419,32"/>
-<area shape="rect" id="node4" href="$classTransSensor.html#aacd97e23ad64ec7ea0e3dc0898a2c06c" title="TransSensor::precomputePose\lRelative" alt="" coords="212,57,415,98"/>
-<area shape="rect" id="node3" href="$classCapture.html#aca404b8d48582d1177875722a98bd64e" title="pre&#45;compute constants affecting the current node. " alt="" coords="467,5,671,32"/>
-<area shape="rect" id="node5" href="$classTransPinHole.html#abd00fe23767484b3a5c67d3ed99cf290" title="Compute Essential and Fundamental matrices. " alt="" coords="481,57,658,98"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="CapNode" name="CapNode">
-<area shape="rect" id="node2" href="$classCap.html" title="Cap" alt="" coords="5,155,51,181"/>
-<area shape="rect" id="node3" href="$classUp.html" title="Up\&lt; FrmNode \&gt;" alt="" coords="76,155,192,181"/>
-<area shape="rect" id="node4" href="$classN.html" title="N" alt="" coords="229,5,267,32"/>
-<area shape="rect" id="node6" href="$classDown.html" title="Down\&lt; FeaNode \&gt;" alt="" coords="181,80,315,107"/>
-<area shape="rect" id="node7" href="$classSide.html" title="Side\&lt; TrSNode \&gt;" alt="" coords="339,80,463,107"/>
-<area shape="rect" id="node5" href="$classExplorer.html" title="Explorer\&lt; FeaNode \&gt;" alt="" coords="217,155,364,181"/>
-</map>

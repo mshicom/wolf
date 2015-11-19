@@ -1,6 +1,0 @@
-<map id="StateRootBase::size" name="StateRootBase::size">
-<area shape="rect" id="node2" href="$classStateRootBase.html#ac508ef6f1a01309d77d0b85d4286bb99" title="StateRootBase::remap" alt="" coords="200,5,355,32"/>
-<area shape="rect" id="node5" href="$classStatePose.html#ad5ff96884a7deb5f19b1d0e078409526" title="Set to origin. " alt="" coords="198,56,357,83"/>
-<area shape="rect" id="node3" href="$classStatePose.html#ad3d46dd2c83f540b418b761491e35292" title="StatePose::remap" alt="" coords="406,5,533,32"/>
-<area shape="rect" id="node4" href="$classStatePQV.html#af086f4173af6f515bf3a1e241f0597a6" title="StatePQV::remap" alt="" coords="581,5,707,32"/>
-</map>

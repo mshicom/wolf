@@ -1,4 +1,0 @@
-<map id="TransSensor::computeExpectation" name="TransSensor::computeExpectation">
-<area shape="rect" id="node2" href="$classEpipolarConstraint.html#a4b3f3f610dab2b16b5cd9fcdca0455e9" title="Compute the expected epipolar line. " alt="" coords="277,5,427,46"/>
-<area shape="rect" id="node3" href="$classEpipolarConstraint.html#ae35d0a64e3924395a4c7852babb0c722" title="Compute the epipolar constraint error. " alt="" coords="475,5,605,46"/>
-</map>

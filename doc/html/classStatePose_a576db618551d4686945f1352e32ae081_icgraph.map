@@ -1,7 +1,0 @@
-<map id="StatePose::p" name="StatePose::p">
-<area shape="rect" id="node2" href="$classStatePose.html#a54597fb22d3a892bc01b48dffbefa29d" title="compose this pose with a base pose " alt="" coords="157,5,355,32"/>
-<area shape="rect" id="node3" href="$classStatePose.html#ad078588ececeeead963fc3c65eba3fbf" title="compose poses " alt="" coords="153,56,359,83"/>
-<area shape="rect" id="node4" href="$classStatePose.html#af174984579917f3922bb1c45bf29279e" title="compose this pose with a local pose " alt="" coords="155,107,357,133"/>
-<area shape="rect" id="node5" href="$classStatePose.html#a421430e15925c8e0590f424098caa67d" title="StatePose::inverse" alt="" coords="189,157,323,184"/>
-<area shape="rect" id="node6" href="$classStatePose.html#abe8cbef5a281013a2f52155060f662ef" title="StatePose::StatePose" alt="" coords="180,208,332,235"/>
-</map>

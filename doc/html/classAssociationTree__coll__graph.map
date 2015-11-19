@@ -1,5 +1,0 @@
-<map id="AssociationTree" name="AssociationTree">
-<area shape="rect" id="node2" href="$classAssociationSolver.html" title="A pure virtual solver for the association problem. " alt="" coords="133,203,259,229"/>
-<area shape="rect" id="node3" href="$classMatrixx.html" title="Matrixx\&lt; double \&gt;" alt="" coords="21,111,147,137"/>
-<area shape="rect" id="node6" href="$classAssociationNode.html" title="A node in the association decision tree. " alt="" coords="261,111,381,137"/>
-</map>

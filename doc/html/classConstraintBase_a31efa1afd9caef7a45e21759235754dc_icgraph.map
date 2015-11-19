@@ -1,8 +1,0 @@
-<map id="ConstraintBase::getConstraintType" name="ConstraintBase::getConstraintType">
-<area shape="rect" id="node2" href="$classSolverManager.html#aaf403507e0235a28ff18041714c1abf9" title="SolverManager::createCost\lFunction" alt="" coords="291,5,472,46"/>
-<area shape="rect" id="node3" href="$classCeresManager.html#ac71babd16b7c8973eca6b3ef1e0f4989" title="CeresManager::createCost\lFunction" alt="" coords="292,70,471,111"/>
-<area shape="rect" id="node7" href="$classSolverQR.html#aee23c07bc8fcec092919e73124e4460a" title="SolverQR::createCostFunction" alt="" coords="281,136,482,163"/>
-<area shape="rect" id="node4" href="$classCeresManager.html#a53f3dfc38ce8685415d1aefb430edf27" title="CeresManager::addConstraint" alt="" coords="531,77,727,104"/>
-<area shape="rect" id="node5" href="$classCeresManager.html#ab4e9f6f0392eb6796116692ca5fc47c7" title="CeresManager::update" alt="" coords="776,77,931,104"/>
-<area shape="rect" id="node6" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="979,77,1029,104"/>
-</map>

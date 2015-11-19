@@ -1,7 +1,0 @@
-<map id="SensorOdom2D" name="SensorOdom2D">
-<area shape="rect" id="node2" href="$classSensorBase.html" title="SensorBase" alt="" coords="859,108,952,135"/>
-<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="260,135,343,161"/>
-<area shape="rect" id="node10" href="$classStateBase.html" title="StateBase" alt="" coords="483,81,565,108"/>
-<area shape="rect" id="node9" href="$classStatePoint.html" title="StatePoint\&lt; SIZE \&gt;" alt="" coords="617,7,754,33"/>
-<area shape="rect" id="node13" href="$classStateOrientation.html" title="StateOrientation" alt="" coords="627,108,743,135"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="LandmarkContainer::LandmarkContainer" name="LandmarkContainer::LandmarkContainer">
-<area shape="rect" id="node2" href="$classStateBase.html#a00a9c4c33332812a92a1127067390556" title="Returns the pointer to the first element of the state. " alt="" coords="231,5,358,32"/>
-<area shape="rect" id="node3" href="$classStateBase.html#a06c6a9bb079b87e0c6aa3c6094042e2d" title="Returns the state unit size. " alt="" coords="211,56,378,83"/>
-<area shape="rect" id="node4" href="$classStateBase.html#a8bdd7664508c4edf53d5e2beb3eee898" title="Returns the parametrization of the state unit. " alt="" coords="210,107,379,133"/>
-<area shape="rect" id="node5" href="$classLandmarkBase.html#aa50a1feda54f2a374bac60f196079491" title="LandmarkBase::setDescriptor" alt="" coords="197,157,392,184"/>
-</map>

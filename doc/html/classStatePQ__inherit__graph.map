@@ -1,5 +1,0 @@
-<map id="StatePQ" name="StatePQ">
-<area shape="rect" id="node2" href="$classStatePose.html" title="Base class for pose states. " alt="" coords="19,155,100,181"/>
-<area shape="rect" id="node3" href="$classStateBase.html" title="Base class for regular states. " alt="" coords="19,80,100,107"/>
-<area shape="rect" id="node4" href="$classStateRootBase.html" title="Base class for all kind of states. " alt="" coords="5,5,115,32"/>
-</map>

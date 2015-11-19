@@ -1,4 +1,0 @@
-<map id="CaptureLaser2D::fitNewContainer" name="CaptureLaser2D::fitNewContainer">
-<area shape="rect" id="node2" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="273,5,450,46"/>
-<area shape="rect" id="node3" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="499,12,717,39"/>
-</map>

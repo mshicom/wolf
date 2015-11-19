@@ -1,6 +1,0 @@
-<map id="CeresManager::addConstraint" name="CeresManager::addConstraint">
-<area shape="rect" id="node2" href="$classCeresManager.html#ac71babd16b7c8973eca6b3ef1e0f4989" title="CeresManager::createCost\lFunction" alt="" coords="259,5,437,46"/>
-<area shape="rect" id="node4" href="$classConstraintBase.html#adcda725e3dba669e71a2bef0a3c263bb" title="Returns a vector of scalar pointers to the first element of all state blocks involved in the constrai..." alt="" coords="263,70,433,111"/>
-<area shape="rect" id="node5" href="$classNodeBase.html#ad812ef6535872d7769b127f2cd3a71e4" title="Sets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="251,136,445,163"/>
-<area shape="rect" id="node3" href="$classConstraintBase.html#a31efa1afd9caef7a45e21759235754dc" title="Returns the constraint type. " alt="" coords="493,12,720,39"/>
-</map>

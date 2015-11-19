@@ -1,8 +1,0 @@
-<map id="StateBase" name="StateBase">
-<area shape="rect" id="node3" href="$classStateOrientation.html" title="StateOrientation" alt="" coords="169,155,284,181"/>
-<area shape="rect" id="node7" href="$classStatePoint.html" title="StatePoint\&lt; SIZE \&gt;" alt="" coords="309,155,445,181"/>
-<area shape="rect" id="node2" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="260,5,341,32"/>
-<area shape="rect" id="node4" href="$classStateComplexAngle.html" title="StateComplexAngle" alt="" coords="5,229,144,256"/>
-<area shape="rect" id="node5" href="$classStateQuaternion.html" title="StateQuaternion" alt="" coords="169,229,284,256"/>
-<area shape="rect" id="node6" href="$classStateTheta.html" title="StateTheta" alt="" coords="309,229,395,256"/>
-</map>

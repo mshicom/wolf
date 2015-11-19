@@ -1,4 +1,0 @@
-<map id="RawLaser2D::print" name="RawLaser2D::print">
-<area shape="rect" id="node2" href="$classRawBase.html#a332d579ae00fa3f1e6f5c61cd1f00fe3" title="Prints time stamp + data. " alt="" coords="184,5,296,32"/>
-<area shape="rect" id="node3" href="$classTimeStamp.html#a40522a4de60229de4338fd372447247f" title="Prints time stamp to a given ostream. " alt="" coords="344,5,467,32"/>
-</map>

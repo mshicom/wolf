@@ -1,7 +1,0 @@
-<map id="SolverManager::addStateUnit" name="SolverManager::addStateUnit">
-<area shape="rect" id="node2" href="$classStateBase.html#a00a9c4c33332812a92a1127067390556" title="Returns the pointer to the first element of the state. " alt="" coords="282,5,409,32"/>
-<area shape="rect" id="node3" href="$classStateBase.html#a7d3651e59f3641b5bd29f1290228e567" title="Returns the status of the state unit. " alt="" coords="256,56,435,83"/>
-<area shape="rect" id="node4" href="$classStateBase.html#a8bdd7664508c4edf53d5e2beb3eee898" title="Returns the parametrization of the state unit. " alt="" coords="261,107,430,133"/>
-<area shape="rect" id="node5" href="$classNodeBase.html#ad812ef6535872d7769b127f2cd3a71e4" title="Sets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="248,157,443,184"/>
-<area shape="rect" id="node6" href="$classSolverManager.html#a3e9634b06971f58941d3cb1763f5edb6" title="SolverManager::updateState\lUnitStatus" alt="" coords="252,209,439,250"/>
-</map>

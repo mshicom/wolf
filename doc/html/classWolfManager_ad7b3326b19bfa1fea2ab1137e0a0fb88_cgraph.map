@@ -1,5 +1,0 @@
-<map id="WolfManager::addCapture" name="WolfManager::addCapture">
-<area shape="rect" id="node2" href="$classCaptureBase.html#a7cf93606f67c333befdfec207a69782f" title="CaptureBase::getTimeStamp" alt="" coords="230,5,421,32"/>
-<area shape="rect" id="node3" href="$classNodeBase.html#af7e6b768837f694504f51780e7cbe920" title="Gets node ID. " alt="" coords="260,56,391,83"/>
-<area shape="rect" id="node4" href="$classTimeStamp.html#a40522a4de60229de4338fd372447247f" title="Prints time stamp to a given ostream. " alt="" coords="264,107,387,133"/>
-</map>

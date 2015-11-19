@@ -1,5 +1,0 @@
-<map id="CorrespondenceBase::featurePtr" name="CorrespondenceBase::featurePtr">
-<area shape="rect" id="node2" href="$classEpipolarConstraint.html#ae35d0a64e3924395a4c7852babb0c722" title="Compute the epipolar constraint error. " alt="" coords="209,5,338,46"/>
-<area shape="rect" id="node3" href="$classCorrespondenceBase.html#ada8e81a01a274f3e69f42becffbec920" title="Compute error of this correspondence (non recursive) " alt="" coords="200,70,347,111"/>
-<area shape="rect" id="node4" href="$classCorrespondenceBase.html#aeb842a1243610f32a8161c4010ba51f0" title="CorrespondenceBase\l::feature" alt="" coords="200,135,347,177"/>
-</map>

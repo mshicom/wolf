@@ -1,5 +1,0 @@
-<map id="main" name="main">
-<area shape="rect" id="node2" href="$classStateOrientation.html#aa823da60f946aaea55f612be77806fdf" title="Returns the 3x3 rotation matrix of the orientation. " alt="" coords="105,5,295,46"/>
-<area shape="rect" id="node4" href="$classStateQuaternion.html#a8cb49a724fb71af9eca1d94588ee22cd" title="Normalizes the quaternion. " alt="" coords="110,71,290,97"/>
-<area shape="rect" id="node3" href="$classStateOrientation.html#a802f21afe40faffb2a39edb3ec55505a" title="StateOrientation::rotation\lMatrix" alt="" coords="345,5,511,46"/>
-</map>

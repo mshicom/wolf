@@ -1,5 +1,0 @@
-<map id="SensorBase::pose" name="SensorBase::pose">
-<area shape="rect" id="node2" href="$classCapture.html#aee05c9315ed568e0cd607d626e56e1bf" title="Capture::precomputeGlobalPose" alt="" coords="184,5,395,32"/>
-<area shape="rect" id="node4" href="$classCapture.html#a38c9007b7fcad245043239476eb4e2f9" title="Prints tabulated information about this node. " alt="" coords="227,56,351,83"/>
-<area shape="rect" id="node3" href="$classCapture.html#aca404b8d48582d1177875722a98bd64e" title="pre&#45;compute constants affecting the current node. " alt="" coords="443,5,647,32"/>
-</map>

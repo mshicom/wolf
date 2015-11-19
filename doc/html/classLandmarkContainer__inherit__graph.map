@@ -1,5 +1,0 @@
-<map id="LandmarkContainer" name="LandmarkContainer">
-<area shape="rect" id="node2" href="$classLandmarkBase.html" title="LandmarkBase" alt="" coords="32,171,141,197"/>
-<area shape="rect" id="node3" href="$classNodeLinked.html" title="NodeLinked\&lt; MapBase,\l NodeTerminus \&gt;" alt="" coords="5,81,168,122"/>
-<area shape="rect" id="node4" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="45,5,127,32"/>
-</map>

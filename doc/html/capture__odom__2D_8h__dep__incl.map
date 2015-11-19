@@ -1,8 +1,0 @@
-<map id="capture_odom_2D.h" name="capture_odom_2D.h">
-<area shape="rect" id="node2" href="$capture__odom__2D_8cpp.html" title="capture_odom_2D.cpp" alt="" coords="5,88,157,115"/>
-<area shape="rect" id="node3" href="$test__ceres__laser_8cpp.html" title="test_ceres_laser.cpp" alt="" coords="182,88,324,115"/>
-<area shape="rect" id="node4" href="$test__ceres__manager__tree_8cpp.html" title="test_ceres_manager\l_tree.cpp" alt="" coords="349,81,488,122"/>
-<area shape="rect" id="node5" href="$wolf__manager_8h.html" title="wolf_manager.h" alt="" coords="513,88,628,115"/>
-<area shape="rect" id="node6" href="$test__ceres__2__lasers_8cpp.html" title="test_ceres_2_lasers.cpp" alt="" coords="401,171,564,197"/>
-<area shape="rect" id="node7" href="$test__iQR__wolf2_8cpp.html" title="test_iQR_wolf2.cpp" alt="" coords="589,171,725,197"/>
-</map>

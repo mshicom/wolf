@@ -1,6 +1,0 @@
-<map id="StateError" name="StateError">
-<area shape="rect" id="node3" href="$classStateErrorIMU.html" title="Error&#45;state class for IMU biases states. " alt="" coords="5,155,112,181"/>
-<area shape="rect" id="node4" href="$classStateErrorPose.html" title="StateErrorPose" alt="" coords="137,155,247,181"/>
-<area shape="rect" id="node2" href="$classStateRootBase.html" title="Base class for all kind of states. " alt="" coords="70,5,180,32"/>
-<area shape="rect" id="node5" href="$classStateErrorPQV.html" title="Error state class for position&#45;velocity&#45;quaternion states. " alt="" coords="137,229,247,256"/>
-</map>

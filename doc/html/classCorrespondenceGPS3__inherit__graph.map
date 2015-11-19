@@ -1,7 +1,0 @@
-<map id="CorrespondenceGPS3" name="CorrespondenceGPS3">
-<area shape="rect" id="node2" href="$classCorrespondence1Sparse.html" title="Correspondence1Sparse\l\&lt; 3, 3 \&gt;" alt="" coords="13,337,177,378"/>
-<area shape="rect" id="node3" href="$classCorrespondenceBase.html" title="CorrespondenceBase" alt="" coords="23,261,169,288"/>
-<area shape="rect" id="node4" href="$classNodeConstrainer.html" title="NodeConstrainer\&lt; Feature\lBase, NodeTerminus \&gt;" alt="" coords="8,171,184,213"/>
-<area shape="rect" id="node5" href="$classNodeLinked.html" title="NodeLinked\&lt; FeatureBase,\l NodeTerminus \&gt;" alt="" coords="5,81,187,122"/>
-<area shape="rect" id="node6" href="$classNode.html" title="Base class for Nodes. " alt="" coords="69,5,123,32"/>
-</map>

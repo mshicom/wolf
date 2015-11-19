@@ -1,5 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classAssociationSolver.html" title="A pure virtual solver for the association problem. " alt="" coords="6,31,133,57"/>
-<area shape="rect" id="node2" href="$classAssociationNNLS.html" title="Nearest neighbour linear search. " alt="" coords="182,5,309,32"/>
-<area shape="rect" id="node3" href="$classAssociationTree.html" title="The whole decision tree. " alt="" coords="187,56,303,83"/>
-</map>

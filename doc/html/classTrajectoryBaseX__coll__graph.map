@@ -1,5 +1,0 @@
-<map id="TrajectoryBaseX" name="TrajectoryBaseX">
-<area shape="rect" id="node2" href="$classNodeLinked.html" title="NodeLinked\&lt; NodeTerminus,\l FrameBaseX \&gt;" alt="" coords="84,278,276,319"/>
-<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="136,109,217,136"/>
-<area shape="rect" id="node8" href="$classNodeTerminus.html" title="Dummy node to terminate the tree in both the Top and Bottom levels. " alt="" coords="127,187,233,213"/>
-</map>
