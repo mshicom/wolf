@@ -1,0 +1,15 @@
+<map id="CaptureBase::getFeatureListPtr" name="CaptureBase::getFeatureListPtr">
+<area shape="rect" id="node2" href="$classCaptureTwist2D.html#a31d115c4a62cf575f28e54a865a6e78a" title="CaptureTwist2D::addConstraints" alt="" coords="263,5,476,32"/>
+<area shape="rect" id="node4" href="$classCaptureOdom2D.html#a3b314684e5abca3123952a91fd257574" title="CaptureOdom2D::addConstraints" alt="" coords="261,56,477,83"/>
+<area shape="rect" id="node6" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="281,107,458,149"/>
+<area shape="rect" id="node8" href="$classCaptureBase.html#a31cef1162ac2890de7e6e7438c6c0d31" title="Fills the provided list with all constraints related to this capture. " alt="" coords="267,173,472,200"/>
+<area shape="rect" id="node9" href="$classCaptureTwist2D.html#a46d12b55c8189282a4f2324579ec2b97" title="CaptureTwist2D::integrate\lCapture" alt="" coords="282,225,457,266"/>
+<area shape="rect" id="node10" href="$classCaptureOdom2D.html#a86283e34d006d1f700077c495011c685" title="CaptureOdom2D::integrate\lCapture" alt="" coords="280,290,459,331"/>
+<area shape="rect" id="node11" href="$classCaptureFix.html#a54177a1109631e7ef967d3ce92006c40" title="CaptureFix::processCapture" alt="" coords="276,356,463,383"/>
+<area shape="rect" id="node13" href="$classCaptureGPSFix.html#aac43fd1596069e8477565622acb1ef6c" title="CaptureGPSFix::processCapture" alt="" coords="262,407,477,433"/>
+<area shape="rect" id="node14" href="$classWolfManager.html#a72c88e77fd209fc2555c0dabe37468f7" title="WolfManager::update" alt="" coords="296,457,443,484"/>
+<area shape="rect" id="node3" href="$classCaptureTwist2D.html#a684a199bdd7aae7afb007369acccc843" title="CaptureTwist2D::processCapture" alt="" coords="527,5,745,32"/>
+<area shape="rect" id="node5" href="$classCaptureOdom2D.html#ae0c441648749b44b38fcccbe8d0b42e1" title="CaptureOdom2D::processCapture" alt="" coords="526,56,746,83"/>
+<area shape="rect" id="node7" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="527,115,745,141"/>
+<area shape="rect" id="node12" href="$classWolfManager.html#a9e60afc41b30733515039dbf5a8cc7df" title="WolfManager::WolfManager" alt="" coords="544,356,728,383"/>
+</map>

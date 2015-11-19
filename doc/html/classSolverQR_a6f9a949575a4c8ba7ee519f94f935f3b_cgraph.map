@@ -1,0 +1,6 @@
+<map id="SolverQR::addStateUnit" name="SolverQR::addStateUnit">
+<area shape="rect" id="node2" href="$classStateBase.html#a06c6a9bb079b87e0c6aa3c6094042e2d" title="Returns the state unit size. " alt="" coords="230,5,397,32"/>
+<area shape="rect" id="node3" href="$classStateBase.html#a7d3651e59f3641b5bd29f1290228e567" title="Returns the status of the state unit. " alt="" coords="224,56,403,83"/>
+<area shape="rect" id="node4" href="$classNodeBase.html#af7e6b768837f694504f51780e7cbe920" title="Gets node ID. " alt="" coords="248,107,379,133"/>
+<area shape="rect" id="node5" href="$classNodeBase.html#ad812ef6535872d7769b127f2cd3a71e4" title="Sets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="216,157,411,184"/>
+</map>

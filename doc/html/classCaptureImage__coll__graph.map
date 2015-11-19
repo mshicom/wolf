@@ -1,0 +1,11 @@
+<map id="CaptureImage" name="CaptureImage">
+<area shape="rect" id="node2" href="$classCapture.html" title="Base class for raw data captures from sensors. " alt="" coords="1201,100,1269,127"/>
+<area shape="rect" id="node3" href="$classNodeConstrainer.html" title="NodeConstrainer\&lt; Frame,\l FeatureBase \&gt;" alt="" coords="853,122,1027,163"/>
+<area shape="rect" id="node4" href="$classNodeLinked.html" title="NodeLinked\&lt; Frame,\l FeatureBase \&gt;" alt="" coords="576,122,720,163"/>
+<area shape="rect" id="node5" href="$classNode.html" title="Base class for Nodes. " alt="" coords="389,97,443,124"/>
+<area shape="rect" id="node13" href="$classNodeLinked.html" title="NodeLinked\&lt; VehicleBase,\l NodeTerminus \&gt;" alt="" coords="558,57,738,98"/>
+<area shape="rect" id="node10" href="$classStateRootBase.html" title="Base class for all kind of states. " alt="" coords="361,33,471,60"/>
+<area shape="rect" id="node8" href="$classStatePose.html" title="Base class for pose states. " alt="" coords="899,12,981,39"/>
+<area shape="rect" id="node9" href="$classStateBase.html" title="Base class for regular states. " alt="" coords="607,5,689,32"/>
+<area shape="rect" id="node12" href="$classSensorBase.html" title="Base class for all kind of sensors. " alt="" coords="893,68,987,95"/>
+</map>

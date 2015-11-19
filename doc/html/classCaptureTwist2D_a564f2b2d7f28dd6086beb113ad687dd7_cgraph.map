@@ -1,0 +1,6 @@
+<map id="CaptureTwist2D::computePrior" name="CaptureTwist2D::computePrior">
+<area shape="rect" id="node2" href="$classCaptureBase.html#a04de3a81803d93b08af9533041c06860" title="Gets up_node_ptr_. " alt="" coords="256,12,435,39"/>
+<area shape="rect" id="node4" href="$classFrameBase.html#a0ceb0a11272d9350bb34fd322fbf6772" title="FrameBase::getOPtr" alt="" coords="274,63,417,89"/>
+<area shape="rect" id="node5" href="$classStateBase.html#a8bdd7664508c4edf53d5e2beb3eee898" title="Returns the parametrization of the state unit. " alt="" coords="261,113,430,140"/>
+<area shape="rect" id="node3" href="$classNodeLinked.html#a5ab61f1533b7b4137e040b5900e90223" title="Access the pointer to parent. " alt="" coords="483,5,683,46"/>
+</map>

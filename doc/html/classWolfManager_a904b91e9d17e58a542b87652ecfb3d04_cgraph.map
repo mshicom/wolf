@@ -1,0 +1,5 @@
+<map id="WolfManager::manageWindow" name="WolfManager::manageWindow">
+<area shape="rect" id="node2" href="$classTrajectoryBase.html#ab175c9fc0089cbbe7d6b5266edec6ddc" title="Returns a pointer to Frame list. " alt="" coords="267,5,440,46"/>
+<area shape="rect" id="node4" href="$classWolfProblem.html#a4279e89c0cb160e14b7ac86767afb039" title="Gets a pointer to map. " alt="" coords="254,71,453,97"/>
+<area shape="rect" id="node3" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="501,5,736,46"/>
+</map>

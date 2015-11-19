@@ -1,0 +1,7 @@
+<map id="FeatureBase::getMeasurement" name="FeatureBase::getMeasurement">
+<area shape="rect" id="node2" href="$classCaptureLaser2D.html#a30675456036f30199e9636f51535b43b" title="CaptureLaser2D::computeSquared\lMahalanobisDistances" alt="" coords="257,5,479,46"/>
+<area shape="rect" id="node5" href="$classCaptureLaser2D.html#ac4e4bbc26e6ed9b711969f033048ca48" title="Tries to fit a container given a feature and all existing landmarks. " alt="" coords="528,63,747,89"/>
+<area shape="rect" id="node6" href="$classCaptureLaser2D.html#ae60be4c7e8dcf3784b46da9ac2e903d7" title="CaptureLaser2D::createCorner\lLandmark" alt="" coords="537,114,737,155"/>
+<area shape="rect" id="node3" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="795,55,973,97"/>
+<area shape="rect" id="node4" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="1022,63,1239,89"/>
+</map>

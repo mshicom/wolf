@@ -1,0 +1,7 @@
+<map id="CaptureOdom2D::integrateCapture" name="CaptureOdom2D::integrateCapture">
+<area shape="rect" id="node2" href="$classCaptureBase.html#a1da66dc567fc8af91a7f8e9d4ba264c7" title="CaptureBase::getData" alt="" coords="265,5,417,32"/>
+<area shape="rect" id="node3" href="$classCaptureBase.html#a16988a7ce3df4fd882f656781b897bb9" title="CaptureBase::getDataCovariance" alt="" coords="232,56,451,83"/>
+<area shape="rect" id="node4" href="$classCaptureBase.html#a1d08e83b5d2aff3e139bd9f24a4e89f7" title="Gets a pointer to feature list. " alt="" coords="238,107,445,133"/>
+<area shape="rect" id="node6" href="$classCaptureRelative.html#ac9cbc74327c661fd6226ecc80595c911" title="CaptureRelative::getFinal\lTimeStamp" alt="" coords="256,158,427,199"/>
+<area shape="rect" id="node5" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="499,92,701,148"/>
+</map>

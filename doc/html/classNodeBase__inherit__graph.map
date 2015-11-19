@@ -1,0 +1,60 @@
+<map id="NodeBase" name="NodeBase">
+<area shape="rect" id="node2" href="$classNodeLinked.html" title="Linked node element in the Wolf Tree. " alt="" coords="148,447,319,489"/>
+<area shape="rect" id="node3" href="$classNodeLinked.html" title="NodeLinked\&lt; CaptureBase,\l ConstraintBase \&gt;" alt="" coords="142,513,325,554"/>
+<area shape="rect" id="node9" href="$classNodeLinked.html" title="NodeLinked\&lt; CaptureBaseX,\l CorrespondenceBaseX \&gt;" alt="" coords="137,578,329,619"/>
+<area shape="rect" id="node11" href="$classNodeLinked.html" title="NodeLinked\&lt; FeatureBase,\l NodeTerminus \&gt;" alt="" coords="143,675,324,717"/>
+<area shape="rect" id="node21" href="$classNodeLinked.html" title="NodeLinked\&lt; FeatureBaseX,\l NodeTerminus \&gt;" alt="" coords="138,806,329,847"/>
+<area shape="rect" id="node25" href="$classNodeLinked.html" title="NodeLinked\&lt; FrameBase,\l FeatureBase \&gt;" alt="" coords="146,871,321,913"/>
+<area shape="rect" id="node31" href="$classNodeLinked.html" title="NodeLinked\&lt; FrameBaseX,\l FeatureBaseX \&gt;" alt="" coords="142,937,325,978"/>
+<area shape="rect" id="node33" href="$classNodeLinked.html" title="NodeLinked\&lt; MapBase,\l NodeTerminus \&gt;" alt="" coords="152,1002,315,1043"/>
+<area shape="rect" id="node37" href="$classNodeLinked.html" title="NodeLinked\&lt; NodeTerminus,\l FrameBaseX \&gt;" alt="" coords="137,1067,329,1109"/>
+<area shape="rect" id="node39" href="$classNodeLinked.html" title="NodeLinked\&lt; TrajectoryBase,\l CaptureBase \&gt;" alt="" coords="136,1133,331,1174"/>
+<area shape="rect" id="node41" href="$classNodeLinked.html" title="NodeLinked\&lt; TrajectoryBase\lX, CaptureBaseX \&gt;" alt="" coords="138,1198,329,1239"/>
+<area shape="rect" id="node43" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l FrameBase \&gt;" alt="" coords="142,1263,325,1305"/>
+<area shape="rect" id="node45" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l LandmarkBase \&gt;" alt="" coords="142,1329,325,1370"/>
+<area shape="rect" id="node47" href="$classNodeTerminus.html" title="Dummy node to terminate the tree in both the Top and Bottom levels. " alt="" coords="180,1395,287,1421"/>
+<area shape="rect" id="node48" href="$classSensorBase.html" title="SensorBase" alt="" coords="187,1445,280,1472"/>
+<area shape="rect" id="node53" href="$classStateBase.html" title="StateBase" alt="" coords="192,1532,275,1559"/>
+<area shape="rect" id="node59" href="$classWolfProblem.html" title="Wolf problem node element in the Wolf Tree. " alt="" coords="185,1583,282,1609"/>
+<area shape="rect" id="node4" href="$classFeatureBase.html" title="FeatureBase" alt="" coords="409,107,505,133"/>
+<area shape="rect" id="node5" href="$classFeatureCorner2D.html" title="FeatureCorner2D" alt="" coords="663,5,785,32"/>
+<area shape="rect" id="node6" href="$classFeatureFix.html" title="FeatureFix" alt="" coords="682,56,766,83"/>
+<area shape="rect" id="node7" href="$classFeatureGPSFix.html" title="FeatureGPSFix" alt="" coords="668,107,780,133"/>
+<area shape="rect" id="node8" href="$classFeatureOdom2D.html" title="FeatureOdom2D" alt="" coords="665,157,783,184"/>
+<area shape="rect" id="node10" href="$classFeatureBaseX.html" title="FeatureBaseX" alt="" coords="405,537,510,564"/>
+<area shape="rect" id="node12" href="$classConstraintBase.html" title="ConstraintBase" alt="" coords="401,588,513,615"/>
+<area shape="rect" id="node13" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; MEASUREMENT\l_SIZE, BLOCK_0_SIZE, BLOCK\l_1_SIZE, BLOCK_2_SIZE, BLOCK\l_3_SIZE, BLOCK_4_SIZE, BLOCK\l_5_SIZE, BLOCK_6_SIZE, BLOCK_7\l_SIZE, BLOCK_8_SIZE, BLOCK_9_SIZE \&gt;" alt="" coords="585,209,863,309"/>
+<area shape="rect" id="node14" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 2, 2 \&gt;" alt="" coords="639,333,809,360"/>
+<area shape="rect" id="node15" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 2,\l 2, 1, 2, 1 \&gt;" alt="" coords="651,385,797,426"/>
+<area shape="rect" id="node16" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 2,\l 2, 2, 2, 2 \&gt;" alt="" coords="651,450,797,491"/>
+<area shape="rect" id="node17" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 3,\l 2, 1 \&gt;" alt="" coords="651,515,797,557"/>
+<area shape="rect" id="node18" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 3,\l 2, 1, 2, 1 \&gt;" alt="" coords="651,581,797,622"/>
+<area shape="rect" id="node19" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 3,\l 2, 1, 2, 1, 2, 1 \&gt;" alt="" coords="651,646,797,687"/>
+<area shape="rect" id="node20" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 3,\l 2, 2, 2, 2 \&gt;" alt="" coords="651,711,797,753"/>
+<area shape="rect" id="node22" href="$classCorrespondenceBaseX.html" title="CorrespondenceBaseX" alt="" coords="379,813,535,840"/>
+<area shape="rect" id="node23" href="$classCorrespondenceGPSFix.html" title="CorrespondenceGPSFix" alt="" coords="643,777,805,804"/>
+<area shape="rect" id="node24" href="$classCorrespondenceOdom2D.html" title="CorrespondenceOdom2D" alt="" coords="639,828,809,855"/>
+<area shape="rect" id="node26" href="$classCaptureBase.html" title="CaptureBase" alt="" coords="408,893,507,920"/>
+<area shape="rect" id="node27" href="$classCaptureFix.html" title="CaptureFix" alt="" coords="681,879,767,905"/>
+<area shape="rect" id="node28" href="$classCaptureGPSFix.html" title="CaptureGPSFix" alt="" coords="667,929,781,956"/>
+<area shape="rect" id="node29" href="$classCaptureLaser2D.html" title="CaptureLaser2D" alt="" coords="665,980,783,1007"/>
+<area shape="rect" id="node30" href="$classCaptureRelative.html" title="CaptureRelative" alt="" coords="666,1031,782,1057"/>
+<area shape="rect" id="node32" href="$classCaptureBaseX.html" title="CaptureBaseX" alt="" coords="404,944,511,971"/>
+<area shape="rect" id="node34" href="$classLandmarkBase.html" title="LandmarkBase" alt="" coords="403,1024,512,1051"/>
+<area shape="rect" id="node35" href="$classLandmarkContainer.html" title="LandmarkContainer" alt="" coords="657,1081,791,1108"/>
+<area shape="rect" id="node36" href="$classLandmarkCorner2D.html" title="LandmarkCorner2D" alt="" coords="657,1132,791,1159"/>
+<area shape="rect" id="node38" href="$classTrajectoryBaseX.html" title="TrajectoryBaseX" alt="" coords="398,1075,517,1101"/>
+<area shape="rect" id="node40" href="$classFrameBase.html" title="FrameBase" alt="" coords="413,1140,502,1167"/>
+<area shape="rect" id="node42" href="$classFrameBaseX.html" title="FrameBaseX" alt="" coords="408,1205,507,1232"/>
+<area shape="rect" id="node44" href="$classTrajectoryBase.html" title="TrajectoryBase" alt="" coords="402,1263,513,1289"/>
+<area shape="rect" id="node46" href="$classMapBase.html" title="MapBase" alt="" coords="419,1313,496,1340"/>
+<area shape="rect" id="node49" href="$classSensorGPSFix.html" title="SensorGPSFix" alt="" coords="403,1364,512,1391"/>
+<area shape="rect" id="node50" href="$classSensorLaser2D.html" title="SensorLaser2D" alt="" coords="401,1415,513,1441"/>
+<area shape="rect" id="node51" href="$classSensorOdom2D.html" title="SensorOdom2D" alt="" coords="400,1465,515,1492"/>
+<area shape="rect" id="node52" href="$classSensorTwist2D.html" title="SensorTwist2D" alt="" coords="401,1516,513,1543"/>
+<area shape="rect" id="node54" href="$classStateOrientation.html" title="StateOrientation" alt="" coords="399,1567,515,1593"/>
+<area shape="rect" id="node58" href="$classStatePoint.html" title="StatePoint\&lt; SIZE \&gt;" alt="" coords="389,1617,526,1644"/>
+<area shape="rect" id="node55" href="$classStateComplexAngle.html" title="StateComplexAngle" alt="" coords="655,1516,793,1543"/>
+<area shape="rect" id="node56" href="$classStateQuaternion.html" title="StateQuaternion" alt="" coords="666,1567,782,1593"/>
+<area shape="rect" id="node57" href="$classStateTheta.html" title="StateTheta" alt="" coords="681,1617,767,1644"/>
+</map>

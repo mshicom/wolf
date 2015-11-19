@@ -1,0 +1,9 @@
+<map id="WolfProblem::getMapPtr" name="WolfProblem::getMapPtr">
+<area shape="rect" id="node2" href="$classCeresManager.html#aaf2823935e2d984e752abd25184a9617" title="CeresManager::computeCovariances" alt="" coords="219,5,458,32"/>
+<area shape="rect" id="node4" href="$classCaptureLaser2D.html#a409d482c258acc2987f4f1d6466a06bb" title="CaptureLaser2D::createContainer\lLandmark" alt="" coords="230,57,447,98"/>
+<area shape="rect" id="node5" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="507,145,685,186"/>
+<area shape="rect" id="node7" href="$classCaptureLaser2D.html#ae60be4c7e8dcf3784b46da9ac2e903d7" title="CaptureLaser2D::createCorner\lLandmark" alt="" coords="239,174,439,215"/>
+<area shape="rect" id="node8" href="$classCaptureLaser2D.html#ac4e4bbc26e6ed9b711969f033048ca48" title="Tries to fit a container given a feature and all existing landmarks. " alt="" coords="229,240,448,267"/>
+<area shape="rect" id="node3" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="571,5,621,32"/>
+<area shape="rect" id="node6" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="734,152,951,179"/>
+</map>

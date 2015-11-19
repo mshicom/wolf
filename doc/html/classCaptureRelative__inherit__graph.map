@@ -1,0 +1,7 @@
+<map id="CaptureRelative" name="CaptureRelative">
+<area shape="rect" id="node5" href="$classCaptureOdom2D.html" title="CaptureOdom2D" alt="" coords="5,320,125,347"/>
+<area shape="rect" id="node6" href="$classCaptureTwist2D.html" title="CaptureTwist2D" alt="" coords="149,320,265,347"/>
+<area shape="rect" id="node2" href="$classCaptureBase.html" title="CaptureBase" alt="" coords="87,171,185,197"/>
+<area shape="rect" id="node3" href="$classNodeLinked.html" title="NodeLinked\&lt; FrameBase,\l FeatureBase \&gt;" alt="" coords="49,81,223,122"/>
+<area shape="rect" id="node4" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="95,5,176,32"/>
+</map>

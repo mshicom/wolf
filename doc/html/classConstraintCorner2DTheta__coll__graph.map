@@ -1,0 +1,26 @@
+<map id="ConstraintCorner2DTheta" name="ConstraintCorner2DTheta">
+<area shape="rect" id="node2" href="$classConstraintSparse.html" title="ConstraintSparse\&lt; 3,\l 2, 1, 2, 1 \&gt;" alt="" coords="490,1497,637,1538"/>
+<area shape="rect" id="node3" href="$classConstraintXBase.html" title="ConstraintXBase" alt="" coords="731,464,851,491"/>
+<area shape="rect" id="node34" href="$classStateBase.html" title="StateBase" alt="" coords="1153,413,1234,440"/>
+<area shape="rect" id="node5" href="$classConstraintBase.html" title="ConstraintBase" alt="" coords="761,1259,871,1285"/>
+<area shape="rect" id="node6" href="$classNodeLinked.html" title="NodeLinked\&lt; FeatureBase,\l NodeTerminus \&gt;" alt="" coords="859,1153,1041,1194"/>
+<area shape="rect" id="node7" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="1003,117,1085,144"/>
+<area shape="rect" id="node13" href="$classNodeLinked.html" title="NodeLinked\&lt; CaptureBase,\l ConstraintBase \&gt;" alt="" coords="1140,955,1322,997"/>
+<area shape="rect" id="node15" href="$classNodeLinked.html" title="NodeLinked\&lt; FrameBase,\l FeatureBase \&gt;" alt="" coords="1753,715,1927,757"/>
+<area shape="rect" id="node17" href="$classNodeLinked.html" title="NodeLinked\&lt; TrajectoryBase,\l CaptureBase \&gt;" alt="" coords="1859,517,2054,558"/>
+<area shape="rect" id="node19" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l FrameBase \&gt;" alt="" coords="1931,307,2113,349"/>
+<area shape="rect" id="node20" href="$classWolfProblem.html" title="Wolf problem node element in the Wolf Tree. " alt="" coords="1557,216,1654,243"/>
+<area shape="rect" id="node27" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l LandmarkBase \&gt;" alt="" coords="1617,307,1799,349"/>
+<area shape="rect" id="node38" href="$classSensorBase.html" title="SensorBase" alt="" coords="1097,624,1190,651"/>
+<area shape="rect" id="node49" href="$classNodeLinked.html" title="NodeLinked\&lt; MapBase,\l NodeTerminus \&gt;" alt="" coords="1409,517,1571,558"/>
+<area shape="rect" id="node18" href="$classTrajectoryBase.html" title="TrajectoryBase" alt="" coords="2051,413,2161,440"/>
+<area shape="rect" id="node40" href="$classStatePoint.html" title="StatePoint\&lt; SIZE \&gt;" alt="" coords="1596,524,1733,551"/>
+<area shape="rect" id="node12" href="$classFeatureBase.html" title="FeatureBase" alt="" coords="902,1061,998,1088"/>
+<area shape="rect" id="node14" href="$classCaptureBase.html" title="CaptureBase" alt="" coords="1269,864,1367,891"/>
+<area shape="rect" id="node16" href="$classFrameBase.html" title="FrameBase" alt="" coords="1796,624,1885,651"/>
+<area shape="rect" id="node26" href="$classMapBase.html" title="MapBase" alt="" coords="1419,413,1495,440"/>
+<area shape="rect" id="node48" href="$classLandmarkBase.html" title="LandmarkBase" alt="" coords="426,624,535,651"/>
+<area shape="rect" id="node33" href="$classStateOrientation.html" title="StateOrientation" alt="" coords="1179,524,1294,551"/>
+<area shape="rect" id="node36" href="$classTimeStamp.html" title="TimeStamp implements basic functionalities for time stamps. " alt="" coords="2079,524,2167,551"/>
+<area shape="rect" id="node47" href="$classLandmarkCorner2D.html" title="LandmarkCorner2D" alt="" coords="156,797,290,824"/>
+</map>

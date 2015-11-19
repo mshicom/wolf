@@ -1,0 +1,9 @@
+<map id="CaptureBase::addFeature" name="CaptureBase::addFeature">
+<area shape="rect" id="node2" href="$classCaptureLaser2D.html#a9c1288282c82761dfcf7f2de0ee9d613" title="get corners " alt="" coords="229,5,441,32"/>
+<area shape="rect" id="node4" href="$classCaptureFix.html#a54177a1109631e7ef967d3ce92006c40" title="CaptureFix::processCapture" alt="" coords="241,56,428,83"/>
+<area shape="rect" id="node6" href="$classCaptureGPSFix.html#aac43fd1596069e8477565622acb1ef6c" title="CaptureGPSFix::processCapture" alt="" coords="227,107,442,133"/>
+<area shape="rect" id="node7" href="$classCaptureTwist2D.html#a684a199bdd7aae7afb007369acccc843" title="CaptureTwist2D::processCapture" alt="" coords="226,157,443,184"/>
+<area shape="rect" id="node8" href="$classCaptureOdom2D.html#ae0c441648749b44b38fcccbe8d0b42e1" title="CaptureOdom2D::processCapture" alt="" coords="225,208,445,235"/>
+<area shape="rect" id="node3" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="494,5,711,32"/>
+<area shape="rect" id="node5" href="$classWolfManager.html#a9e60afc41b30733515039dbf5a8cc7df" title="WolfManager::WolfManager" alt="" coords="511,56,695,83"/>
+</map>

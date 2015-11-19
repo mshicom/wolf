@@ -1,0 +1,11 @@
+<map id="main" name="main">
+<area shape="rect" id="node2" href="$classCorrespondenceCeresBase.html#a93d6d05a4ff32150e6b15d6bfe43fce8" title="CorrespondenceCeresBase\l::addBlock" alt="" coords="138,5,321,46"/>
+<area shape="rect" id="node3" href="$classWolfProblem.html#acbc1676f0d8337be93faf8edeb6dadbb" title="WolfProblem::addCorrespondence" alt="" coords="119,71,340,97"/>
+<area shape="rect" id="node4" href="$classWolfProblem.html#aaca401aebb14c1cf46037b722edb95ce" title="WolfProblem::computePrior" alt="" coords="138,121,321,148"/>
+<area shape="rect" id="node5" href="$classWolfProblem.html#ab80a8e922db6bd99909b84de614a9089" title="WolfProblem::getCorrespondence" alt="" coords="120,172,339,199"/>
+<area shape="rect" id="node6" href="$classWolfProblem.html#a84bcdf96379bc981062be15235d6d644" title="WolfProblem::getCorrespondencesSize" alt="" coords="104,223,355,249"/>
+<area shape="rect" id="node7" href="$classWolfProblem.html#a8c861d7fa803e479377d8c1f75c9beae" title="WolfProblem::getPrior" alt="" coords="154,273,305,300"/>
+<area shape="rect" id="node8" href="$classCorrespondenceBase.html#a5664d5409f0064d73856071574cc3b41" title="CorrespondenceBase\l::inventMeasurement" alt="" coords="156,325,303,366"/>
+<area shape="rect" id="node9" href="$classWolfProblem.html#ab7440cc3cf46cb49599f18ea611a5202" title="WolfProblem::print" alt="" coords="164,391,295,417"/>
+<area shape="rect" id="node10" href="$classWolfProblem.html#a4a40c1beb08f23160c45f086ced8d6d5" title="WolfProblem::resizeState" alt="" coords="144,441,315,468"/>
+</map>

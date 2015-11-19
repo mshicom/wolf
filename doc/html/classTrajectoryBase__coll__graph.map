@@ -1,0 +1,7 @@
+<map id="TrajectoryBase" name="TrajectoryBase">
+<area shape="rect" id="node8" href="$classWolfProblem.html" title="Wolf problem node element in the Wolf Tree. " alt="" coords="710,402,807,428"/>
+<area shape="rect" id="node2" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l FrameBase \&gt;" alt="" coords="982,518,1165,560"/>
+<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="333,588,416,615"/>
+<area shape="rect" id="node15" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l LandmarkBase \&gt;" alt="" coords="982,638,1165,680"/>
+<area shape="rect" id="node14" href="$classMapBase.html" title="MapBase" alt="" coords="1216,471,1293,498"/>
+</map>

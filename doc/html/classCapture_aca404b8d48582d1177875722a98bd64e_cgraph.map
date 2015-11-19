@@ -1,0 +1,10 @@
+<map id="Capture::precomputeConstants" name="Capture::precomputeConstants">
+<area shape="rect" id="node2" href="$classCapture.html#aee05c9315ed568e0cd607d626e56e1bf" title="Capture::precomputeGlobalPose" alt="" coords="259,81,469,108"/>
+<area shape="rect" id="node3" href="$namespaceWolf.html#aa7cf09411f337d78f2d58c52dc916ed7" title="compose frames " alt="" coords="517,5,672,32"/>
+<area shape="rect" id="node4" href="$classCapture.html#afebe90e42b39d31ee9ca82319580704b" title="Gets up_node_ptr_. " alt="" coords="531,56,658,83"/>
+<area shape="rect" id="node6" href="$classSensorBase.html#a4974103c3dcb2173e400dcd68f00a53e" title="SensorBase::pose" alt="" coords="530,107,659,133"/>
+<area shape="rect" id="node7" href="$classStatePose.html#a3da74b9abf605ce41780669735e331b3" title="inverse pose " alt="" coords="528,157,661,184"/>
+<area shape="rect" id="node5" href="$classNodeLinked.html#a51e6a99b8a3067ee7ba5e8315ab39dee" title="Access the pointer to parent. " alt="" coords="721,49,903,90"/>
+<area shape="rect" id="node8" href="$classStatePose.html#ace80bf6875105230ef431d5c8c43c060" title="StatePose::q" alt="" coords="763,136,861,163"/>
+<area shape="rect" id="node9" href="$classStatePose.html#a67ce72acf40bc14bcd24183535501d76" title="StatePose::p" alt="" coords="763,187,861,213"/>
+</map>

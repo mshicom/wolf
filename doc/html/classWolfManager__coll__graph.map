@@ -1,0 +1,18 @@
+<map id="WolfManager&lt; StatePositionT, StateOrientationT, StateVelocityT, StateOmegaT &gt;" name="WolfManager&lt; StatePositionT, StateOrientationT, StateVelocityT, StateOmegaT &gt;">
+<area shape="rect" id="node25" href="$classStateBase.html" title="StateBase" alt="" coords="1329,576,1412,603"/>
+<area shape="rect" id="node3" href="$classWolfProblem.html" title="Wolf problem node element in the Wolf Tree. " alt="" coords="710,852,807,879"/>
+<area shape="rect" id="node12" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l FrameBase \&gt;" alt="" coords="982,186,1165,227"/>
+<area shape="rect" id="node19" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l LandmarkBase \&gt;" alt="" coords="982,783,1165,825"/>
+<area shape="rect" id="node4" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="333,496,416,523"/>
+<area shape="rect" id="node22" href="$classSensorBase.html" title="SensorBase" alt="" coords="1899,833,1992,860"/>
+<area shape="rect" id="node35" href="$classNodeLinked.html" title="NodeLinked\&lt; TrajectoryBase,\l CaptureBase \&gt;" alt="" coords="1576,257,1771,298"/>
+<area shape="rect" id="node41" href="$classNodeLinked.html" title="NodeLinked\&lt; FrameBase,\l FeatureBase \&gt;" alt="" coords="2201,674,2375,715"/>
+<area shape="rect" id="node11" href="$classTrajectoryBase.html" title="TrajectoryBase" alt="" coords="1315,208,1426,235"/>
+<area shape="rect" id="node24" href="$classStatePoint.html" title="StatePoint\&lt; SIZE \&gt;" alt="" coords="1605,783,1742,809"/>
+<area shape="rect" id="node18" href="$classMapBase.html" title="MapBase" alt="" coords="1332,848,1409,875"/>
+<area shape="rect" id="node40" href="$classCaptureBase.html" title="CaptureBase" alt="" coords="2545,803,2644,829"/>
+<area shape="rect" id="node27" href="$classStateOrientation.html" title="StateOrientation" alt="" coords="1615,617,1731,644"/>
+<area shape="rect" id="node34" href="$classFrameBase.html" title="FrameBase" alt="" coords="1901,465,1990,492"/>
+<area shape="rect" id="node37" href="$classTimeStamp.html" title="TimeStamp implements basic functionalities for time stamps. " alt="" coords="1629,465,1718,492"/>
+<area shape="rect" id="node39" href="$classCaptureRelative.html" title="CaptureRelative" alt="" coords="2734,803,2850,829"/>
+</map>

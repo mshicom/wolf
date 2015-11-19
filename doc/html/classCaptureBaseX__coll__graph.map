@@ -1,0 +1,9 @@
+<map id="CaptureBaseX" name="CaptureBaseX">
+<area shape="rect" id="node2" href="$classNodeLinked.html" title="NodeLinked\&lt; FrameBaseX,\l FeatureBaseX \&gt;" alt="" coords="171,673,353,714"/>
+<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="555,109,636,136"/>
+<area shape="rect" id="node9" href="$classNodeLinked.html" title="NodeLinked\&lt; TrajectoryBase\lX, CaptureBaseX \&gt;" alt="" coords="294,475,484,517"/>
+<area shape="rect" id="node13" href="$classNodeLinked.html" title="NodeLinked\&lt; NodeTerminus,\l FrameBaseX \&gt;" alt="" coords="544,278,736,319"/>
+<area shape="rect" id="node14" href="$classNodeTerminus.html" title="Dummy node to terminate the tree in both the Top and Bottom levels. " alt="" coords="608,187,715,213"/>
+<area shape="rect" id="node12" href="$classTrajectoryBaseX.html" title="TrajectoryBaseX" alt="" coords="581,384,699,411"/>
+<area shape="rect" id="node8" href="$classFrameBaseX.html" title="FrameBaseX" alt="" coords="305,581,404,608"/>
+</map>

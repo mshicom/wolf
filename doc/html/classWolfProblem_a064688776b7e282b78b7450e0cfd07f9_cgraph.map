@@ -1,0 +1,8 @@
+<map id="WolfProblem::print" name="WolfProblem::print">
+<area shape="rect" id="node2" href="$classWolfProblem.html#a08974da6da0d619974f1271710589f65" title="Prints recursively lower nodes info. " alt="" coords="184,107,349,133"/>
+<area shape="rect" id="node6" href="$classWolfProblem.html#a99aa5df24462dc68c244bf1fb7237edf" title="Prints tabulated information about this node. " alt="" coords="190,56,343,83"/>
+<area shape="rect" id="node3" href="$classNodeBase.html#a87253cda60ae7e76c67166202e64747f" title="prints a number of tabulations. " alt="" coords="401,56,546,83"/>
+<area shape="rect" id="node4" href="$classNodeBase.html#af7e6b768837f694504f51780e7cbe920" title="Gets node ID. " alt="" coords="408,107,539,133"/>
+<area shape="rect" id="node5" href="$classNodeLinked.html#a5530f5861210ee0ac08ffc9fda85256f" title="Prints node information. " alt="" coords="411,157,535,184"/>
+<area shape="rect" id="node7" href="$classNodeBase.html#aac6f48ed29dafb110c2bac5a3840bebf" title="Gets node label. " alt="" coords="398,5,549,32"/>
+</map>

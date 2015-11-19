@@ -1,0 +1,5 @@
+<map id="CeresManager::updateStateUnitStatus" name="CeresManager::updateStateUnitStatus">
+<area shape="rect" id="node2" href="$classStateBase.html#a00a9c4c33332812a92a1127067390556" title="Returns the pointer to the first element of the state. " alt="" coords="274,5,401,32"/>
+<area shape="rect" id="node3" href="$classStateBase.html#a7d3651e59f3641b5bd29f1290228e567" title="Returns the status of the state unit. " alt="" coords="248,56,427,83"/>
+<area shape="rect" id="node4" href="$classNodeBase.html#ad812ef6535872d7769b127f2cd3a71e4" title="Sets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="240,107,435,133"/>
+</map>

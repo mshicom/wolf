@@ -1,0 +1,8 @@
+<map id="Capture" name="Capture">
+<area shape="rect" id="node5" href="$classCaptureGPS.html" title="CaptureGPS" alt="" coords="5,336,101,363"/>
+<area shape="rect" id="node6" href="$classCaptureImage.html" title="Image capture, generally from a projective, pin&#45;hole camera. " alt="" coords="125,336,229,363"/>
+<area shape="rect" id="node7" href="$classCaptureLaser2D.html" title="CaptureLaser2D" alt="" coords="253,336,369,363"/>
+<area shape="rect" id="node2" href="$classNodeConstrainer.html" title="NodeConstrainer\&lt; Frame,\l FeatureBase \&gt;" alt="" coords="91,171,264,213"/>
+<area shape="rect" id="node3" href="$classNodeLinked.html" title="NodeLinked\&lt; Frame,\l FeatureBase \&gt;" alt="" coords="105,81,249,122"/>
+<area shape="rect" id="node4" href="$classNode.html" title="Base class for Nodes. " alt="" coords="151,5,204,32"/>
+</map>

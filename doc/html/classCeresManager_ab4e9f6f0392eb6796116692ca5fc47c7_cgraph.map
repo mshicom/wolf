@@ -1,0 +1,21 @@
+<map id="CeresManager::update" name="CeresManager::update">
+<area shape="rect" id="node2" href="$classCeresManager.html#a53f3dfc38ce8685415d1aefb430edf27" title="CeresManager::addConstraint" alt="" coords="219,107,415,133"/>
+<area shape="rect" id="node7" href="$classCeresManager.html#ae205d5cf1e27001da9594928e5f6cb5f" title="CeresManager::addStateUnit" alt="" coords="222,289,413,316"/>
+<area shape="rect" id="node11" href="$classCeresManager.html#a131d30b9141763639034120112a5224d" title="CeresManager::updateState\lUnitStatus" alt="" coords="475,339,661,381"/>
+<area shape="rect" id="node12" href="$classTrajectoryBase.html#a00e96176f63dc529ce72f940924d06d2" title="Returns a list of all constraints in the trajectory thru reference. " alt="" coords="209,395,426,421"/>
+<area shape="rect" id="node15" href="$classWolfProblem.html#a7c874fbcb3f9f5e9653451a5ded2964a" title="Gets a list of wolfscalar pointers contained by removed state units (in order to delete them in ceres..." alt="" coords="212,446,423,487"/>
+<area shape="rect" id="node16" href="$classWolfProblem.html#ab5f1002a1883a23452888682f6294b1f" title="Gets a pointer to the state units list. " alt="" coords="221,512,413,539"/>
+<area shape="rect" id="node17" href="$classWolfProblem.html#a4279e89c0cb160e14b7ac86767afb039" title="Gets a pointer to map. " alt="" coords="218,563,417,589"/>
+<area shape="rect" id="node18" href="$classWolfProblem.html#ad18f8124fea52936eac894d272520928" title="Gets if the state has been reallocated. " alt="" coords="225,613,409,640"/>
+<area shape="rect" id="node19" href="$classWolfProblem.html#a87493e5243da3e6a8918ef8d3ac94cc5" title="Turn off the reallocation flag. " alt="" coords="216,664,419,691"/>
+<area shape="rect" id="node20" href="$classCeresManager.html#a58e75708858400482a2001d608d2840d" title="CeresManager::removeAllState\lUnits" alt="" coords="215,715,419,757"/>
+<area shape="rect" id="node3" href="$classCeresManager.html#ac71babd16b7c8973eca6b3ef1e0f4989" title="CeresManager::createCost\lFunction" alt="" coords="479,5,657,46"/>
+<area shape="rect" id="node5" href="$classConstraintBase.html#adcda725e3dba669e71a2bef0a3c263bb" title="Returns a vector of scalar pointers to the first element of all state blocks involved in the constrai..." alt="" coords="483,70,653,111"/>
+<area shape="rect" id="node6" href="$classNodeBase.html#ad812ef6535872d7769b127f2cd3a71e4" title="Sets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="729,187,924,213"/>
+<area shape="rect" id="node4" href="$classConstraintBase.html#a31efa1afd9caef7a45e21759235754dc" title="Returns the constraint type. " alt="" coords="713,12,940,39"/>
+<area shape="rect" id="node8" href="$classStateBase.html#a8bdd7664508c4edf53d5e2beb3eee898" title="Returns the parametrization of the state unit. " alt="" coords="483,288,653,315"/>
+<area shape="rect" id="node9" href="$classStateBase.html#a00a9c4c33332812a92a1127067390556" title="Returns the pointer to the first element of the state. " alt="" coords="763,292,890,319"/>
+<area shape="rect" id="node10" href="$classStateBase.html#a7d3651e59f3641b5bd29f1290228e567" title="Returns the status of the state unit. " alt="" coords="737,401,916,428"/>
+<area shape="rect" id="node13" href="$classTrajectoryBase.html#ab175c9fc0089cbbe7d6b5266edec6ddc" title="Returns a pointer to Frame list. " alt="" coords="481,457,655,498"/>
+<area shape="rect" id="node14" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="709,457,944,498"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="FrameBase::getNextFrame" name="FrameBase::getNextFrame">
+<area shape="rect" id="node2" href="$classTrajectoryBase.html#ab175c9fc0089cbbe7d6b5266edec6ddc" title="Returns a pointer to Frame list. " alt="" coords="244,7,417,49"/>
+<area shape="rect" id="node4" href="$classFrameBase.html#a5da03c9bf261feae73161c1013813c0e" title="FrameBase::getTrajectoryPtr" alt="" coords="235,75,426,101"/>
+<area shape="rect" id="node3" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="475,5,709,46"/>
+<area shape="rect" id="node5" href="$classNodeLinked.html#a5ab61f1533b7b4137e040b5900e90223" title="Access the pointer to parent. " alt="" coords="491,70,693,111"/>
+</map>

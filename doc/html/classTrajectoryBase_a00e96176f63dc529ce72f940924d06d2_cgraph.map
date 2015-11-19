@@ -1,0 +1,4 @@
+<map id="TrajectoryBase::getConstraintList" name="TrajectoryBase::getConstraintList">
+<area shape="rect" id="node2" href="$classTrajectoryBase.html#ab175c9fc0089cbbe7d6b5266edec6ddc" title="Returns a pointer to Frame list. " alt="" coords="272,5,445,46"/>
+<area shape="rect" id="node3" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="493,5,728,46"/>
+</map>

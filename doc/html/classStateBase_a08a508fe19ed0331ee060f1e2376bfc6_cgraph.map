@@ -1,0 +1,4 @@
+<map id="StateBase::setStateStatus" name="StateBase::setStateStatus">
+<area shape="rect" id="node2" href="$classNodeBase.html#a6020d2ae5191c6ad645562bfb44a3a47" title="Gets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="232,5,427,32"/>
+<area shape="rect" id="node3" href="$classNodeBase.html#ad812ef6535872d7769b127f2cd3a71e4" title="Sets the node pending status (pending or not to be added/updated in the filter or optimizer) ..." alt="" coords="232,56,427,83"/>
+</map>

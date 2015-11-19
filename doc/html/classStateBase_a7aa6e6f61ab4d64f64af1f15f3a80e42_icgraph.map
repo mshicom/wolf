@@ -1,0 +1,7 @@
+<map id="StateBase::setPtr" name="StateBase::setPtr">
+<area shape="rect" id="node2" href="$classWolfProblem.html#ac4924e9c76c7d30a5eea7dfecd33ec3d" title="Adds a new state unit to the state. " alt="" coords="181,45,339,72"/>
+<area shape="rect" id="node3" href="$classCaptureLaser2D.html#ae60be4c7e8dcf3784b46da9ac2e903d7" title="CaptureLaser2D::createCorner\lLandmark" alt="" coords="396,5,596,46"/>
+<area shape="rect" id="node6" href="$classCaptureLaser2D.html#a409d482c258acc2987f4f1d6466a06bb" title="CaptureLaser2D::createContainer\lLandmark" alt="" coords="387,70,605,111"/>
+<area shape="rect" id="node4" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="654,38,831,79"/>
+<area shape="rect" id="node5" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="881,45,1098,72"/>
+</map>

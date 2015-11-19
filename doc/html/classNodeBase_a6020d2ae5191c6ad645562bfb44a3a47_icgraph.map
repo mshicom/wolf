@@ -1,0 +1,5 @@
+<map id="NodeBase::getPendingStatus" name="NodeBase::getPendingStatus">
+<area shape="rect" id="node2" href="$classStateBase.html#a08a508fe19ed0331ee060f1e2376bfc6" title="Set the status of the state unit. " alt="" coords="248,31,427,57"/>
+<area shape="rect" id="node3" href="$classFrameBase.html#ae8ee3644978f44f5161c69e6b7cccba8" title="FrameBase::fix" alt="" coords="482,5,593,32"/>
+<area shape="rect" id="node4" href="$classFrameBase.html#a645e3509430b70f0a58a8957a7569e94" title="FrameBase::unfix" alt="" coords="475,56,600,83"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="AssociationTree::normalizeTree" name="AssociationTree::normalizeTree">
+<area shape="rect" id="node2" href="$classAssociationNode.html#ab9275252d8587bfbd7f79a555a027132" title="Normalizes node probabilities recursively. " alt="" coords="262,5,447,46"/>
+<area shape="rect" id="node3" href="$classAssociationNode.html#af1a0ed1d5462e5315a9b436b58b3399c" title="True if this is node is terminus (no more nodes below) " alt="" coords="497,12,690,39"/>
+</map>

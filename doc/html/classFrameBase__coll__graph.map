@@ -1,0 +1,12 @@
+<map id="FrameBase" name="FrameBase">
+<area shape="rect" id="node2" href="$classNodeLinked.html" title="NodeLinked\&lt; TrajectoryBase,\l CaptureBase \&gt;" alt="" coords="1315,394,1509,435"/>
+<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="288,411,371,437"/>
+<area shape="rect" id="node9" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l FrameBase \&gt;" alt="" coords="553,626,735,667"/>
+<area shape="rect" id="node10" href="$classWolfProblem.html" title="Wolf problem node element in the Wolf Tree. " alt="" coords="1363,867,1461,893"/>
+<area shape="rect" id="node17" href="$classNodeLinked.html" title="NodeLinked\&lt; WolfProblem,\l LandmarkBase \&gt;" alt="" coords="1641,799,1823,841"/>
+<area shape="rect" id="node24" href="$classStateBase.html" title="StateBase" alt="" coords="963,137,1045,164"/>
+<area shape="rect" id="node8" href="$classTrajectoryBase.html" title="TrajectoryBase" alt="" coords="949,616,1059,643"/>
+<area shape="rect" id="node16" href="$classMapBase.html" title="MapBase" alt="" coords="1875,844,1952,871"/>
+<area shape="rect" id="node23" href="$classStateOrientation.html" title="StateOrientation" alt="" coords="1354,56,1470,83"/>
+<area shape="rect" id="node27" href="$classTimeStamp.html" title="TimeStamp implements basic functionalities for time stamps. " alt="" coords="1367,5,1457,32"/>
+</map>

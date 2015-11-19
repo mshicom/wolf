@@ -1,0 +1,12 @@
+<map id="CaptureTwist2D::processCapture" name="CaptureTwist2D::processCapture">
+<area shape="rect" id="node2" href="$classCaptureTwist2D.html#a31d115c4a62cf575f28e54a865a6e78a" title="CaptureTwist2D::addConstraints" alt="" coords="272,125,485,152"/>
+<area shape="rect" id="node10" href="$classCaptureBase.html#aa682ee3a7053fc5f7c972394cfbb045b" title="Adds a Feature to the down node list. " alt="" coords="293,180,464,207"/>
+<area shape="rect" id="node3" href="$classCaptureBase.html#a04de3a81803d93b08af9533041c06860" title="Gets up_node_ptr_. " alt="" coords="796,5,975,32"/>
+<area shape="rect" id="node5" href="$classFrameBase.html#aa73aa6e7a764fbc289bef6d103bc8da5" title="FrameBase::getNextFrame" alt="" coords="547,100,727,127"/>
+<area shape="rect" id="node9" href="$classCaptureBase.html#a1d08e83b5d2aff3e139bd9f24a4e89f7" title="Gets a pointer to feature list. " alt="" coords="534,151,741,177"/>
+<area shape="rect" id="node4" href="$classNodeLinked.html#a5ab61f1533b7b4137e040b5900e90223" title="Access the pointer to parent. " alt="" coords="1047,33,1247,74"/>
+<area shape="rect" id="node6" href="$classFrameBase.html#a5da03c9bf261feae73161c1013813c0e" title="FrameBase::getTrajectoryPtr" alt="" coords="790,56,981,83"/>
+<area shape="rect" id="node7" href="$classTrajectoryBase.html#ab175c9fc0089cbbe7d6b5266edec6ddc" title="Returns a pointer to Frame list. " alt="" coords="799,107,972,149"/>
+<area shape="rect" id="node8" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="1029,123,1264,165"/>
+<area shape="rect" id="node11" href="$classNodeLinked.html#a7398e39d5f4647187659ce59eadf537f" title="Adds a down node. " alt="" coords="534,202,741,243"/>
+</map>

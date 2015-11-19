@@ -1,0 +1,24 @@
+<map id="StateBase::getPtr" name="StateBase::getPtr">
+<area shape="rect" id="node2" href="$classWolfProblem.html#a74382fc2dd9e5416fc068aea6c936806" title="Adds a new covariance block. " alt="" coords="183,198,375,239"/>
+<area shape="rect" id="node7" href="$classCeresManager.html#aaf2823935e2d984e752abd25184a9617" title="CeresManager::computeCovariances" alt="" coords="425,305,663,332"/>
+<area shape="rect" id="node9" href="$classSolverManager.html#a995560621d2a5c3f1001f815da5ce4dc" title="SolverManager::addStateUnit" alt="" coords="182,44,375,71"/>
+<area shape="rect" id="node11" href="$classCeresManager.html#ae205d5cf1e27001da9594928e5f6cb5f" title="CeresManager::addStateUnit" alt="" coords="449,423,639,449"/>
+<area shape="rect" id="node13" href="$classWolfManager.html#a6bfdc8905fb8aae935d9b71121d57f3d" title="WolfManager::computeOdom\lCapture" alt="" coords="183,315,375,357"/>
+<area shape="rect" id="node14" href="$classWolfProblem.html#ace0017d732c4bedf0692e93560f7aa80" title="Gets a covariance block. " alt="" coords="184,133,373,174"/>
+<area shape="rect" id="node18" href="$classFrameBase.html#a986b8e582c8cd0531a9888456229b105" title="FrameBase::getState" alt="" coords="205,447,352,473"/>
+<area shape="rect" id="node19" href="$classLandmarkContainer.html#a22ef22f6108cf6bb538888a829304070" title="Constructor with type, time stamp and the position state pointer. " alt="" coords="207,498,350,539"/>
+<area shape="rect" id="node20" href="$classWolfProblem.html#a68248b594c7faab6e0d347aa421b50d1" title="Removes a new state unit of the state. " alt="" coords="189,564,368,591"/>
+<area shape="rect" id="node22" href="$classFrameBase.html#ae1df016d6f605d9d9d86dc94b5d6933b" title="FrameBase::setState" alt="" coords="205,615,352,641"/>
+<area shape="rect" id="node23" href="$classCeresManager.html#a131d30b9141763639034120112a5224d" title="CeresManager::updateState\lUnitStatus" alt="" coords="186,381,371,422"/>
+<area shape="rect" id="node3" href="$classCaptureLaser2D.html#ae60be4c7e8dcf3784b46da9ac2e903d7" title="CaptureLaser2D::createCorner\lLandmark" alt="" coords="444,174,644,215"/>
+<area shape="rect" id="node6" href="$classCaptureLaser2D.html#a409d482c258acc2987f4f1d6466a06bb" title="CaptureLaser2D::createContainer\lLandmark" alt="" coords="435,239,653,281"/>
+<area shape="rect" id="node4" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="993,115,1170,157"/>
+<area shape="rect" id="node5" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="1219,123,1437,149"/>
+<area shape="rect" id="node8" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="1056,343,1107,369"/>
+<area shape="rect" id="node10" href="$classSolverManager.html#ac5c3830404c8018abf9555dc44912646" title="SolverManager::update" alt="" coords="466,5,622,32"/>
+<area shape="rect" id="node12" href="$classCeresManager.html#ab4e9f6f0392eb6796116692ca5fc47c7" title="CeresManager::update" alt="" coords="751,372,905,399"/>
+<area shape="rect" id="node15" href="$classCaptureLaser2D.html#a9de369dc0fdc939d0dde9c8f0a7bbc7a" title="CaptureLaser2D::computeExpected\lFeature" alt="" coords="713,115,943,157"/>
+<area shape="rect" id="node16" href="$classCaptureLaser2D.html#a30675456036f30199e9636f51535b43b" title="CaptureLaser2D::computeSquared\lMahalanobisDistances" alt="" coords="433,57,655,98"/>
+<area shape="rect" id="node17" href="$classCaptureLaser2D.html#ac4e4bbc26e6ed9b711969f033048ca48" title="Tries to fit a container given a feature and all existing landmarks. " alt="" coords="719,13,937,40"/>
+<area shape="rect" id="node21" href="$classFrameBase.html#a2f0de36114b3cb2c59e7c671970dbebb" title="Destructor. " alt="" coords="458,564,630,591"/>
+</map>

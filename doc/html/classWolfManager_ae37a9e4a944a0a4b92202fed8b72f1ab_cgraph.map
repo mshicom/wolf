@@ -1,0 +1,10 @@
+<map id="WolfManager::update" name="WolfManager::update">
+<area shape="rect" id="node2" href="$classCaptureBase.html#a59d8d100cff2c73a8b2c7c2e5e65776c" title="CaptureBase::computePrior" alt="" coords="205,5,387,32"/>
+<area shape="rect" id="node3" href="$classWolfManager.html#adaa6242761a0f059bf331a94a816c94a" title="WolfManager::createFrame" alt="" coords="206,56,386,83"/>
+<area shape="rect" id="node5" href="$classTimeStamp.html#a029b5e54bfd86b4fa74970a4a4373f8e" title="Get time stamp. " alt="" coords="239,107,353,133"/>
+<area shape="rect" id="node6" href="$classCaptureBase.html#a048c166c0787df262a0fb467c800a36a" title="CaptureBase::getSensorPtr" alt="" coords="205,157,387,184"/>
+<area shape="rect" id="node7" href="$classCaptureBase.html#a7cf93606f67c333befdfec207a69782f" title="CaptureBase::getTimeStamp" alt="" coords="201,208,391,235"/>
+<area shape="rect" id="node8" href="$classCaptureRelative.html#aa9e3036777839c7fe5509a9aabc4eec8" title="CaptureRelative::integrate\lCapture" alt="" coords="209,259,383,301"/>
+<area shape="rect" id="node9" href="$classNodeBase.html#af7e6b768837f694504f51780e7cbe920" title="Gets node ID. " alt="" coords="231,325,361,352"/>
+<area shape="rect" id="node4" href="$classStateComplexAngle.html#aa27ed38148c74223e7ac49a547bba76d" title="Returns the state unit size. " alt="" coords="440,49,587,90"/>
+</map>

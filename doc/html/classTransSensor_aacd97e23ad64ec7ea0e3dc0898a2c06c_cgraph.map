@@ -1,0 +1,5 @@
+<map id="TransSensor::precomputePoseRelative" name="TransSensor::precomputePoseRelative">
+<area shape="rect" id="node2" href="$namespaceWolf.html#aa7cf09411f337d78f2d58c52dc916ed7" title="compose frames " alt="" coords="272,5,427,32"/>
+<area shape="rect" id="node3" href="$classCapture.html#a737c36afb10c022f040ab0bafb728e99" title="Capture::globalPose" alt="" coords="279,56,419,83"/>
+<area shape="rect" id="node4" href="$classCapture.html#ad5390b15b9f93e660cb203ec26e00987" title="Capture::inverseGlobalPose" alt="" coords="257,107,442,133"/>
+</map>

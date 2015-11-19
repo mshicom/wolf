@@ -1,0 +1,11 @@
+<map id="StateRootBase" name="StateRootBase">
+<area shape="rect" id="node2" href="$classStateBase.html" title="Base class for regular states. " alt="" coords="108,80,189,107"/>
+<area shape="rect" id="node7" href="$classStateError.html" title="Base class for error states. " alt="" coords="227,80,308,107"/>
+<area shape="rect" id="node3" href="$classStateIMU.html" title="Class for IMU bias states. " alt="" coords="5,155,83,181"/>
+<area shape="rect" id="node4" href="$classStatePose.html" title="Base class for pose states. " alt="" coords="108,155,189,181"/>
+<area shape="rect" id="node5" href="$classStatePQ.html" title="State pose with position and orientation only. " alt="" coords="63,229,135,256"/>
+<area shape="rect" id="node6" href="$classStatePQV.html" title="Class for 3D position, velocity and orientation states. " alt="" coords="159,229,240,256"/>
+<area shape="rect" id="node8" href="$classStateErrorIMU.html" title="Error&#45;state class for IMU biases states. " alt="" coords="215,155,321,181"/>
+<area shape="rect" id="node9" href="$classStateErrorPose.html" title="StateErrorPose" alt="" coords="346,155,456,181"/>
+<area shape="rect" id="node10" href="$classStateErrorPQV.html" title="Error state class for position&#45;velocity&#45;quaternion states. " alt="" coords="347,229,456,256"/>
+</map>

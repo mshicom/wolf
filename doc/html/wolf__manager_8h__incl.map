@@ -1,0 +1,38 @@
+<map id="wolf_manager.h" name="wolf_manager.h">
+<area shape="rect" id="node14" href="$wolf_8h.html" title="General typedefs for the Wolf project. " alt="" coords="2609,859,2665,885"/>
+<area shape="rect" id="node18" href="$sensor__base_8h.html" title="sensor_base.h" alt="" coords="956,411,1063,437"/>
+<area shape="rect" id="node20" href="$state__point_8h.html" title="state_point.h" alt="" coords="898,560,995,587"/>
+<area shape="rect" id="node23" href="$state__base_8h.html" title="state_base.h" alt="" coords="1093,635,1189,661"/>
+<area shape="rect" id="node25" href="$sensor__odom__2D_8h.html" title="sensor_odom_2D.h" alt="" coords="1011,163,1145,189"/>
+<area shape="rect" id="node26" href="$sensor__gps__fix_8h.html" title="sensor_gps_fix.h" alt="" coords="814,336,935,363"/>
+<area shape="rect" id="node27" href="$feature__base_8h.html" title="feature_base.h" alt="" coords="2281,253,2388,280"/>
+<area shape="rect" id="node29" href="$capture__base_8h.html" title="capture_base.h" alt="" coords="1785,336,1895,363"/>
+<area shape="rect" id="node32" href="$frame__base_8h.html" title="frame_base.h" alt="" coords="1772,411,1873,437"/>
+<area shape="rect" id="node33" href="$trajectory__base_8h.html" title="trajectory_base.h" alt="" coords="1748,485,1871,512"/>
+<area shape="rect" id="node34" href="$wolf__problem_8h.html" title="wolf_problem.h" alt="" coords="1754,560,1864,587"/>
+<area shape="rect" id="node35" href="$map__base_8h.html" title="map_base.h" alt="" coords="1772,635,1865,661"/>
+<area shape="rect" id="node37" href="$state__complex__angle_8h.html" title="state_complex_angle.h" alt="" coords="599,485,755,512"/>
+<area shape="rect" id="node38" href="$capture__fix_8h.html" title="capture_fix.h" alt="" coords="2027,80,2124,107"/>
+<area shape="rect" id="node41" href="$constraint__sparse_8h.html" title="constraint_sparse.h" alt="" coords="3148,336,3283,363"/>
+<area shape="rect" id="node42" href="$capture__relative_8h.html" title="capture_relative.h" alt="" coords="1576,253,1701,280"/>
+<area shape="rect" id="node43" href="$capture__odom__2D_8h.html" title="capture_odom_2D.h" alt="" coords="1525,80,1664,107"/>
+<area shape="rect" id="node45" href="$constraint__odom__2D__theta_8h.html" title="constraint_odom_2D\l_theta.h" alt="" coords="2699,246,2841,287"/>
+<area shape="rect" id="node46" href="$constraint__odom__2D__complex__angle_8h.html" title="constraint_odom_2D\l_complex_angle.h" alt="" coords="2921,246,3063,287"/>
+<area shape="rect" id="node47" href="$capture__gps__fix_8h.html" title="capture_gps_fix.h" alt="" coords="1789,80,1915,107"/>
+<area shape="rect" id="node49" href="$constraint__gps__2D_8h.html" title="constraint_gps_2D.h" alt="" coords="3087,253,3229,280"/>
+<area shape="rect" id="node50" href="$capture__laser__2D_8h.html" title="capture_laser_2D.h" alt="" coords="2853,80,2987,107"/>
+<area shape="rect" id="node60" href="$state__quaternion_8h.html" title="state_quaternion.h" alt="" coords="441,485,569,512"/>
+<area shape="rect" id="node19" href="$node__base_8h.html" title="node_base.h" alt="" coords="1348,784,1444,811"/>
+<area shape="rect" id="node24" href="$state__orientation_8h.html" title="state_orientation.h" alt="" coords="745,560,873,587"/>
+<area shape="rect" id="node28" href="$node__linked_8h.html" title="node_linked.h" alt="" coords="2222,709,2324,736"/>
+<area shape="rect" id="node36" href="$constraint__base_8h.html" title="constraint_base.h" alt="" coords="2745,411,2871,437"/>
+<area shape="rect" id="node30" href="$time__stamp_8h.html" title="time_stamp.h" alt="" coords="2473,485,2575,512"/>
+<area shape="rect" id="node39" href="$feature__fix_8h.html" title="feature_fix.h" alt="" coords="2065,163,2159,189"/>
+<area shape="rect" id="node40" href="$constraint__fix_8h.html" title="constraint_fix.h" alt="" coords="3306,253,3416,280"/>
+<area shape="rect" id="node44" href="$feature__odom__2D_8h.html" title="feature_odom_2D.h" alt="" coords="2400,163,2535,189"/>
+<area shape="rect" id="node48" href="$feature__gps__fix_8h.html" title="feature_gps_fix.h" alt="" coords="2560,163,2683,189"/>
+<area shape="rect" id="node56" href="$constraint__corner__2D__theta_8h.html" title="constraint_corner_2D\l_theta.h" alt="" coords="3441,246,3588,287"/>
+<area shape="rect" id="node57" href="$constraint__container_8h.html" title="constraint_container.h" alt="" coords="3613,253,3763,280"/>
+<area shape="rect" id="node58" href="$sensor__laser__2D_8h.html" title="sensor_laser_2D.h" alt="" coords="1323,336,1452,363"/>
+<area shape="rect" id="node59" href="$feature__corner__2D_8h.html" title="feature_corner_2D.h" alt="" coords="2235,163,2375,189"/>
+</map>

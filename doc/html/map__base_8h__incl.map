@@ -1,0 +1,18 @@
+<map id="map_base.h" name="map_base.h">
+<area shape="rect" id="node7" href="$wolf_8h.html" title="General typedefs for the Wolf project. " alt="" coords="1770,677,1827,704"/>
+<area shape="rect" id="node13" href="$wolf__problem_8h.html" title="wolf_problem.h" alt="" coords="811,80,921,107"/>
+<area shape="rect" id="node16" href="$node__linked_8h.html" title="node_linked.h" alt="" coords="1727,528,1829,555"/>
+<area shape="rect" id="node17" href="$node__terminus_8h.html" title="node_terminus.h" alt="" coords="1585,528,1703,555"/>
+<area shape="rect" id="node30" href="$landmark__base_8h.html" title="landmark_base.h" alt="" coords="805,379,925,405"/>
+<area shape="rect" id="node14" href="$node__base_8h.html" title="node_base.h" alt="" coords="1432,603,1528,629"/>
+<area shape="rect" id="node15" href="$trajectory__base_8h.html" title="trajectory_base.h" alt="" coords="805,155,928,181"/>
+<area shape="rect" id="node18" href="$frame__base_8h.html" title="frame_base.h" alt="" coords="1019,229,1120,256"/>
+<area shape="rect" id="node28" href="$state__base_8h.html" title="state_base.h" alt="" coords="955,528,1052,555"/>
+<area shape="rect" id="node19" href="$time__stamp_8h.html" title="time_stamp.h" alt="" coords="2036,528,2137,555"/>
+<area shape="rect" id="node23" href="$capture__base_8h.html" title="capture_base.h" alt="" coords="1829,304,1939,331"/>
+<area shape="rect" id="node24" href="$feature__base_8h.html" title="feature_base.h" alt="" coords="1846,379,1953,405"/>
+<area shape="rect" id="node26" href="$sensor__base_8h.html" title="sensor_base.h" alt="" coords="1352,379,1459,405"/>
+<area shape="rect" id="node25" href="$constraint__base_8h.html" title="constraint_base.h" alt="" coords="1837,453,1963,480"/>
+<area shape="rect" id="node27" href="$state__point_8h.html" title="state_point.h" alt="" coords="1107,453,1204,480"/>
+<area shape="rect" id="node29" href="$state__orientation_8h.html" title="state_orientation.h" alt="" coords="801,453,929,480"/>
+</map>

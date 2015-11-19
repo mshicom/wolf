@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jsola/dev/labrobotica/algorithms/wolf/trunk/src/examples/test_permutations.cpp
+cstdlib
+-
+iostream
+-
+fstream
+-
+memory
+-
+random
+-
+typeinfo
+-
+ctime
+-
+queue
+-
+eigen3/Eigen/OrderingMethods
+-
+

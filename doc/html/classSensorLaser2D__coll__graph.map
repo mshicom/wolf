@@ -1,0 +1,7 @@
+<map id="SensorLaser2D" name="SensorLaser2D">
+<area shape="rect" id="node2" href="$classSensorBase.html" title="SensorBase" alt="" coords="887,109,980,136"/>
+<area shape="rect" id="node3" href="$classNodeBase.html" title="Base class for Nodes. " alt="" coords="260,136,343,163"/>
+<area shape="rect" id="node10" href="$classStateBase.html" title="StateBase" alt="" coords="483,83,565,109"/>
+<area shape="rect" id="node9" href="$classStatePoint.html" title="StatePoint\&lt; SIZE \&gt;" alt="" coords="617,8,754,35"/>
+<area shape="rect" id="node13" href="$classStateOrientation.html" title="StateOrientation" alt="" coords="627,109,743,136"/>
+</map>

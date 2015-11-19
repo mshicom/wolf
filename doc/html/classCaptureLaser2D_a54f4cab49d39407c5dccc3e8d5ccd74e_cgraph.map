@@ -1,0 +1,4 @@
+<map id="CaptureLaser2D::extractCorners" name="CaptureLaser2D::extractCorners">
+<area shape="rect" id="node2" href="$classSensorLaser2D.html#a7f19caa1cda2cde6096acab1298e08bc" title="Get parameters for corner detection algorithm. " alt="" coords="282,5,459,46"/>
+<area shape="rect" id="node3" href="$classSensorLaser2D.html#a041eeb6fbf3e001b6ae3bbfbc56741a4" title="Get scanner intrinsic parameters. " alt="" coords="264,71,477,97"/>
+</map>

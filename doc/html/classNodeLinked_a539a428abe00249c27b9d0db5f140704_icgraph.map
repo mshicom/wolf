@@ -1,0 +1,5 @@
+<map id="NodeLinked::linkToUpperNode" name="NodeLinked::linkToUpperNode">
+<area shape="rect" id="node2" href="$classWolfProblem.html#a03989aac94892cc10f39d6144cdbd326" title="Sets the index of the last occupied position of the state. " alt="" coords="270,5,421,32"/>
+<area shape="rect" id="node3" href="$classWolfProblem.html#aaefbb16c1cd2b0980a49b574dab0e7fe" title="Adds a trajectory. " alt="" coords="253,56,437,83"/>
+<area shape="rect" id="node4" href="$classWolfProblem.html#ae7c039aad0ae8851657e92ca0b579575" title="Constructor from state size. " alt="" coords="255,107,435,133"/>
+</map>

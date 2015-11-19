@@ -1,0 +1,15 @@
+<map id="CorrespondenceGPSDoppler" name="CorrespondenceGPSDoppler">
+<area shape="rect" id="node2" href="$classCorrespondenceGlobal.html" title="CorrespondenceGlobal" alt="" coords="1629,307,1784,333"/>
+<area shape="rect" id="node3" href="$classCorrespondenceBase.html" title="CorrespondenceBase" alt="" coords="1432,307,1579,333"/>
+<area shape="rect" id="node4" href="$classNodeConstrainer.html" title="NodeConstrainer\&lt; Feature\lBase, NodeTerminus \&gt;" alt="" coords="867,47,1043,89"/>
+<area shape="rect" id="node5" href="$classNodeLinked.html" title="NodeLinked\&lt; FeatureBase,\l NodeTerminus \&gt;" alt="" coords="557,30,739,71"/>
+<area shape="rect" id="node6" href="$classNode.html" title="Base class for Nodes. " alt="" coords="389,155,443,181"/>
+<area shape="rect" id="node15" href="$classNodeLinked.html" title="NodeLinked\&lt; Frame,\l FeatureBase \&gt;" alt="" coords="576,213,720,254"/>
+<area shape="rect" id="node17" href="$classNodeLinked.html" title="NodeLinked\&lt; VehicleBase,\l NodeTerminus \&gt;" alt="" coords="558,147,738,189"/>
+<area shape="rect" id="node11" href="$classStateRootBase.html" title="Base class for all kind of states. " alt="" coords="361,335,471,361"/>
+<area shape="rect" id="node14" href="$classNodeConstrainer.html" title="NodeConstrainer\&lt; Frame,\l FeatureBase \&gt;" alt="" coords="868,255,1041,297"/>
+<area shape="rect" id="node9" href="$classStatePose.html" title="Base class for pose states. " alt="" coords="913,335,996,361"/>
+<area shape="rect" id="node13" href="$classCapture.html" title="Base class for raw data captures from sensors. " alt="" coords="1221,248,1289,275"/>
+<area shape="rect" id="node10" href="$classStateBase.html" title="Base class for regular states. " alt="" coords="607,335,689,361"/>
+<area shape="rect" id="node16" href="$classSensorBase.html" title="Base class for all kind of sensors. " alt="" coords="908,153,1001,180"/>
+</map>

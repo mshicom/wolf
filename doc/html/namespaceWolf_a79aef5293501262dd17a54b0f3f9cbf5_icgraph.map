@@ -1,0 +1,9 @@
+<map id="Wolf::quaternionFromVector" name="Wolf::quaternionFromVector">
+<area shape="rect" id="node2" href="$classStateErrorPQV.html#a55888fc8605ee5fc72d48db26c118f58" title="StateErrorPQV::compose" alt="" coords="717,31,888,57"/>
+<area shape="rect" id="node5" href="$classStateErrorPose.html#a22b3b27a30f22aff423c9257d998259c" title="StateErrorPose::compose" alt="" coords="241,56,413,83"/>
+<area shape="rect" id="node3" href="$classStateErrorPQV.html#a0da7f6a49fc027a5fd2dd5852a7b4d83" title="StateErrorPQV::StateErrorPQV" alt="" coords="937,5,1141,32"/>
+<area shape="rect" id="node4" href="$classStateErrorPQV.html#a0b90f70aeef41e52d5cc8d37a97ca3be" title="StateErrorPQV::vc" alt="" coords="973,56,1104,83"/>
+<area shape="rect" id="node6" href="$classStateErrorPose.html#a47f18b5713828dbef785b49252c1c095" title="StateErrorPose::pc" alt="" coords="499,31,632,57"/>
+<area shape="rect" id="node7" href="$classStateErrorPose.html#af0224476713c7241ef50ce205a4563bc" title="StateErrorPose::qc" alt="" coords="499,81,632,108"/>
+<area shape="rect" id="node8" href="$classStateErrorPose.html#abe269e8f055a864655e2c12b03e37652" title="StateErrorPose::StateErrorPose" alt="" coords="461,132,669,159"/>
+</map>

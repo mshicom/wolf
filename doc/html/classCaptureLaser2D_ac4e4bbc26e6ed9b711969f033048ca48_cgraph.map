@@ -1,0 +1,25 @@
+<map id="CaptureLaser2D::fitNewContainer" name="CaptureLaser2D::fitNewContainer">
+<area shape="rect" id="node2" href="$classCaptureLaser2D.html#a30675456036f30199e9636f51535b43b" title="CaptureLaser2D::computeSquared\lMahalanobisDistances" alt="" coords="273,414,495,455"/>
+<area shape="rect" id="node8" href="$classFeatureBase.html#ab5926c7176046c8cc85a68a7c03b0547" title="FeatureBase::getMeasurement" alt="" coords="551,5,753,32"/>
+<area shape="rect" id="node17" href="$classNodeLinked.html#a281274ee60831fe8d23ef19120c6bc4a" title="Gets a pointer to the tree top node. " alt="" coords="565,713,739,754"/>
+<area shape="rect" id="node21" href="$wolf_8h.html#a46554b7331b164855fd18e4065e5c65d" title="Enumeration of all possible feature types. " alt="" coords="627,779,677,805"/>
+<area shape="rect" id="node22" href="$classMapBase.html#a1a124e072d1ca63daac9502b239aef1c" title="Returns Frame list. " alt="" coords="285,821,483,848"/>
+<area shape="rect" id="node24" href="$classWolfProblem.html#aa6127ecb7d92ebbd7141a716ce102834" title="Gets a reference to map. " alt="" coords="301,872,467,899"/>
+<area shape="rect" id="node3" href="$classWolfProblem.html#ace0017d732c4bedf0692e93560f7aa80" title="Gets a covariance block. " alt="" coords="557,57,747,98"/>
+<area shape="rect" id="node6" href="$classCaptureBase.html#a04de3a81803d93b08af9533041c06860" title="Gets up_node_ptr_. " alt="" coords="563,123,741,149"/>
+<area shape="rect" id="node9" href="$classFeatureBase.html#a6f6bd0ed34fa0cedd0f0871673045c38" title="FeatureBase::getMeasurement\lCovariance" alt="" coords="551,174,753,215"/>
+<area shape="rect" id="node10" href="$classSensorBase.html#a304bb765a47c0bccd4e0d167f6af29f9" title="SensorBase::getOPtr" alt="" coords="579,240,725,267"/>
+<area shape="rect" id="node11" href="$classLandmarkBase.html#a46fa5511b781da2230821408a99d2bcd" title="LandmarkBase::getOPtr" alt="" coords="571,291,733,317"/>
+<area shape="rect" id="node12" href="$classSensorBase.html#ac435672cf39aa659da8e257d6d3803e0" title="SensorBase::getPPtr" alt="" coords="579,341,725,368"/>
+<area shape="rect" id="node13" href="$classLandmarkBase.html#af8f6d4dc74be44163fbca289143962e0" title="LandmarkBase::getPPtr" alt="" coords="571,392,733,419"/>
+<area shape="rect" id="node14" href="$classStateOrientation.html#aa823da60f946aaea55f612be77806fdf" title="Returns the 3x3 rotation matrix of the orientation. " alt="" coords="557,443,747,485"/>
+<area shape="rect" id="node16" href="$classCaptureBase.html#a048c166c0787df262a0fb467c800a36a" title="CaptureBase::getSensorPtr" alt="" coords="561,509,743,536"/>
+<area shape="rect" id="node18" href="$classStateBase.html#a756fcf70d28d52d7d7a09954a0799fd9" title="Returns a (mapped) vector of the state unit. " alt="" coords="579,560,725,587"/>
+<area shape="rect" id="node19" href="$classStatePoint.html#a76d0fa1c8fc48fa6e2e30fee3a425b61" title="Returns the point in a (mapped) vector. " alt="" coords="579,611,725,637"/>
+<area shape="rect" id="node20" href="$classStateOrientation.html#abcf024c2865bcbf27257a4c10a52b8f0" title="Returns the yaw angle. " alt="" coords="568,661,736,688"/>
+<area shape="rect" id="node4" href="$classStateBase.html#a00a9c4c33332812a92a1127067390556" title="Returns the pointer to the first element of the state. " alt="" coords="845,64,971,91"/>
+<area shape="rect" id="node5" href="$classStateBase.html#a06c6a9bb079b87e0c6aa3c6094042e2d" title="Returns the state unit size. " alt="" coords="825,13,991,40"/>
+<area shape="rect" id="node7" href="$classNodeLinked.html#a5ab61f1533b7b4137e040b5900e90223" title="Access the pointer to parent. " alt="" coords="808,115,1008,157"/>
+<area shape="rect" id="node15" href="$classStateOrientation.html#a802f21afe40faffb2a39edb3ec55505a" title="StateOrientation::rotation\lMatrix" alt="" coords="825,443,991,485"/>
+<area shape="rect" id="node23" href="$classNodeLinked.html#a82880e4aa5db66ceddaf35e3b1ff9276" title="Gets a constant reference to down node list. " alt="" coords="544,829,760,885"/>
+</map>

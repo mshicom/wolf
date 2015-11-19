@@ -1,0 +1,5 @@
+<map id="CaptureLaser2D::computeMahalanobisDistance" name="CaptureLaser2D::computeMahalanobisDistance">
+<area shape="rect" id="node2" href="$classCaptureLaser2D.html#a5fa5230f0c0ce2f49c79d9366f34d4de" title="Create constraints given current measured features and existing landmarks. " alt="" coords="302,5,479,46"/>
+<area shape="rect" id="node3" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="302,70,479,111"/>
+<area shape="rect" id="node4" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="529,77,746,104"/>
+</map>

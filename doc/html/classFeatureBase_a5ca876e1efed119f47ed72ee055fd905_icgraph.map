@@ -1,0 +1,7 @@
+<map id="FeatureBase::measurement" name="FeatureBase::measurement">
+<area shape="rect" id="node2" href="$classEpipolarConstraint.html#a0c1cff3905b8df1b8e3841b7acffa34d" title="Compute the epipolar constraint error. " alt="" coords="249,5,378,46"/>
+<area shape="rect" id="node3" href="$classCorrespondenceBase.html#ada8e81a01a274f3e69f42becffbec920" title="Compute error of this correspondence (non recursive) " alt="" coords="240,70,387,111"/>
+<area shape="rect" id="node4" href="$classEpipolarConstraint.html#a4b3f3f610dab2b16b5cd9fcdca0455e9" title="Compute the expected epipolar line. " alt="" coords="239,135,388,177"/>
+<area shape="rect" id="node6" href="$classFeatureBase.html#a14d9f04902d60641feb23335e2111c8c" title="prints object&#39;s info " alt="" coords="237,201,389,228"/>
+<area shape="rect" id="node5" href="$classEpipolarConstraint.html#ae35d0a64e3924395a4c7852babb0c722" title="Compute the epipolar constraint error. " alt="" coords="438,135,567,177"/>
+</map>

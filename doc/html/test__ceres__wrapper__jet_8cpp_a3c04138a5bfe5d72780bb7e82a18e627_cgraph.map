@@ -1,0 +1,7 @@
+<map id="main" name="main">
+<area shape="rect" id="node2" href="$classWolfVehicle.html#a786fe1dded3077b94f952746920e9a5f" title="WolfVehicle::computePrior" alt="" coords="126,5,303,32"/>
+<area shape="rect" id="node3" href="$classWolfVehicle.html#adc783c516e066c680560515af38f9d92" title="WolfVehicle::getPrior" alt="" coords="142,56,287,83"/>
+<area shape="rect" id="node4" href="$classWolfVehicle.html#aaf29095e623bf6a6498d7a5d6d600abc" title="WolfVehicle::inventMeasurements" alt="" coords="104,107,325,133"/>
+<area shape="rect" id="node5" href="$classWolfVehicle.html#a7211a4dfc24b07bba3266fc8cfa337af" title="WolfVehicle::print" alt="" coords="152,157,277,184"/>
+<area shape="rect" id="node6" href="$classWolfVehicle.html#a77a90af84108679b9d5417abb4d289ce" title="WolfVehicle::resizeState" alt="" coords="131,208,298,235"/>
+</map>

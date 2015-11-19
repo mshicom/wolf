@@ -1,0 +1,18 @@
+<map id="CaptureBase::getFramePtr" name="CaptureBase::getFramePtr">
+<area shape="rect" id="node2" href="$classCaptureTwist2D.html#a31d115c4a62cf575f28e54a865a6e78a" title="CaptureTwist2D::addConstraints" alt="" coords="237,5,451,32"/>
+<area shape="rect" id="node4" href="$classCaptureOdom2D.html#a3b314684e5abca3123952a91fd257574" title="CaptureOdom2D::addConstraints" alt="" coords="236,60,452,87"/>
+<area shape="rect" id="node6" href="$classCaptureLaser2D.html#a9de369dc0fdc939d0dde9c8f0a7bbc7a" title="CaptureLaser2D::computeExpected\lFeature" alt="" coords="505,107,735,149"/>
+<area shape="rect" id="node7" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="785,278,962,319"/>
+<area shape="rect" id="node9" href="$classCaptureTwist2D.html#a564f2b2d7f28dd6086beb113ad687dd7" title="CaptureTwist2D::computePrior" alt="" coords="243,216,445,243"/>
+<area shape="rect" id="node10" href="$classCaptureOdom2D.html#aa9d6ad2812505b760edbbfe0fa90bd6f" title="CaptureOdom2D::computePrior" alt="" coords="241,267,447,293"/>
+<area shape="rect" id="node11" href="$classCaptureLaser2D.html#a30675456036f30199e9636f51535b43b" title="CaptureLaser2D::computeSquared\lMahalanobisDistances" alt="" coords="233,318,455,359"/>
+<area shape="rect" id="node13" href="$classCaptureLaser2D.html#a409d482c258acc2987f4f1d6466a06bb" title="CaptureLaser2D::createContainer\lLandmark" alt="" coords="511,362,729,403"/>
+<area shape="rect" id="node14" href="$classCaptureLaser2D.html#ae60be4c7e8dcf3784b46da9ac2e903d7" title="CaptureLaser2D::createCorner\lLandmark" alt="" coords="520,427,720,469"/>
+<area shape="rect" id="node15" href="$classCaptureFix.html#a54177a1109631e7ef967d3ce92006c40" title="CaptureFix::processCapture" alt="" coords="251,485,437,512"/>
+<area shape="rect" id="node17" href="$classCaptureGPSFix.html#aac43fd1596069e8477565622acb1ef6c" title="CaptureGPSFix::processCapture" alt="" coords="237,536,451,563"/>
+<area shape="rect" id="node3" href="$classCaptureTwist2D.html#a684a199bdd7aae7afb007369acccc843" title="CaptureTwist2D::processCapture" alt="" coords="511,5,729,32"/>
+<area shape="rect" id="node5" href="$classCaptureOdom2D.html#ae0c441648749b44b38fcccbe8d0b42e1" title="CaptureOdom2D::processCapture" alt="" coords="510,56,730,83"/>
+<area shape="rect" id="node8" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="1011,285,1229,312"/>
+<area shape="rect" id="node12" href="$classCaptureLaser2D.html#ac4e4bbc26e6ed9b711969f033048ca48" title="Tries to fit a container given a feature and all existing landmarks. " alt="" coords="511,311,729,337"/>
+<area shape="rect" id="node16" href="$classWolfManager.html#a9e60afc41b30733515039dbf5a8cc7df" title="WolfManager::WolfManager" alt="" coords="528,493,712,520"/>
+</map>

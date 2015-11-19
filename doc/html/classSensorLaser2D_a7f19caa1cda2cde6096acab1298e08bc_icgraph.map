@@ -1,0 +1,6 @@
+<map id="SensorLaser2D::getCornerAlgParams" name="SensorLaser2D::getCornerAlgParams">
+<area shape="rect" id="node2" href="$classCaptureLaser2D.html#a54f4cab49d39407c5dccc3e8d5ccd74e" title="Extract corners and push&#45;back to Feature down list. " alt="" coords="232,31,443,57"/>
+<area shape="rect" id="node5" href="$classCaptureLaser2D.html#a80d5a39351cf7f8e94beab7541dfefec" title="Extract lines from the capture. " alt="" coords="239,81,435,108"/>
+<area shape="rect" id="node3" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="575,5,625,32"/>
+<area shape="rect" id="node4" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="491,56,709,83"/>
+</map>

@@ -1,0 +1,18 @@
+<map id="StateBase::getStateSize" name="StateBase::getStateSize">
+<area shape="rect" id="node2" href="$classWolfProblem.html#a74382fc2dd9e5416fc068aea6c936806" title="Adds a new covariance block. " alt="" coords="221,215,413,257"/>
+<area shape="rect" id="node7" href="$classCeresManager.html#aaf2823935e2d984e752abd25184a9617" title="CeresManager::computeCovariances" alt="" coords="462,281,701,308"/>
+<area shape="rect" id="node9" href="$classWolfProblem.html#ac4924e9c76c7d30a5eea7dfecd33ec3d" title="Adds a new state unit to the state. " alt="" coords="239,164,396,191"/>
+<area shape="rect" id="node10" href="$classSolverQR.html#a6f9a949575a4c8ba7ee519f94f935f3b" title="SolverQR::addStateUnit" alt="" coords="236,332,399,359"/>
+<area shape="rect" id="node11" href="$classWolfProblem.html#ace0017d732c4bedf0692e93560f7aa80" title="Gets a covariance block. " alt="" coords="223,98,412,139"/>
+<area shape="rect" id="node15" href="$classFrameBase.html#a986b8e582c8cd0531a9888456229b105" title="FrameBase::getState" alt="" coords="244,383,391,409"/>
+<area shape="rect" id="node16" href="$classLandmarkContainer.html#a22ef22f6108cf6bb538888a829304070" title="Constructor with type, time stamp and the position state pointer. " alt="" coords="246,434,389,475"/>
+<area shape="rect" id="node17" href="$classFrameBase.html#ae1df016d6f605d9d9d86dc94b5d6933b" title="FrameBase::setState" alt="" coords="244,500,391,527"/>
+<area shape="rect" id="node3" href="$classCaptureLaser2D.html#ae60be4c7e8dcf3784b46da9ac2e903d7" title="CaptureLaser2D::createCorner\lLandmark" alt="" coords="481,215,681,257"/>
+<area shape="rect" id="node6" href="$classCaptureLaser2D.html#a409d482c258acc2987f4f1d6466a06bb" title="CaptureLaser2D::createContainer\lLandmark" alt="" coords="473,150,690,191"/>
+<area shape="rect" id="node4" href="$classCaptureLaser2D.html#ac577c9ee8f500fb16f3b3fab22b3efe4" title="Create constraints given current measured features and existing landmarks. " alt="" coords="1030,114,1207,155"/>
+<area shape="rect" id="node5" href="$classCaptureLaser2D.html#adf87983189ef653b6c1bdaa78ec4dc83" title="Calls the necessary pipeline from raw scan to features. " alt="" coords="1257,121,1474,148"/>
+<area shape="rect" id="node8" href="$test__ceres__2__lasers_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title="main" alt="" coords="840,281,891,308"/>
+<area shape="rect" id="node12" href="$classCaptureLaser2D.html#a9de369dc0fdc939d0dde9c8f0a7bbc7a" title="CaptureLaser2D::computeExpected\lFeature" alt="" coords="750,5,981,46"/>
+<area shape="rect" id="node13" href="$classCaptureLaser2D.html#a30675456036f30199e9636f51535b43b" title="CaptureLaser2D::computeSquared\lMahalanobisDistances" alt="" coords="470,85,693,126"/>
+<area shape="rect" id="node14" href="$classCaptureLaser2D.html#ac4e4bbc26e6ed9b711969f033048ca48" title="Tries to fit a container given a feature and all existing landmarks. " alt="" coords="756,71,975,97"/>
+</map>
