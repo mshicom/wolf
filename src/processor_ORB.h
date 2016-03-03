@@ -5,7 +5,11 @@
 #include "sensor_camera.h"
 #include "capture_image.h"
 
-//#include ORBextractor.h
+//OpenCV includes
+#include<opencv2/core/core.hpp>
+#include<opencv2/features2d/features2d.hpp>
+
+#include ORBextractor.h
 
 class ProcessorORB : public ProcessorBase
 {
@@ -13,6 +17,7 @@ class ProcessorORB : public ProcessorBase
         ProcessorSensorCamera* sensor_cam_ptr_; //specific pointer to sensor camera object
         CaptureImage* capture_img_ptr_; //specific pointer to capture image object;
         //add an ORBextractor
+        //add Settings (camera parameters, nFeatures, ScaleFactor, nLevels, FIniThFAST,fMinThFAST)
 
     public:
         ProcessorORB();
