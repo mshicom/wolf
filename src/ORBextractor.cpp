@@ -64,9 +64,6 @@
 using namespace cv;
 using namespace std;
 
-namespace ORB_SLAM2
-{
-
 const int PATCH_SIZE = 31;
 const int HALF_PATCH_SIZE = 15;
 const int EDGE_THRESHOLD = 19;
@@ -1128,5 +1125,3 @@ void ORBextractor::ComputePyramid(cv::Mat image)
     }
 
 }
-
-} //namespace ORB_SLAM
