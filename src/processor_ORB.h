@@ -16,8 +16,14 @@ class ProcessorORB : public ProcessorBase
     protected:
         ProcessorSensorCamera* sensor_cam_ptr_; //specific pointer to sensor camera object
         CaptureImage* capture_img_ptr_; //specific pointer to capture image object;
-        //add an ORBextractor
-        //add Settings (camera parameters, nFeatures, ScaleFactor, nLevels, FIniThFAST,fMinThFAST)
+        ORBextractor* orb_extractor_ptr;
+
+    private:
+        int nFeatures = 1000;
+        float fScaleFactor = 1.2;
+        int nLevels = 8;
+        int fIniThFAST = 20;
+        int fMinThFAST = 7;
 
     public:
         ProcessorORB();
