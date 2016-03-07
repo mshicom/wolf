@@ -9,12 +9,12 @@
 #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
 
-#include ORBextractor.h
+#include "ORBextractor.h"
 
 class ProcessorORB : public ProcessorBase
 {
     protected:
-        ProcessorSensorCamera* sensor_cam_ptr_; //specific pointer to sensor camera object
+        SensorCamera* sensor_cam_ptr_; //specific pointer to sensor camera object
         CaptureImage* capture_img_ptr_; //specific pointer to capture image object;
         ORBextractor* orb_extractor_ptr;
 
