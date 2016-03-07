@@ -6,6 +6,7 @@
 #include "capture_image.h"
 
 //OpenCV includes
+#include <opencv2/highgui/highgui.hpp>
 #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
 
@@ -31,6 +32,9 @@ class ProcessorORB : public ProcessorBase
 
         virtual void extractFeatures(CaptureBase *_capture_ptr);
         virtual void establishConstraints(CaptureBase *_capture_ptr);
+        virtual void process(CaptureBase* _capture_ptr);
+
+        void drawImage();
 };
 
 #endif // PROCESSORORB_H
