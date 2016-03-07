@@ -121,6 +121,8 @@ SET(HDRS
     node_linked.h
     processor_base.h
     processor_tracker.h
+    processor_ORB.h
+    ORBextractor.h
     sensor_base.h
     sensor_camera.h
     sensor_odom_2D.h
@@ -174,6 +176,8 @@ SET(SRCS
     node_terminus.cpp
     processor_base.cpp
     processor_tracker.cpp
+    processor_ORB.cpp
+    ORBextractor.cpp
     sensor_base.cpp
     sensor_camera.cpp
     sensor_odom_2D.cpp
