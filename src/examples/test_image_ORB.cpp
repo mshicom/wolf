@@ -48,39 +48,29 @@ int main(int argc, char** argv)
     std::cout << "sen_cam intr_ptr" << std::endl << sen_cam_->getIntrinsicPtr()->getVector() << std::endl;
 
 
+//    //CaptureImage test
 
-    //CaptureImage test
-    std::cout << std::endl << " ========= CaptureImage test ===========" << std::endl << std::endl;
-
-    //const char * path="/home/jtarraso/Imágenes/box.jpg";
-    const char * path="/home/jtarraso/Imágenes/house.jpg";
+//    set path to image location
+    const char * path="/home/datchuth/Public/WP_20160211_10_19_31_Pro.jpg";
     cv::Mat image_cv =cv::imread(path);
     TimeStamp t = 1;
 
-    CaptureImage* cap_image = new CaptureImage(t,sen_cam_,image_cv,img_width,img_height);
+//    //FeaturePoint test
+//    std::cout << std::endl << " ========= FeaturePoint test ===========" << std::endl << std::endl;
 
-    std::cout << "timestamp: " << t.get() << std::endl;
-    std::cout << "captureimage test: " << cap_image->getSensorPtr()->getIntrinsicPtr()->getVector() << std::endl;
+//    Eigen::Vector2s m_pos = {5,6};
+//    Eigen::Matrix2s m_cov(2,2);
+//    m_cov(0,0)=1;
+//    m_cov(0,1)=2;
+//    m_cov(1,0)=3;
+//    m_cov(1,1)=4;
 
-    delete cap_image;
+//    FeaturePoint* feat_point = new FeaturePoint(m_pos,m_cov);
+//    std::cout << "measurement position: " << m_pos(0) << " " << m_pos(1) << std::endl;
+//    std::cout << "measurement covariance:\n" << m_cov(0,0) << " " << m_cov(0,1) << "\n" << m_cov(1,0) << " " << m_cov(1,1) << std::endl;
+//    std::cout << "feature position:\n" << feat_point->getMeasurement() << "\nfeature covariance:\n" << feat_point->getMeasurementCovariance()<< std::endl;
 
-
-    //FeaturePoint test
-    std::cout << std::endl << " ========= FeaturePoint test ===========" << std::endl << std::endl;
-
-    Eigen::Vector2s m_pos = {5,6};
-    Eigen::Matrix2s m_cov(2,2);
-    m_cov(0,0)=1;
-    m_cov(0,1)=2;
-    m_cov(1,0)=3;
-    m_cov(1,1)=4;
-
-    FeaturePoint* feat_point = new FeaturePoint(m_pos,m_cov);
-    std::cout << "measurement position: " << m_pos(0) << " " << m_pos(1) << std::endl;
-    std::cout << "measurement covariance:\n" << m_cov(0,0) << " " << m_cov(0,1) << "\n" << m_cov(1,0) << " " << m_cov(1,1) << std::endl;
-    std::cout << "feature position:\n" << feat_point->getMeasurement() << "\nfeature covariance:\n" << feat_point->getMeasurementCovariance()<< std::endl;
-
-    delete feat_point;
+//    delete feat_point;
 
     //ORB test
     std::cout << std::endl << " ========= ORB test ===========" << std::endl << std::endl;
@@ -92,7 +82,7 @@ int main(int argc, char** argv)
 
 
     CaptureImage* cap_vid_orb_ptr;
-    CaptureImage* other_cap_vid_orb_ptr;
+    //CaptureImage* other_cap_vid_orb_ptr;
 
     if(!image_or_video)
     {
@@ -102,8 +92,8 @@ int main(int argc, char** argv)
     }
     else
     {
-        const char * filename = "/home/jtarraso/Vídeos/House interior.mp4";
-        cv::VideoCapture capture(filename);
+        const char * filename = "/home/datchuth/Public/WP_20160217_14_02_25_Pro.mp4" ;
+        cv::VideoCapture capture(filename); //filename = 0 if canera
         cv::Mat frame;
 
         std::cout << "file opened: " << capture.isOpened() << std::endl;
@@ -119,26 +109,24 @@ int main(int argc, char** argv)
         capture >> frame;
         cap_vid_orb_ptr = new CaptureImage(t,sen_cam_,frame,img_width,img_height);
 
+        int f = 50;
         while(f<100)
         {
             capture >> frame;
             //cv::imshow("video",frame);
             wolf_problem_->getTrajectoryPtr()->addFrame(new FrameBase(TimeStamp(),new StateBlock(Eigen::Vector3s::Zero()), new StateBlock(Eigen::Vector3s::Zero())));
 
-
-            delete other_cap_vid_orb_ptr;
-            other_cap_vid_orb_ptr = cap_vid_brisk_ptr;
+            //delete other_cap_vid_orb_ptr;
+            //other_cap_vid_orb_ptr = cap_vid_orb_ptr;
             //CaptureImage* other_cap_vid_brisk = wolf_problem_->getTrajectoryPtr()->getLastFramePtr()->getCaptureListPtr()->back();
-
 
             cap_vid_orb_ptr = new CaptureImage(t,sen_cam_,frame,img_width,img_height);
             wolf_problem_->getTrajectoryPtr()->getLastFramePtr()->addCapture(cap_vid_orb_ptr);
             clock_t t1 = clock();
             processor_ORB->extractFeatures(cap_vid_orb_ptr);
-            processor_ORB->establishConstraints(other_cap_vid_orb_ptr); //
+            //processor_ORB->establishConstraints(other_cap_vid_orb_ptr); //
             //cap_vid_orb->process();
             std::cout << "Time: " << ((double) clock() - t1) / CLOCKS_PER_SEC << "s" << std::endl;
-            cv::waitKey(200);
             f++;
         }
         //cv::waitKey(0);
