@@ -46,7 +46,8 @@ public:
 
   /// Constructor from AngleAxisd
   SO3() :
-      Eigen::Matrix3s(I_3x3) {
+      Eigen::Matrix3s(Eigen::Matrix3s::Identity()) {
+      // was Eigen::Matrix3s(I_3x3)
   }
 
   /// Constructor from Eigen Matrix
@@ -81,7 +82,7 @@ public:
 
   /// identity rotation for group operation
   static SO3 identity() {
-    return I_3x3;
+    return Eigen::Matrix3s::Identity();
   }
 
   /// inverse of a rotation = transpose

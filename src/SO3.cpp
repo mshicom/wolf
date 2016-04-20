@@ -12,10 +12,6 @@
 /**
  * @file    SO3.cpp
  * @brief   3*3 matrix representation of SO(3)
- * @author  Frank Dellaert
- * @author  Luca Carlone
- * @author  Duy Nguyen Ta
- * @date    December 2014
  */
 
 #include "SO3.h"
@@ -60,19 +56,19 @@ ExpmapFunctor::ExpmapFunctor(const Eigen::Vector3s& axis, double angle, bool nea
 
 SO3 ExpmapFunctor::expmap() const {
   if (nearZero)
-    return I_3x3 + W;
+    return Eigen::Matrix3s::Identity() + W;
   else
-    return I_3x3 + sin_theta * K + one_minus_cos * KK;
+    return Eigen::Matrix3s::Identity() + sin_theta * K + one_minus_cos * KK;
 }
 
 DexpFunctor::DexpFunctor(const Eigen::Vector3s& omega, bool nearZeroApprox)
     : ExpmapFunctor(omega, nearZeroApprox), omega(omega) {
   if (nearZero)
-    dexp_ = I_3x3 - 0.5 * W;
+    dexp_ = Eigen::Matrix3s::Identity() - 0.5 * W;
   else {
     a = one_minus_cos / theta;
     b = 1.0 - sin_theta / theta;
-    dexp_ = I_3x3 - a * K + b * KK;
+    dexp_ = Eigen::Matrix3s::Identity() - a * K + b * KK;
   }
 }
 
@@ -86,9 +82,9 @@ Eigen::Vector3s DexpFunctor::applyDexp(const Eigen::Vector3s& v, OptionalJacobia
       const Eigen::Vector3s Kv = K * v;
       const double Da = (sin_theta - 2.0 * a) / theta2;
       const double Db = (one_minus_cos - 3.0 * b) / theta2;
-      *H1 = (Db * K - Da * I_3x3) * Kv * omega.transpose() -
+      *H1 = (Db * K - Da * Eigen::Matrix3s::Identity()) * Kv * omega.transpose() -
             skewSymmetric(Kv * b / theta) +
-            (a * I_3x3 - b * K) * skewSymmetric(v / theta);
+            (a * Eigen::Matrix3s::Identity() - b * K) * skewSymmetric(v / theta);
     }
   }
   if (H2) *H2 = dexp_;
@@ -177,7 +173,7 @@ Eigen::Matrix3s SO3::LogmapDerivative(const Eigen::Vector3s& omega) {
   using std::sin;
 
   double theta2 = omega.dot(omega);
-  if (theta2 <= std::numeric_limits<double>::epsilon()) return I_3x3;
+  if (theta2 <= std::numeric_limits<double>::epsilon()) return Eigen::Matrix3s::Identity();
   double theta = std::sqrt(theta2);  // rotation angle
   /** Right Jacobian for Log map in SO(3) - equation (10.86) and following equations in
    * G.S. Chirikjian, "Stochastic Models, Information Theory, and Lie Groups", Volume 2, 2008.
@@ -187,7 +183,7 @@ Eigen::Matrix3s SO3::LogmapDerivative(const Eigen::Vector3s& omega) {
    * to a perturbation in the tangent space (Jrinv * omega)
    */
   const Eigen::Matrix3s W = skewSymmetric(omega); // element of Lie algebra so(3): W = omega^
-  return I_3x3 + 0.5 * W +
+  return Eigen::Matrix3s::Identity() + 0.5 * W +
          (1 / (theta * theta) - (1 + cos(theta)) / (2 * theta * sin(theta))) *
              W * W;
 }
