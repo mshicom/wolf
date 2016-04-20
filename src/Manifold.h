@@ -126,6 +126,7 @@ template<class Class> struct Manifold: ManifoldTraits<Class>{};
 } // \ namespace internal
 
 /// Check invariants for Manifold type
+/// TODO : new version not depending on BOOST
 //template<typename T>
 //BOOST_CONCEPT_REQUIRES(((IsTestable<T>)),(bool)) //
 //check_manifold_invariants(const T& a, const T& b, double tol=1e-9) {
