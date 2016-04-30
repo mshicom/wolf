@@ -17,7 +17,7 @@ namespace wolf {
 class ProcessorBase : public NodeLinked<SensorBase, NodeTerminus>
 {
     public:
-        ProcessorBase(ProcessorType _tp);
+        ProcessorBase(ProcessorType _tp, std::string _type);
 
         /** \brief Default destructor (not recommended)
          *

@@ -20,7 +20,7 @@ namespace wolf {
 class MapBase : public NodeLinked<Problem,LandmarkBase>
 {
     public:
-        MapBase();
+        MapBase(std::string _type = "");
 
         /** \brief Default destructor (not recommended)
          *

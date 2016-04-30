@@ -26,7 +26,7 @@ class TrajectoryBase : public NodeLinked<Problem,FrameBase>
         unsigned int fixed_size_; // Limits the number of Frames forming the Trajectory
         
     public:
-        TrajectoryBase(FrameStructure _frame_sturcture);
+        TrajectoryBase(FrameStructure _frame_sturcture, std::string _type = "");
 
         /** \brief Default destructor (not recommended)
          *

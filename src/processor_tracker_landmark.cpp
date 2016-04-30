@@ -11,7 +11,7 @@ namespace wolf
 {
 
 ProcessorTrackerLandmark::ProcessorTrackerLandmark(ProcessorType _tp, const unsigned int& _max_new_features) :
-    ProcessorTracker(_tp, _max_new_features)
+    ProcessorTracker(_tp, "TRACKER LANDMARK", _max_new_features)
 {
 }
 

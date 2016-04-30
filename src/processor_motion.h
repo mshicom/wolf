@@ -159,8 +159,8 @@ class ProcessorMotion : public ProcessorBase
 
         //        void reset(CaptureMotion2* _capture_ptr);
 
-        FrameBase* makeFrame(CaptureBase* _capture_ptr, FrameType _type = NON_KEY_FRAME);
-        FrameBase* makeFrame(CaptureBase* _capture_ptr, const Eigen::VectorXs& _state, FrameType _type);
+        FrameBase* makeFrame(CaptureBase* _capture_ptr, FrameKeyType _type = NON_KEY_FRAME);
+        FrameBase* makeFrame(CaptureBase* _capture_ptr, const Eigen::VectorXs& _state, FrameKeyType _type);
 
         MotionBuffer* getBufferPtr();
 
@@ -287,7 +287,7 @@ class ProcessorMotion : public ProcessorBase
 };
 
 inline ProcessorMotion::ProcessorMotion(ProcessorType _tp, size_t _state_size, size_t _delta_size, size_t _data_size) :
-        ProcessorBase(_tp), x_size_(_state_size), delta_size_(_delta_size), data_size_(_data_size), origin_ptr_(
+        ProcessorBase(_tp, "MOTION"), x_size_(_state_size), delta_size_(_delta_size), data_size_(_data_size), origin_ptr_(
                 nullptr), last_ptr_(nullptr), incoming_ptr_(nullptr), dt_(0.0), x_(_state_size), delta_(_delta_size), delta_cov_(
                 delta_size_, delta_size_), delta_integrated_(_delta_size), delta_integrated_cov_(delta_size_,
                                                                                                  delta_size_), data_(
@@ -443,7 +443,7 @@ inline bool ProcessorMotion::keyFrameCallback(FrameBase* _keyframe_ptr)
     key_capture_ptr->getBufferPtr()->get().push_back(mot);
 
     // create motion constraint and add it to the new keyframe
-    FeatureBase* key_feature_ptr = new FeatureBase(FEAT_MOTION,
+    FeatureBase* key_feature_ptr = new FeatureBase(FEAT_MOTION, "MOTION",
                                                    key_capture_ptr->getBufferPtr()->get().back().delta_integr_,
                                                    key_capture_ptr->getBufferPtr()->get().back().delta_integr_cov_);
     key_capture_ptr->addFeature(key_feature_ptr);
@@ -463,7 +463,7 @@ inline void ProcessorMotion::splitBuffer(const TimeStamp& _t_split, MotionBuffer
     last_ptr_->getBufferPtr()->split(_t_split, _oldest_part);
 }
 
-inline FrameBase* ProcessorMotion::makeFrame(CaptureBase* _capture_ptr, const Eigen::VectorXs& _state, FrameType _type)
+inline FrameBase* ProcessorMotion::makeFrame(CaptureBase* _capture_ptr, const Eigen::VectorXs& _state, FrameKeyType _type)
 {
     // We need to create the new free Frame to hold what will become the last Capture
     FrameBase* new_frame_ptr = getProblem()->createFrame(_type, _state, _capture_ptr->getTimeStamp());
@@ -471,7 +471,7 @@ inline FrameBase* ProcessorMotion::makeFrame(CaptureBase* _capture_ptr, const Ei
     return new_frame_ptr;
 }
 
-inline FrameBase* ProcessorMotion::makeFrame(CaptureBase* _capture_ptr, FrameType _type)
+inline FrameBase* ProcessorMotion::makeFrame(CaptureBase* _capture_ptr, FrameKeyType _type)
 {
     // We need to create the new free Frame to hold what will become the last Capture
     FrameBase* new_frame_ptr = getProblem()->createFrame(_type, _capture_ptr->getTimeStamp());

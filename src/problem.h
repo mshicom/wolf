@@ -90,13 +90,13 @@ class Problem : public NodeBase
          *
          * This acts as a Frame factory, but also takes care to update related lists in WolfProblem
          */
-        FrameBase* createFrame(FrameType _frameType, const TimeStamp& _time_stamp);
+        FrameBase* createFrame(FrameKeyType _frameType, const TimeStamp& _time_stamp);
 
         /** \brief Create Frame from vector
          *
          * This acts as a Frame factory, but also takes care to update related lists in WolfProblem
          */
-        FrameBase* createFrame(FrameType _frame_type, const Eigen::VectorXs& _frame_state,
+        FrameBase* createFrame(FrameKeyType _frame_type, const Eigen::VectorXs& _frame_state,
                                const TimeStamp& _time_stamp);
 
         /** \brief Get the state at last timestamp

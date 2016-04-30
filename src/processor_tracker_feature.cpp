@@ -11,7 +11,7 @@ namespace wolf
 {
 
 ProcessorTrackerFeature::ProcessorTrackerFeature(ProcessorType _tp) :
-        ProcessorTracker(_tp)
+        ProcessorTracker(_tp, "TRACKER FEATURE")
 {
 }
 

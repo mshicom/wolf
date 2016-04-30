@@ -76,7 +76,7 @@ class NodeLinked : public NodeBase
 
         /** \brief Constructor without specify up node
          */
-        NodeLinked(const NodeLocation _loc, const std::string& _class);
+        NodeLinked(const NodeLocation _loc, const std::string& _class = "", std::string _type = "", std::string _name = "");
 
         /** \brief Default destructor (not recommended)
          *
@@ -212,8 +212,8 @@ namespace wolf
 {
 
 template<class UpperType, class LowerType>
-NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _class) :
-        NodeBase(_class), //
+NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _class, std::string _type, std::string _name) :
+        NodeBase(_class, _type, _name), //
         location_(_loc), //
         up_node_ptr_(nullptr), down_node_list_(), is_deleting_(false)
 {

@@ -4,8 +4,8 @@
 
 namespace wolf {
 
-TrajectoryBase::TrajectoryBase(FrameStructure _frame_structure) :
-    NodeLinked(MID, "TRAJECTORY"),
+TrajectoryBase::TrajectoryBase(FrameStructure _frame_structure, std::string _type) :
+    NodeLinked(MID, "TRAJECTORY", _type),
     frame_structure_(_frame_structure), fixed_size_(0)
 {
     //
