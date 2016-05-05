@@ -22,8 +22,11 @@ namespace wolf {
 //class FrameBase
 class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
 {
+    private:
+        static unsigned int frame_id_count_;
     protected:
-        FrameType type_;         ///< type of frame. Either NON_KEY_FRAME or KEY_FRAME. (types defined at wolf.h)
+        unsigned int frame_id_;
+        FrameType type_id_;         ///< type of frame. Either NON_KEY_FRAME or KEY_FRAME. (types defined at wolf.h)
         TimeStamp time_stamp_;   ///< frame time stamp
         StateStatus status_;     ///< status of the estimation of the frame state
         StateBlock* p_ptr_;      ///< Position state block pointer
@@ -31,6 +34,7 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
         StateBlock* v_ptr_;      ///< Linear velocity state block pointer
         
     public:
+
         /** \brief Constructor of non-key Frame with only time stamp
          *
          * Constructor with only time stamp
@@ -56,6 +60,8 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
          * 
          **/
         virtual ~FrameBase();
+
+        unsigned int id();
 
 
 
@@ -95,7 +101,7 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
         FrameBase* getNextFrame() const;
 
         CaptureBaseList* getCaptureListPtr();
-        void addCapture(CaptureBase* _capt_ptr);
+        CaptureBase* addCapture(CaptureBase* _capt_ptr);
         void removeCapture(CaptureBaseIter& _capt_iter);
         CaptureBaseIter hasCaptureOf(const SensorBase* _sensor_ptr);
 
@@ -117,11 +123,16 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
 
 };
 
+inline unsigned int FrameBase::id()
+{
+    return frame_id_;
+}
+
 // IMPLEMENTATION //
 
 inline bool FrameBase::isKey() const
 {
-    return (type_ == KEY_FRAME);
+    return (type_id_ == KEY_FRAME);
 }
 
 inline void FrameBase::fix()
@@ -180,9 +191,10 @@ inline CaptureBaseList* FrameBase::getCaptureListPtr()
     return getDownNodeListPtr();
 }
 
-inline void FrameBase::addCapture(CaptureBase* _capt_ptr)
+inline CaptureBase* FrameBase::addCapture(CaptureBase* _capt_ptr)
 {
     addDownNode(_capt_ptr);
+    return _capt_ptr;
 }
 
 inline void FrameBase::removeCapture(CaptureBaseIter& _capt_iter)

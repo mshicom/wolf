@@ -45,6 +45,13 @@ const Scalar MAX_ACCEPTED_APERTURE_DIFF = 20.0*M_PI/180.; //20 degrees
 const Scalar CONTAINER_WIDTH = 2.44;
 const Scalar CONTAINER_LENGTH = 12.20;
 
+struct ProcessorParamsLaser2D : public ProcessorParamsBase
+{
+        Scalar max_accepted_aperture_diff = 20.0*M_PI/180.; //20 degrees
+        Scalar container_width = 2.44;
+        Scalar container_length = 12.20;
+};
+
 
 
 class ProcessorLaser2D : public ProcessorBase
@@ -60,12 +67,12 @@ class ProcessorLaser2D : public ProcessorBase
         void process(CaptureBase *_capture_ptr);
 
         virtual bool voteForKeyFrame();
-
+        virtual bool keyFrameCallback(FrameBase* _keyframe_ptr){return false;};
         virtual void init(CaptureBase* _origin_ptr);
 
     protected:
-        virtual void preProcess(){}
-        virtual void postProcess(){}
+//        virtual void preProcess(){}
+//        virtual void postProcess(){}
 
         // JS: These two fcns can be removed and substituted by process() above.
     private:
@@ -94,6 +101,8 @@ class ProcessorLaser2D : public ProcessorBase
         void createContainerLandmark(FeatureCorner2D* _corner_ptr, const Eigen::Vector3s& _feature_global_pose,
                                      LandmarkCorner2D* _old_corner_landmark_ptr, int& _feature_idx, int& _corner_idx);
 
+    public:
+        static ProcessorBase* create(const std::string& _unique_name, const ProcessorParamsBase* _params);
 };
 
 inline bool ProcessorLaser2D::voteForKeyFrame()
@@ -106,5 +115,16 @@ inline void ProcessorLaser2D::init(CaptureBase* _origin_ptr)
 }
 
 } // namespace wolf
+
+
+// Register in the SensorFactory
+#include "processor_factory.h"
+namespace wolf {
+namespace
+{
+const bool registered_prc_laser_2d = ProcessorFactory::get()->registerCreator("LASER 2D", ProcessorLaser2D::create);
+}
+} // namespace wolf
+
 
 #endif /* SRC_PROCESSOR_LASER_2D_H_ */

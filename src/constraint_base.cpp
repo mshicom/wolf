@@ -5,9 +5,12 @@
 
 namespace wolf {
 
+unsigned int ConstraintBase::constraint_id_count_ = 0;
+
 ConstraintBase::ConstraintBase(ConstraintType _tp, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
-    type_(_tp),
+    constraint_id_(++constraint_id_count_),
+    type_id_(_tp),
     category_(CTR_ABSOLUTE),
     status_(_status),
     frame_ptr_(nullptr),
@@ -20,7 +23,8 @@ ConstraintBase::ConstraintBase(ConstraintType _tp, ConstraintStatus _status) :
 
 ConstraintBase::ConstraintBase(ConstraintType _tp, FrameBase* _frame_ptr, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
-    type_(_tp),
+    constraint_id_(++constraint_id_count_),
+    type_id_(_tp),
     category_(CTR_FRAME),
     status_(_status),
     frame_ptr_(_frame_ptr),
@@ -34,7 +38,8 @@ ConstraintBase::ConstraintBase(ConstraintType _tp, FrameBase* _frame_ptr, Constr
 
 ConstraintBase::ConstraintBase(ConstraintType _tp, FeatureBase* _feature_ptr, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
-    type_(_tp),
+    constraint_id_(++constraint_id_count_),
+    type_id_(_tp),
     category_(CTR_FEATURE),
     status_(_status),
     frame_ptr_(nullptr),
@@ -48,7 +53,8 @@ ConstraintBase::ConstraintBase(ConstraintType _tp, FeatureBase* _feature_ptr, Co
 
 ConstraintBase::ConstraintBase(ConstraintType _tp, LandmarkBase* _landmark_ptr, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
-    type_(_tp),
+    constraint_id_(++constraint_id_count_),
+    type_id_(_tp),
     category_(CTR_LANDMARK),
     status_(_status),
     frame_ptr_(nullptr),
@@ -65,8 +71,8 @@ ConstraintBase::~ConstraintBase()
     is_deleting_ = true;
 
     // add constraint to be removed from solver
-    if (getWolfProblem() != nullptr)
-        getWolfProblem()->removeConstraintPtr(this);
+    if (getProblem() != nullptr)
+        getProblem()->removeConstraintPtr(this);
 
     //std::cout << "removeConstraintPtr " << std::endl;
 
@@ -103,14 +109,14 @@ CaptureBase* ConstraintBase::getCapturePtr() const
 
 void ConstraintBase::setStatus(ConstraintStatus _status)
 {
-    if (getWolfProblem() == nullptr)
+    if (getProblem() == nullptr)
         std::cout << "constraint not linked with 'top', only status changed" << std::endl;
     else if (_status != status_)
     {
         if (_status == CTR_ACTIVE)
-            getWolfProblem()->addConstraintPtr(this);
+            getProblem()->addConstraintPtr(this);
         else if (_status == CTR_INACTIVE)
-            getWolfProblem()->removeConstraintPtr(this);
+            getProblem()->removeConstraintPtr(this);
     }
     status_ = _status;
 }

@@ -13,6 +13,8 @@ class NodeTerminus;
 
 namespace wolf {
 
+struct ProcessorParamsBase{};
+
 //class ProcessorBase
 class ProcessorBase : public NodeLinked<SensorBase, NodeTerminus>
 {
@@ -25,6 +27,8 @@ class ProcessorBase : public NodeLinked<SensorBase, NodeTerminus>
          *
          **/
         virtual ~ProcessorBase();
+
+        unsigned int id();
 
         virtual void process(CaptureBase* _capture_ptr) = 0;
 
@@ -39,18 +43,27 @@ class ProcessorBase : public NodeLinked<SensorBase, NodeTerminus>
 
         virtual bool permittedKeyFrame() final;
 
+        virtual bool keyFrameCallback(FrameBase* _keyframe_ptr) = 0;
+
         SensorBase* getSensorPtr();
 
-        //virtual void newKeyFrameCallback(FrameBase* _new_key_frame_ptr, const Scalar& _time_tolerance) = 0;
-
     private:
-        ProcessorType type_;
+        static unsigned int processor_id_count_;
 
+    protected:
+        unsigned int processor_id_;
+        ProcessorType type_id_;
 };
 
-inline bool ProcessorBase::permittedKeyFrame()
+}
+
+#include "problem.h"
+
+namespace wolf {
+
+inline unsigned int ProcessorBase::id()
 {
-    return getWolfProblem()->permitKeyFrame(this);
+    return processor_id_;
 }
 
 inline SensorBase* ProcessorBase::getSensorPtr()

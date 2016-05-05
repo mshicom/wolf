@@ -3,6 +3,9 @@
 MESSAGE("Starting WOLF CMakeLists ...")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+#CMAKE modules
+SET(CMAKE_MODULE_PATH ../cmake_modules)
+
 #find dependencies. 
 FIND_PACKAGE(Ceres QUIET) #Ceres is not required
 IF(Ceres_FOUND)
@@ -26,12 +29,23 @@ IF(raw_gps_utils_FOUND)
     MESSAGE("raw_gps_utils Library FOUND: raw_gps_utils related sources will be built.")
 ENDIF(raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
+# OpenCV
 FIND_PACKAGE(OpenCV QUIET)
 IF(OpenCV_FOUND)
     MESSAGE("OpenCV Library FOUND: OpenCV related sources will be built.")
 ENDIF(OpenCV_FOUND)
 
+# YAML with yaml-cpp
+SET(YAMLCPP_USE_STATIC_LIBS TRUE) #Use static library : not working: TO BE REVISED
+FIND_PACKAGE(YamlCpp)
+IF(YAMLCPP_FOUND)
+    MESSAGE("yaml-cpp Library FOUND: yaml-cpp related sources will be built.")
+    MESSAGE("-- YamlCpp includes: " ${YAMLCPP_INCLUDE_DIR})
+    MESSAGE("-- YamlCpp library: " ${YAMLCPP_LIBRARY})
+ELSEIF(YAMLCPP_FOUND)
+    MESSAGE("yaml-cpp Library NOT FOUND!")
+ENDIF(YAMLCPP_FOUND)
+    
 # SuiteSparse doesn't have find*.cmake:
 FIND_PATH(
     Suitesparse_INCLUDE_DIRS
@@ -66,7 +80,7 @@ IF(raw_gps_utils_FOUND)
     INCLUDE_DIRECTORIES(${raw_gps_utils_INCLUDE_DIRS})
 ENDIF(raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
+# OpenCV
 IF(OpenCV_FOUND)
     INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 ENDIF(OpenCV_FOUND)
@@ -86,7 +100,6 @@ SET(HDRS
     capture_motion.h
     capture_motion2.h
     capture_odom_2D.h
-    capture_odom_3D.h
     capture_void.h
     constraint_base.h
     constraint_analytic.h
@@ -123,8 +136,10 @@ SET(HDRS
     node_terminus.h
     problem.h
     processor_base.h
+    processor_imu.h
+    processor_factory.h
     processor_motion.h
-    processor_motion_base.h
+    processor_odom_2D.h
     processor_odom_3D.h
     processor_tracker.h
     processor_tracker_feature.h
@@ -133,9 +148,11 @@ SET(HDRS
     processor_tracker_landmark_dummy.h
     sensor_base.h
     sensor_camera.h
-    sensor_odom_2D.h
-    sensor_gps.h
+    sensor_factory.h
+#    sensor_gps.h      # What is this doing here?
     sensor_gps_fix.h
+    sensor_imu.h
+    sensor_odom_2D.h
     state_block.h
     state_homogeneous_3d.h
     state_quaternion.h
@@ -177,6 +194,8 @@ SET(SRCS
     node_base.cpp
     problem.cpp
     processor_base.cpp
+    processor_factory.cpp
+    processor_imu.cpp
     processor_tracker.cpp
     processor_tracker_feature.cpp
     processor_tracker_feature_dummy.cpp
@@ -184,8 +203,11 @@ SET(SRCS
     processor_tracker_landmark_dummy.cpp
     sensor_base.cpp
     sensor_camera.cpp
-    sensor_odom_2D.cpp
+    sensor_factory.cpp
+    sensor_gps.cpp   # What is this doing here?
     sensor_gps_fix.cpp
+    sensor_imu.cpp
+    sensor_odom_2D.cpp
     time_stamp.cpp
     trajectory_base.cpp
     wolf_manager.cpp
@@ -244,7 +266,7 @@ IF (raw_gps_utils_FOUND)
         )
 ENDIF(raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
+# OpenCV 
 IF (OpenCV_FOUND)
     SET(HDRS ${HDRS}
         capture_image.h
@@ -280,10 +302,15 @@ IF (raw_gps_utils_FOUND)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${raw_gps_utils_LIBRARY})
 ENDIF (raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
+# OpenCV
 IF (OpenCV_FOUND)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OpenCV_LIBS})
 ENDIF (OpenCV_FOUND)
+
+IF (YAMLCPP_FOUND)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${YAMLCPP_LIBRARY})
+ENDIF (YAMLCPP_FOUND)
+
 
 #install library
 INSTALL(TARGETS ${PROJECT_NAME}

@@ -8,10 +8,14 @@ class TrajectoryBase;
 class MapBase;
 class ProcessorMotion;
 class TimeStamp;
+struct IntrinsicsBase;
+struct ProcessorParamsBase;
 }
 
 //wolf includes
 #include "node_base.h"
+#include "sensor_base.h"
+//#include "sensor_factory.h"
 #include "wolf.h"
 
 // std includes
@@ -19,6 +23,7 @@ class TimeStamp;
 
 
 namespace wolf {
+
 
 /** \brief Wolf problem node element in the Wolf Tree
  * 
@@ -72,12 +77,14 @@ class Problem : public NodeBase
 
 
         /** \brief add sensor to hardware
-         *
-         * add sensor to hardware
-         *
          */
         void addSensor(SensorBase* _sen_ptr);
 
+        /** \brief Factory method to add sensor only from its properties
+         */
+        SensorBase* addSensor(std::string _sen_type, std::string _unique_sensor_name, Eigen::VectorXs& _extrinsics, IntrinsicsBase* _intrinsics);
+
+        ProcessorBase* addProcessor(std::string _sen_type, std::string _unique_processor_name, std::string _corresponding_sensor_name, ProcessorParamsBase* _prc_params);
 
         /** \brief Set the processor motion
          *
@@ -113,15 +120,25 @@ class Problem : public NodeBase
         Eigen::VectorXs getStateAtTimeStamp(const TimeStamp& _ts);
         void getStateAtTimeStamp(const TimeStamp& _ts, Eigen::VectorXs& state);
 
+        /** \brief Give the permission to a processor to create a new keyFrame
+         *
+         * Give the permission to a processor to create a new keyFrame
+         */
         bool permitKeyFrame(ProcessorBase* _processor_ptr);
 
-        void addLandmark(LandmarkBase* _lmk_ptr);
+        /** \brief New key frame callback
+         *
+         * New key frame callback: It should be called by any processor that creates a new keyframe. It calls the keyFrameCallback of the rest of processors.
+         */
+        void keyFrameCallback(FrameBase* _keyframe_ptr, ProcessorBase* _processor_ptr);
+
+        LandmarkBase* addLandmark(LandmarkBase* _lmk_ptr);
 
         void addLandmarkList(LandmarkBaseList _lmk_list);
 
         /** \brief Adds a new state block to be added to solver manager
          */
-        void addStateBlockPtr(StateBlock* _state_ptr);
+        StateBlock* addStateBlockPtr(StateBlock* _state_ptr);
 
         /** \brief Adds a new state block to be updated to solver manager
          */
@@ -133,7 +150,7 @@ class Problem : public NodeBase
 
         /** \brief Adds a new constraint to be added to solver manager
          */
-        void addConstraintPtr(ConstraintBase* _constraint_ptr);
+        ConstraintBase* addConstraintPtr(ConstraintBase* _constraint_ptr);
 
         /** \brief Adds a constraint to be removed to solver manager
          */
@@ -149,23 +166,26 @@ class Problem : public NodeBase
 
         /** \brief Gets a covariance block
          */
-        bool getCovarianceBlock(StateBlock* _state1, StateBlock* _state2, Eigen::MatrixXs& _cov_block);
-        /** \brief Gets a covariance block
+        bool getCovarianceBlock(StateBlock* _state1, StateBlock* _state2, Eigen::MatrixXs& _cov, const int _row = 0,
+                                const int _col=0);
+
+        /** \brief Gets the covariance of a frame
          */
-        bool getCovarianceBlock(StateBlock* _state1, StateBlock* _state2, Eigen::MatrixXs& _cov, const int _row,
-                                const int _col);
+        bool getFrameCovariance(FrameBase* _frame_ptr, Eigen::MatrixXs& _covariance);
+        Eigen::MatrixXs getFrameCovariance(FrameBase* _frame_ptr);
+
+        /** \brief Gets the covariance of a frame
+         */
+        bool getLandmarkCovariance(LandmarkBase* _landmark_ptr, Eigen::MatrixXs& _covariance);
+        Eigen::MatrixXs getFrameCovariance(LandmarkBase* _landmark_ptr);
 
         /** \brief Adds a map
          */
-        void addMap(MapBase* _map_ptr);
+        MapBase* addMap(MapBase* _map_ptr);
 
         /** \brief Adds a trajectory
          */
-        void addTrajectory(TrajectoryBase* _trajectory_ptr);
-
-        /** \brief Adds a hardware
-         */
-        void addHarware(HardwareBase* _hardware_ptr);
+        TrajectoryBase* addTrajectory(TrajectoryBase* _trajectory_ptr);
 
         /** \brief Gets a pointer to map
          */
@@ -209,7 +229,7 @@ class Problem : public NodeBase
 
         /** \brief get top node
          */
-        virtual Problem* getWolfProblem();
+        virtual Problem* getProblem();
 
         /** \brief Returns a true (is top)
          */
@@ -245,7 +265,7 @@ inline std::list<unsigned int>* Problem::getConstraintRemoveList()
     return &constraint_remove_list_;
 }
 
-inline Problem* Problem::getWolfProblem()
+inline Problem* Problem::getProblem()
 {
     return this;
 }

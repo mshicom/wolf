@@ -37,15 +37,25 @@ namespace wolf {
 typedef double Scalar;        // Use this for double, 64 bit precision
 //typedef long double Scalar;   // Use this for long double, 128 bit precision
 
+/**
+ * \brief Vector and Matrices size type for the Wolf project
+ *
+ * We use the default defined in Eigen (int)
+ *
+ */
+typedef EIGEN_DEFAULT_DENSE_INDEX_TYPE Size;
+
 namespace Constants{
 
 // Wolf standard tolerance
-const double EPS = 1e-8;
+const Scalar EPS = 1e-8;
 // Wolf smmmmall tolerance
-const double EPS_SMALL = 1e-16;
+const Scalar EPS_SMALL = 1e-16;
 
 // use it in odometry covariances for instance.
-const double MIN_VARIANCE = 1e-6;
+const Scalar MIN_VARIANCE = 1e-6;
+
+const Scalar PI = 3.14159265358979323846264338328;
 
 }
 
@@ -98,7 +108,7 @@ namespace wolf {
  */
 typedef enum
 {
-    TOP,   ///< root node location. This is the one that commands jobs down the tree.
+    TOP = 1,   ///< root node location. This is the one that commands jobs down the tree.
     MID,   ///< middle nodes. These delegate jobs to lower nodes.
     BOTTOM ///< lowest level nodes. These are the ones that do not delegate any longer and have to do the job.
 } NodeLocation;
@@ -109,8 +119,8 @@ typedef enum
  */
 typedef enum
 {
-    KEY_FRAME,    ///< key frame. It will stay in the frames window and play at optimizations.
-    NON_KEY_FRAME ///< regular frame. It does play at optimizations but it will be discarded from the window once a newer frame arrives.
+    NON_KEY_FRAME = 0, ///< regular frame. It does play at optimizations but it will be discarded from the window once a newer frame arrives.
+    KEY_FRAME = 1    ///< key frame. It will stay in the frames window and play at optimizations.
 } FrameType;
 
 /** \brief Enumeration of all possible frames
@@ -119,7 +129,7 @@ typedef enum
  */
 typedef enum
 {
-    FRM_PO_2D,  ///< 2D frame containing position (x,y) and orientation angle.
+    FRM_PO_2D = 1,  ///< 2D frame containing position (x,y) and orientation angle.
     FRM_PO_3D,  ///< 3D frame containing position (x,y,z) and orientation quaternion (qx,qy,qz,qw).
     FRM_POV_3D,  ///< 3D frame with position, orientation quaternion, and linear velocity (vx,vy,vz)
     FRM_PQVBB_3D ///< 3D frame with pos, orient quat, velocity, acc bias (abx,aby,abz), and gyro bias (wbx,wby,wbz).
@@ -131,7 +141,7 @@ typedef enum
  */
 typedef enum
 {
-    CTR_GPS_FIX_2D,             ///< 2D GPS Fix constraint.
+    CTR_GPS_FIX_2D = 1,             ///< 2D GPS Fix constraint.
     CTR_GPS_PR_2D,              ///< 2D GPS Pseudorange constraint.
     CTR_GPS_PR_3D,              ///< 3D GPS Pseudorange constraint.
     CTR_FIX,                    ///< Fix constraint (for priors).
@@ -150,7 +160,7 @@ typedef enum
  */
 typedef enum
 {
-    CTR_ABSOLUTE,   ///< Constraint established with absolute reference.
+    CTR_ABSOLUTE = 1,   ///< Constraint established with absolute reference.
     CTR_FRAME,      ///< Constraint established with a frame (odometry).
     CTR_FEATURE,    ///< Constraint established with a feature (correspondence).
     CTR_LANDMARK    ///< Constraint established with a landmark (correpondence).
@@ -162,8 +172,8 @@ typedef enum
  */
 typedef enum
 {
-    CTR_ACTIVE,   ///< Constraint established with absolute reference.
-    CTR_INACTIVE  ///< Constraint established with a frame (odometry).
+    CTR_INACTIVE = 0,  ///< Constraint established with a frame (odometry).
+    CTR_ACTIVE = 1   ///< Constraint established with absolute reference.
 } ConstraintStatus;
 
 /** \brief Enumeration of jacobian computation method
@@ -172,7 +182,7 @@ typedef enum
  */
 typedef enum
 {
-    JAC_AUTO,    ///< Auto differentiation (AutoDiffCostFunctionWrapper or ceres::NumericDiffCostFunction).
+    JAC_AUTO = 1,    ///< Auto differentiation (AutoDiffCostFunctionWrapper or ceres::NumericDiffCostFunction).
     JAC_NUMERIC, ///< Numeric differentiation (ceres::NumericDiffCostFunction).
     JAC_ANALYTIC ///< Analytic jacobians.
 } JacobianMethod;
@@ -185,7 +195,7 @@ typedef enum
 typedef enum
 {
     ST_ESTIMATED = 0,		///< State in estimation (default)
-    ST_FIXED,			  ///< State fixed, estimated enough or fixed infrastructure.
+    ST_FIXED = 1,			  ///< State fixed, estimated enough or fixed infrastructure.
 } StateStatus;
 
 /** \brief Enumeration of all possible sensor types
@@ -194,12 +204,13 @@ typedef enum
  */
 typedef enum
 {
-    SEN_ODOM_2D,	    ///< Odometry measurement from encoders: displacement and rotation.
+    SEN_ODOM_2D = 1,        ///< 2D Odometry measurement from encoders: displacement and rotation.
+    SEN_ODOM_3D,        ///< 3D Odometry measurement from encoders: displacement and rotation.
     SEN_TWIST_2D,       ///< Twist measurement form encoders or motion command: lineal and angular velocities.
     SEN_IMU,		      ///< Inertial measurement unit with 3 acceleros, 3 gyros
     SEN_CAMERA,		    ///< Regular pinhole camera
     SEN_GPS_FIX,	    ///< GPS fix calculated from a GPS receiver
-    SEN_GPS_RAW,      ///< GPS pseudo ranges, doppler and satellite ephemerides
+    SEN_GPS_RAW,      ///< GPS pseudo ranges, Doppler and satellite ephemerides
     SEN_LIDAR,		    ///< Laser Range Finder, 2D
     SEN_RADAR,		    ///< Radar
     SEN_ABSOLUTE_POSE ///< Full absolute pose (XYZ+quaternion)
@@ -211,13 +222,15 @@ typedef enum
  */
 typedef enum
 {
-    PRC_TRACKER_DUMMY,
+    PRC_TRACKER_DUMMY = 1,
     PRC_TRACKER_BRISK,
     PRC_TRACKER_ORB,
     PRC_TRACKER_LIDAR,
     PRC_GPS_RAW,
     PRC_LIDAR,
-    PRC_ODOM_3D
+    PRC_ODOM_2D,
+    PRC_ODOM_3D,
+    PRC_IMU
 } ProcessorType;
 
 /** \brief enumeration of all possible Feature types
@@ -226,11 +239,12 @@ typedef enum
  */
 typedef enum
 {
-    FEAT_CORNER,
+    FEAT_CORNER = 1,
     FEAT_FIX,
     FEAT_GPS_FIX,
     FEAT_GPS_PR,
     FEAT_ODOM_2D,
+    FEAT_MOTION,
     FEAT_POINT_IMAGE
 }FeatureType;
 
@@ -239,14 +253,14 @@ typedef enum
  */
 typedef enum
 {
-    LANDMARK_POINT,     ///< A Euclidean point landmark, either 3D or 2D
+    LANDMARK_POINT = 1,     ///< A Euclidean point landmark, either 3D or 2D
     LANDMARK_CORNER,    ///< A corner landmark (2D)
     LANDMARK_CONTAINER  ///< A container landmark (2D)
 } LandmarkType;
 
 typedef enum
 {
-    LANDMARK_CANDIDATE,   ///< A landmark, just created. Association with it allowed, but not yet establish an actual constraint for the solver
+    LANDMARK_CANDIDATE = 1,   ///< A landmark, just created. Association with it allowed, but not yet establish an actual constraint for the solver
     LANDMARK_ESTIMATED,   ///< A landmark being estimated. Association with it allowed, establishing actual constraints for the solver where both vehicle and landmark states are being estimated
     LANDMARK_FIXED,       ///< A landmark estimated. Association with it allowed, establishing actual constraints for the solver, but its value remains static, no longer optimized
     LANDMARK_OUT_OF_VIEW, ///< A landmark out of the field of view. Association with it is not allowed, so does not pose constraints for the solver
@@ -339,7 +353,7 @@ typedef StateBlockList::iterator StateBlockIter;
 
 inline Scalar pi2pi(const Scalar& angle)
 {
-    return (angle > 0 ? fmod(angle + M_PI, 2 * M_PI) - M_PI : fmod(angle - M_PI, 2 * M_PI) + M_PI);
+    return (angle > 0 ? fmod(angle + Constants::PI, 2 * Constants::PI) - Constants::PI : fmod(angle - Constants::PI, 2 * Constants::PI) + Constants::PI);
 }
 
 } // namespace wolf

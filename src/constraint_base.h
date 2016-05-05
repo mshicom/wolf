@@ -20,8 +20,11 @@ namespace wolf {
 //class ConstraintBase
 class ConstraintBase : public NodeLinked<FeatureBase, NodeTerminus>
 {
+    private:
+        static unsigned int constraint_id_count_;
     protected:
-        ConstraintType type_;                           ///< type of constraint (types defined at wolf.h)
+        unsigned int constraint_id_;
+        ConstraintType type_id_;                           ///< type of constraint (types defined at wolf.h)
         ConstraintCategory category_;                   ///< category of constraint (types defined at wolf.h)
         ConstraintStatus status_;                       ///< status of constraint (types defined at wolf.h)
         FrameBase* frame_ptr_;                          ///< FrameBase pointer (for category CTR_FRAME)
@@ -29,6 +32,7 @@ class ConstraintBase : public NodeLinked<FeatureBase, NodeTerminus>
         LandmarkBase* landmark_ptr_;                    ///< LandmarkBase pointer (for category CTR_LANDMARK)
 
     public:
+
         /** \brief Constructor of category CTR_ABSOLUTE
          **/
         ConstraintBase(ConstraintType _tp, ConstraintStatus _status);
@@ -51,6 +55,8 @@ class ConstraintBase : public NodeLinked<FeatureBase, NodeTerminus>
          * 
          **/
         virtual ~ConstraintBase();
+
+        unsigned int id();
 
         /** \brief Returns the constraint type
          **/
@@ -117,11 +123,16 @@ class ConstraintBase : public NodeLinked<FeatureBase, NodeTerminus>
         LandmarkBase* getLandmarkOtherPtr();
 };
 
+inline unsigned int ConstraintBase::id()
+{
+    return constraint_id_;
+}
+
 // IMPLEMENTATION //
 
 inline ConstraintType ConstraintBase::getType() const
 {
-    return type_;
+    return type_id_;
 }
 
 inline FeatureBase* ConstraintBase::getFeaturePtr() const

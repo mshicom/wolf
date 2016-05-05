@@ -4,9 +4,12 @@
 
 namespace wolf {
 
+unsigned int FeatureBase::feature_id_count_ = 0;
+
 FeatureBase::FeatureBase(FeatureType _tp, unsigned int _dim_measurement) :
     NodeConstrained(MID, "FEATURE"),
-    type_(_tp),
+    feature_id_(++feature_id_count_),
+    type_id_(_tp),
     measurement_(_dim_measurement)
 {
     //
@@ -14,13 +17,14 @@ FeatureBase::FeatureBase(FeatureType _tp, unsigned int _dim_measurement) :
 
 FeatureBase::FeatureBase(FeatureType _tp, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance) :
 	NodeConstrained(MID, "FEATURE"),
-    type_(_tp),
+    feature_id_(++feature_id_count_),
+    type_id_(_tp),
 	measurement_(_measurement),
 	measurement_covariance_(_meas_covariance)
 {
     Eigen::LLT<Eigen::MatrixXs> lltOfA(measurement_covariance_); // compute the Cholesky decomposition of A
     Eigen::MatrixXs measurement_sqrt_covariance = lltOfA.matrixU();
-    measurement_sqrt_information_ = measurement_sqrt_covariance.inverse(); // retrieve factor U  in the decomposition
+    measurement_sqrt_information_ = measurement_sqrt_covariance.inverse().transpose(); // retrieve factor U  in the decomposition
 }
 
 FeatureBase::~FeatureBase()
@@ -37,12 +41,14 @@ FeatureBase::~FeatureBase()
     //std::cout << "constraints deleted" << std::endl;
 }
 
-void FeatureBase::addConstraint(ConstraintBase* _co_ptr)
+ConstraintBase* FeatureBase::addConstraint(ConstraintBase* _co_ptr)
 {
     addDownNode(_co_ptr);
     // add constraint to be added in solver
-    if (getWolfProblem() != nullptr)
-        getWolfProblem()->addConstraintPtr(_co_ptr);
+    if (getProblem() != nullptr)
+        getProblem()->addConstraintPtr(_co_ptr);
+
+    return _co_ptr;
 }
 
 FrameBase* FeatureBase::getFramePtr() const

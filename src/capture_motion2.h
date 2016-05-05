@@ -41,8 +41,8 @@ class CaptureMotion2 : public CaptureBase
 {
         // public interface:
     public:
-        CaptureMotion2(const TimeStamp& _ts, SensorBase* _sensor_ptr, const Eigen::VectorXs& _data) :
-                CaptureBase(_ts, _sensor_ptr), data_(_data), buffer_()
+        CaptureMotion2(const TimeStamp& _ts, SensorBase* _sensor_ptr, const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_cov) :
+                CaptureBase(_ts, _sensor_ptr), data_(_data), data_cov_(_data_cov), buffer_()
         {
             //
         }
@@ -54,6 +54,10 @@ class CaptureMotion2 : public CaptureBase
         {
             return data_;
         }
+        const Eigen::MatrixXs& getDataCovariance() const
+        {
+            return data_cov_;
+        }
         MotionBuffer* getBufferPtr()
         {
             return &buffer_;
@@ -63,13 +67,14 @@ class CaptureMotion2 : public CaptureBase
             return &buffer_;
         }
         const Eigen::VectorXs& getDelta() const{
-            return buffer_.getDelta();
+            return buffer_.get().back().delta_integr_;
         }
 
         // member data:
-    protected:
-        Eigen::VectorXs data_; ///< Motion data in form of vector mandatory
-        MotionBuffer buffer_; ///< Buffer of motions between this Capture and the next one.
+    private:
+        Eigen::VectorXs data_;     ///< Motion data in form of vector mandatory
+        Eigen::MatrixXs data_cov_; ///< Motion data in form of vector mandatory
+        MotionBuffer buffer_;      ///< Buffer of motions between this Capture and the next one.
 };
 
 } // namespace wolf

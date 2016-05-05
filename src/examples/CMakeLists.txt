@@ -1,7 +1,13 @@
+# SensorFactory classes test
+ADD_EXECUTABLE(test_sensor_factory test_sensor_factory.cpp)
+TARGET_LINK_LIBRARIES(test_sensor_factory ${PROJECT_NAME})
+
 # ProcessorMotion classes test
 ADD_EXECUTABLE(test_motion test_motion.cpp)
 TARGET_LINK_LIBRARIES(test_motion ${PROJECT_NAME})
 
+ADD_EXECUTABLE(test_motion_2d test_motion_2d.cpp)
+TARGET_LINK_LIBRARIES(test_motion_2d ${PROJECT_NAME})
 
 # Local parametrizations classes test
 ADD_EXECUTABLE(test_local_param test_local_param.cpp)
@@ -23,7 +29,14 @@ TARGET_LINK_LIBRARIES(test_virtual_hierarchy ${PROJECT_NAME})
 ADD_EXECUTABLE(test_permutations solver/test_permutations.cpp)
 TARGET_LINK_LIBRARIES(test_permutations ${PROJECT_NAME})
 
+# Enable Yaml config files
+IF(YAMLCPP_FOUND)
+    ADD_EXECUTABLE(test_yaml test_yaml.cpp)
+    TARGET_LINK_LIBRARIES(test_yaml ${PROJECT_NAME})
+ENDIF(YAMLCPP_FOUND)
+
 IF(Suitesparse_FOUND)
+IF (0) # These cannot compile on MacOSX -- we'll fix it some day.
     # Testing a ccolamd test
     ADD_EXECUTABLE(test_ccolamd solver/test_ccolamd.cpp)
     TARGET_LINK_LIBRARIES(test_ccolamd ${PROJECT_NAME})
@@ -47,6 +60,7 @@ IF(Suitesparse_FOUND)
     # Testing SPQR simple test
     #ADD_EXECUTABLE(test_SPQR solver/test_SPQR.cpp)
     #TARGET_LINK_LIBRARIES(test_SPQR ${PROJECT_NAME})
+ENDIF(0)
     
 ENDIF(Suitesparse_FOUND)
 
@@ -74,6 +88,10 @@ IF(OpenCV_FOUND)
     # Testing many things for the 3D image odometry
     ADD_EXECUTABLE(test_image test_image.cpp)
     TARGET_LINK_LIBRARIES(test_image ${PROJECT_NAME})
+
+    # Testing opencv matching and fundamental matrix with ransac
+    ADD_EXECUTABLE(test_opencv test_opencv.cpp)
+    TARGET_LINK_LIBRARIES(test_opencv ${PROJECT_NAME})
 
     # Testing OpenCV functions for projection of points
     ADD_EXECUTABLE(test_projection_points test_projection_points.cpp)

@@ -1,5 +1,7 @@
 
 #include "sensor_gps.h"
+#include "state_block.h"
+#include "state_quaternion.h"
 
 namespace wolf {
 
@@ -13,7 +15,7 @@ SensorGPS::SensorGPS(StateBlock* _p_ptr, //GPS sensor position with respect to t
         map_p_ptr_(_map_p_ptr),
         map_o_ptr_(_map_o_ptr)
 {
-    //std::cout << "SensorGPS constructor... id: " << nodeId() << std::endl;
+    setType("GPS");
 }
 
 // TODO Check carefully this destructor!
@@ -34,23 +36,36 @@ StateBlock *SensorGPS::getMapOPtr() const
 
 void SensorGPS::registerNewStateBlocks()
 {
-    if (getWolfProblem() != nullptr)
+    if (getProblem() != nullptr)
     {
         if (p_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(p_ptr_);
+            getProblem()->addStateBlockPtr(p_ptr_);
 
         if (o_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(o_ptr_);
+            getProblem()->addStateBlockPtr(o_ptr_);
 
         if (intrinsic_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(intrinsic_ptr_);
+            getProblem()->addStateBlockPtr(intrinsic_ptr_);
 
         if (map_p_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(map_p_ptr_);
+            getProblem()->addStateBlockPtr(map_p_ptr_);
 
         if (map_o_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(map_o_ptr_);
+            getProblem()->addStateBlockPtr(map_o_ptr_);
     }
+}
+
+// Define the factory method
+SensorBase* SensorGPS::create(const std::string& _unique_name, const Eigen::VectorXs& _extrinsics_p,
+                              const IntrinsicsBase* _intrinsics)
+{
+    // decode extrinsics vector
+    assert(_extrinsics_p.size() == 3 && "Bad extrinsics vector length. Should be 3 for 3D.");
+    StateBlock* pos_ptr = new StateBlock(_extrinsics_p, true);
+    StateBlock* ori_ptr = nullptr;
+    SensorBase* sen = new SensorGPS(pos_ptr, ori_ptr, nullptr, nullptr, nullptr); // TODO: how to init these last three pointers?
+    sen->setName(_unique_name);
+    return sen;
 }
 
 } // namespace wolf
