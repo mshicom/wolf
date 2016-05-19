@@ -1,17 +1,16 @@
 #include "capture_base.h"
-#include "frame_base.h"
-#include "sensor_base.h"
-#include "feature_base.h"
 
 namespace wolf{
 
+unsigned int CaptureBase::capture_id_count_ = 0;
 
 CaptureBase::CaptureBase(const TimeStamp& _ts, SensorBase* _sensor_ptr) :
         NodeLinked(MID, "CAPTURE"),
+        capture_id_(++capture_id_count_),
         time_stamp_(_ts),
         sensor_ptr_(_sensor_ptr),
-	sensor_p_ptr_(sensor_ptr_->getPPtr()),
-	sensor_o_ptr_(sensor_ptr_->getOPtr())
+        sensor_p_ptr_(sensor_ptr_->getPPtr()),
+        sensor_o_ptr_(sensor_ptr_->getOPtr())
 {
     //
 }

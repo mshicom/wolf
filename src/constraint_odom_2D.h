@@ -12,10 +12,10 @@ class ConstraintOdom2D : public ConstraintSparse<3, 2, 1, 2, 1>
     public:
         static const unsigned int N_BLOCKS = 4;
 
-        ConstraintOdom2D(FeatureBase* _ftr_ptr, FrameBase* _frame_ptr, ConstraintStatus _status = CTR_ACTIVE) :
-                ConstraintSparse<3, 2, 1, 2, 1>(_ftr_ptr, CTR_ODOM_2D, _frame_ptr, _status, _frame_ptr->getPPtr(), _frame_ptr->getOPtr(), _ftr_ptr->getFramePtr()->getPPtr(), _ftr_ptr->getFramePtr()->getOPtr())
+        ConstraintOdom2D(FeatureBase* _ftr_ptr, FrameBase* _frame_ptr, bool _apply_loss_function = false, ConstraintStatus _status = CTR_ACTIVE) :
+                ConstraintSparse<3, 2, 1, 2, 1>(_ftr_ptr, CTR_ODOM_2D, _frame_ptr, _apply_loss_function, _status, _frame_ptr->getPPtr(), _frame_ptr->getOPtr(), _ftr_ptr->getFramePtr()->getPPtr(), _ftr_ptr->getFramePtr()->getOPtr())
         {
-            //
+            setType("ODOM 2D");
         }
 
         /** \brief Default destructor (not recommended)
@@ -33,14 +33,19 @@ class ConstraintOdom2D : public ConstraintSparse<3, 2, 1, 2, 1>
                          T* _residuals) const;
 
         /** \brief Returns the jacobians computation method
-         *
-         * Returns the jacobians computation method
-         *
          **/
         virtual JacobianMethod getJacobianMethod() const
         {
             return JAC_AUTO;
         }
+
+    public:
+        static wolf::ConstraintBase* create(FeatureBase* _feature_ptr, //
+                                            NodeBase* _correspondant_ptr)
+        {
+            return new ConstraintOdom2D(_feature_ptr, (FrameBase*)_correspondant_ptr);
+        }
+
 };
 
 template<typename T>
@@ -72,26 +77,31 @@ inline bool ConstraintOdom2D::operator ()(const T* const _p1, const T* const _o1
     //            for (int i=0; i < 3; i++)
     //                std::cout << "\n\t" << getMeasurementCovariance()(i,i);
     //            std::cout << std::endl;
+
+    // MAPS
+    Eigen::Map<Eigen::Matrix<T,3,1> > residuals_map(_residuals);
+    Eigen::Map<const Eigen::Matrix<T,2,1> > p1_map(_p1);
+    Eigen::Map<const Eigen::Matrix<T,2,1> > p2_map(_p2);
+    Eigen::Matrix<T, 3, 1> expected_measurement;
+
     // Expected measurement
-    // rotar menys l'angle de primer (-_o1)
-    T expected_longitudinal = cos(_o1[0]) * (_p2[0] - _p1[0]) + sin(_o1[0]) * (_p2[1] - _p1[1]); // cos(-o1)(x2-x1) - sin(-o1)(y2-y1)
-    T expected_lateral = -sin(_o1[0]) * (_p2[0] - _p1[0]) + cos(_o1[0]) * (_p2[1] - _p1[1]); // sin(-o1)(x2-x1) + cos(-o1)(y2-y1)
-    T expected_rotation = _o2[0] - _o1[0];
+    expected_measurement.head(2) = Eigen::Rotation2D<T>(-_o1[0]) * (p2_map - p1_map);
+    expected_measurement(2) = _o2[0] - _o1[0];
+
+    // Error
+    residuals_map = expected_measurement - getMeasurement().cast<T>();
+    // pi2pi - cannot use wolf::pi2pi() because of template T
+    while (residuals_map(2) > T(M_PI))
+        residuals_map(2) = residuals_map(2) - T(2 * M_PI);
+    while (residuals_map(2) <= T(-M_PI))
+        residuals_map(2) = residuals_map(2) + T(2 * M_PI);
+
     // Residuals
-    _residuals[0] = (expected_longitudinal - T(getMeasurement()(0)))
-            / T(sqrt(std::max(getMeasurementCovariance()(0, 0), 1e-6)));
-    _residuals[1] = (expected_lateral - T(getMeasurement()(1)))
-            / T(sqrt(std::max(getMeasurementCovariance()(1, 1), 1e-6)));
-    _residuals[2] = expected_rotation - T(getMeasurement()(2));
-    while (_residuals[2] > T(M_PI))
-        _residuals[2] = _residuals[2] - T(2 * M_PI);
-    while (_residuals[2] <= T(-M_PI))
-        _residuals[2] = _residuals[2] + T(2 * M_PI);
-    _residuals[2] = _residuals[2] / T(sqrt(std::max(getMeasurementCovariance()(2, 2), 1e-6)));
-    //std::cout << "constraint odom computed!" << std::endl;
+    residuals_map = getMeasurementSquareRootInformation().cast<T>() * residuals_map;
+    // std::cout << "constraint odom computed!" << std::endl;
+
     return true;
 }
-
 
 } // namespace wolf
 

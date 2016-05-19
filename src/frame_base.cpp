@@ -7,21 +7,25 @@
 
 namespace wolf {
 
+unsigned int FrameBase::frame_id_count_ = 0;
+
 FrameBase::FrameBase(const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _v_ptr) :
             NodeConstrained(MID, "FRAME"),
-            type_(NON_KEY_FRAME),
+            frame_id_(++frame_id_count_),
+            type_id_(NON_KEY_FRAME),
             time_stamp_(_ts),
 			status_(ST_ESTIMATED),
 			p_ptr_(_p_ptr),
             o_ptr_(_o_ptr),
             v_ptr_(_v_ptr)
 {
-    //
+    setType("BASE");
 }
 
-FrameBase::FrameBase(const FrameType & _tp, const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _v_ptr) :
+FrameBase::FrameBase(const FrameKeyType & _tp, const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _v_ptr) :
             NodeConstrained(MID, "FRAME"),
-            type_(_tp),
+            frame_id_(++frame_id_count_),
+            type_id_(_tp),
             time_stamp_(_ts),
 			status_(ST_ESTIMATED),
 			p_ptr_(_p_ptr),
@@ -33,28 +37,29 @@ FrameBase::FrameBase(const FrameType & _tp, const TimeStamp& _ts, StateBlock* _p
                 
 FrameBase::~FrameBase()
 {
-	//std::cout << "deleting FrameBase " << nodeId() << std::endl;
+	//std::cout << "deleting FrameBase " << id() << std::endl;
     is_deleting_ = true;
 
 	// Remove Frame State Blocks
 	if (p_ptr_ != nullptr)
 	{
-        if (getWolfProblem() != nullptr)
-            getWolfProblem()->removeStateBlockPtr(p_ptr_);
+        if (getProblem() != nullptr && type_id_ == KEY_FRAME)
+            getProblem()->removeStateBlockPtr(p_ptr_);
 	    delete p_ptr_;
 	}
     if (o_ptr_ != nullptr)
     {
-        if (getWolfProblem() != nullptr)
-            getWolfProblem()->removeStateBlockPtr(o_ptr_);
+        if (getProblem() != nullptr && type_id_ == KEY_FRAME)
+            getProblem()->removeStateBlockPtr(o_ptr_);
         delete o_ptr_;
     }
     if (v_ptr_ != nullptr)
     {
-        if (getWolfProblem() != nullptr)
-            getWolfProblem()->removeStateBlockPtr(v_ptr_);
+        if (getProblem() != nullptr && type_id_ == KEY_FRAME)
+            getProblem()->removeStateBlockPtr(v_ptr_);
         delete v_ptr_;
     }
+
     //std::cout << "states deleted" << std::endl;
 
 
@@ -69,25 +74,28 @@ FrameBase::~FrameBase()
 
 void FrameBase::registerNewStateBlocks()
 {
-    if (getWolfProblem() != nullptr)
+    if (getProblem() != nullptr)
     {
         if (p_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(p_ptr_);
+            getProblem()->addStateBlockPtr(p_ptr_);
 
         if (o_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(o_ptr_);
+            getProblem()->addStateBlockPtr(o_ptr_);
 
         if (v_ptr_ != nullptr)
-            getWolfProblem()->addStateBlockPtr(v_ptr_);
+            getProblem()->addStateBlockPtr(v_ptr_);
     }
 }
 
 void FrameBase::setKey()
 {
-    if (type_ != KEY_FRAME)
+    if (type_id_ != KEY_FRAME)
     {
-        type_ = KEY_FRAME;
+        type_id_ = KEY_FRAME;
         registerNewStateBlocks();
+
+        if (getTrajectoryPtr()->getLastKeyFramePtr() == nullptr || getTrajectoryPtr()->getLastKeyFramePtr()->getTimeStamp() < time_stamp_)
+            getTrajectoryPtr()->setLastKeyFramePtr(this);
     }
 }
 
@@ -217,20 +225,20 @@ void FrameBase::setStatus(StateStatus _st)
         if (p_ptr_ != nullptr)
         {
             p_ptr_->fix();
-            if (getWolfProblem() != nullptr)
-                getWolfProblem()->updateStateBlockPtr(p_ptr_);
+            if (getProblem() != nullptr)
+                getProblem()->updateStateBlockPtr(p_ptr_);
         }
         if (o_ptr_ != nullptr)
         {
             o_ptr_->fix();
-            if (getWolfProblem() != nullptr)
-                getWolfProblem()->updateStateBlockPtr(o_ptr_);
+            if (getProblem() != nullptr)
+                getProblem()->updateStateBlockPtr(o_ptr_);
         }
         if (v_ptr_ != nullptr)
         {
             v_ptr_->fix();
-            if (getWolfProblem() != nullptr)
-                getWolfProblem()->updateStateBlockPtr(v_ptr_);
+            if (getProblem() != nullptr)
+                getProblem()->updateStateBlockPtr(v_ptr_);
         }
     }
     else if (status_ == ST_ESTIMATED)
@@ -238,20 +246,20 @@ void FrameBase::setStatus(StateStatus _st)
         if (p_ptr_ != nullptr)
         {
             p_ptr_->unfix();
-            if (getWolfProblem() != nullptr)
-                getWolfProblem()->updateStateBlockPtr(p_ptr_);
+            if (getProblem() != nullptr)
+                getProblem()->updateStateBlockPtr(p_ptr_);
         }
         if (o_ptr_ != nullptr)
         {
             o_ptr_->unfix();
-            if (getWolfProblem() != nullptr)
-                getWolfProblem()->updateStateBlockPtr(o_ptr_);
+            if (getProblem() != nullptr)
+                getProblem()->updateStateBlockPtr(o_ptr_);
         }
         if (v_ptr_ != nullptr)
         {
             v_ptr_->unfix();
-            if (getWolfProblem() != nullptr)
-                getWolfProblem()->updateStateBlockPtr(v_ptr_);
+            if (getProblem() != nullptr)
+                getProblem()->updateStateBlockPtr(v_ptr_);
         }
     }
 }

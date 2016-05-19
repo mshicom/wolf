@@ -8,7 +8,14 @@
 // std includes
 
 
+
+
 namespace wolf {
+
+struct IntrinsicsGPSFix : public IntrinsicsBase
+{
+        // Empty -- it acts only as a typedef for IntrinsicsBase, but allows future extension with parameters
+};
 
 class SensorGPSFix : public SensorBase
 {
@@ -35,8 +42,11 @@ class SensorGPSFix : public SensorBase
          * Returns noise standard deviation
          * 
          **/        
-        double getNoise() const;
+        Scalar getNoise() const;
         
+    public:
+        static SensorBase* create(const std::string& _unique_name, const Eigen::VectorXs& _extrinsics_pq, const IntrinsicsBase* _intrinsics);
+
 };
 
 } // namespace wolf

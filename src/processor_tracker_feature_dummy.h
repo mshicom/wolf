@@ -26,8 +26,8 @@ class ProcessorTrackerFeatureDummy : public wolf::ProcessorTrackerFeature
 
         unsigned int n_feature_;
 
-        virtual void preProcess();
-        virtual void postProcess();
+//        virtual void preProcess() { }
+//        virtual void postProcess() { }
 
         /** \brief Track provided features from \b last to \b incoming
          * \param _feature_list_in input list of features in \b last to track
@@ -83,20 +83,12 @@ inline ProcessorTrackerFeatureDummy::ProcessorTrackerFeatureDummy() :
         ProcessorTrackerFeature(PRC_TRACKER_DUMMY),
         n_feature_(0)
 {
-    // TODO Auto-generated constructor stub
+    //
 }
 
 inline ProcessorTrackerFeatureDummy::~ProcessorTrackerFeatureDummy()
 {
-    // TODO Auto-generated destructor stub
-}
-
-inline void ProcessorTrackerFeatureDummy::preProcess()
-{
-}
-
-inline void ProcessorTrackerFeatureDummy::postProcess()
-{
+    //
 }
 
 inline bool ProcessorTrackerFeatureDummy::correctFeatureDrift(const FeatureBase* _last_feature,

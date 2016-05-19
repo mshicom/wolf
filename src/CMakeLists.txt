@@ -3,6 +3,11 @@
 MESSAGE("Starting WOLF CMakeLists ...")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+#CMAKE modules
+SET(CMAKE_MODULE_PATH ${CMAKE_ROOT}/Modules/; ../cmake_modules)
+MESSAGE(STATUS ${CMAKE_MODULE_PATH})
+
+
 #find dependencies. 
 FIND_PACKAGE(Ceres QUIET) #Ceres is not required
 IF(Ceres_FOUND)
@@ -21,17 +26,28 @@ IF(laser_scan_utils_FOUND)
     MESSAGE("laser_scan_utils Library FOUND: laser_scan_utils related sources will be built.")
 ENDIF(laser_scan_utils_FOUND)
 
-FIND_PACKAGE(raw_gps_utils QUIET) #raw_gps_utils is not required
+FIND_PACKAGE(raw_gps_utils ) #raw_gps_utils is not required
 IF(raw_gps_utils_FOUND)
     MESSAGE("raw_gps_utils Library FOUND: raw_gps_utils related sources will be built.")
 ENDIF(raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
-FIND_PACKAGE(OpenCV QUIET)
+# OpenCV
+FIND_PACKAGE(OpenCV 2 QUIET)
 IF(OpenCV_FOUND)
     MESSAGE("OpenCV Library FOUND: OpenCV related sources will be built.")
 ENDIF(OpenCV_FOUND)
 
+# YAML with yaml-cpp
+SET(YAMLCPP_USE_STATIC_LIBS TRUE) #Use static library : not working: TO BE REVISED
+FIND_PACKAGE(YamlCpp)
+IF(YAMLCPP_FOUND)
+    MESSAGE("yaml-cpp Library FOUND: yaml-cpp related sources will be built.")
+    MESSAGE(STATUS ${YAMLCPP_INCLUDE_DIR})
+    MESSAGE(STATUS ${YAMLCPP_LIBRARY})
+ELSEIF(YAMLCPP_FOUND)
+    MESSAGE("yaml-cpp Library NOT FOUND!")
+ENDIF(YAMLCPP_FOUND)
+    
 # SuiteSparse doesn't have find*.cmake:
 FIND_PATH(
     Suitesparse_INCLUDE_DIRS
@@ -66,7 +82,7 @@ IF(raw_gps_utils_FOUND)
     INCLUDE_DIRECTORIES(${raw_gps_utils_INCLUDE_DIRS})
 ENDIF(raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
+# OpenCV
 IF(OpenCV_FOUND)
     INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 ENDIF(OpenCV_FOUND)
@@ -86,20 +102,19 @@ SET(HDRS
     capture_motion.h
     capture_motion2.h
     capture_odom_2D.h
-    capture_odom_3D.h
     capture_void.h
     constraint_base.h
     constraint_analytic.h
+    constraint_container.h
+    constraint_corner_2D.h
     constraint_epipolar.h
     constraint_sparse.h
+    constraint_fix.h
     constraint_gps_2D.h
     constraint_gps_pseudorange_3D.h
     constraint_gps_pseudorange_2D.h
-    constraint_fix.h
     constraint_odom_2D.h
     constraint_odom_2D_analytic.h
-    constraint_corner_2D.h
-    constraint_container.h
     constraint_relative_2D_analytic.h
     feature_base.h
     feature_corner_2D.h
@@ -112,6 +127,7 @@ SET(HDRS
     landmark_base.h
     landmark_corner_2D.h
     landmark_container.h
+    #landmark_line_2D.h
     local_parametrization_base.h
     local_parametrization_quaternion.h
     local_parametrization_homogeneous.h
@@ -123,8 +139,10 @@ SET(HDRS
     node_terminus.h
     problem.h
     processor_base.h
+    processor_imu.h
+    processor_factory.h
     processor_motion.h
-    processor_motion_base.h
+    processor_odom_2D.h
     processor_odom_3D.h
     processor_tracker.h
     processor_tracker_feature.h
@@ -133,9 +151,11 @@ SET(HDRS
     processor_tracker_landmark_dummy.h
     sensor_base.h
     sensor_camera.h
-    sensor_odom_2D.h
+    sensor_factory.h
     sensor_gps.h
     sensor_gps_fix.h
+    sensor_imu.h
+    sensor_odom_2D.h
     state_block.h
     state_homogeneous_3d.h
     state_quaternion.h
@@ -163,6 +183,7 @@ SET(SRCS
     feature_base.cpp
     feature_corner_2D.cpp
     feature_gps_fix.cpp
+    feature_gps_pseudorange.cpp
     feature_fix.cpp
     feature_odom_2D.cpp
     frame_base.cpp
@@ -170,6 +191,7 @@ SET(SRCS
     landmark_base.cpp
     landmark_corner_2D.cpp
     landmark_container.cpp
+    #landmark_line_2D.cpp
     local_parametrization_base.cpp
     local_parametrization_quaternion.cpp
     local_parametrization_homogeneous.cpp
@@ -177,6 +199,10 @@ SET(SRCS
     node_base.cpp
     problem.cpp
     processor_base.cpp
+    processor_factory.cpp
+    processor_imu.cpp
+    processor_odom_2D.cpp
+    processor_odom_3D.cpp
     processor_tracker.cpp
     processor_tracker_feature.cpp
     processor_tracker_feature_dummy.cpp
@@ -184,8 +210,11 @@ SET(SRCS
     processor_tracker_landmark_dummy.cpp
     sensor_base.cpp
     sensor_camera.cpp
-    sensor_odom_2D.cpp
+    sensor_factory.cpp
+    sensor_gps.cpp
     sensor_gps_fix.cpp
+    sensor_imu.cpp
+    sensor_odom_2D.cpp
     time_stamp.cpp
     trajectory_base.cpp
     wolf_manager.cpp
@@ -218,33 +247,31 @@ IF (laser_scan_utils_FOUND)
     SET(HDRS ${HDRS}
         capture_laser_2D.h
         sensor_laser_2D.h
-        processor_laser_2D.h
-        processor_tracker_laser.h
+        #processor_laser_2D.h
+        processor_tracker_landmark_corner.h
+        processor_tracker_feature_corner.h
         )
     SET(SRCS ${SRCS}
         capture_laser_2D.cpp
         sensor_laser_2D.cpp
-        processor_laser_2D.cpp
-        processor_tracker_laser.cpp
+        #processor_laser_2D.cpp
+        processor_tracker_landmark_corner.cpp
+        processor_tracker_feature_corner.cpp
         )
 ENDIF(laser_scan_utils_FOUND)
 
 IF (raw_gps_utils_FOUND)
     SET(HDRS ${HDRS}
         capture_gps.h
-        feature_gps_pseudorange.h
         processor_gps.h
-        sensor_gps.h
         )
     SET(SRCS ${SRCS}
         capture_gps.cpp
-        feature_gps_pseudorange.cpp
         processor_gps.cpp
-        sensor_gps.cpp
         )
 ENDIF(raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
+# OpenCV 
 IF (OpenCV_FOUND)
     SET(HDRS ${HDRS}
         capture_image.h
@@ -280,10 +307,15 @@ IF (raw_gps_utils_FOUND)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${raw_gps_utils_LIBRARY})
 ENDIF (raw_gps_utils_FOUND)
 
-#Added OpenCV (may be wrong) <=====
+# OpenCV
 IF (OpenCV_FOUND)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OpenCV_LIBS})
 ENDIF (OpenCV_FOUND)
+
+IF (YAMLCPP_FOUND)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${YAMLCPP_LIBRARY})
+ENDIF (YAMLCPP_FOUND)
+
 
 #install library
 INSTALL(TARGETS ${PROJECT_NAME}

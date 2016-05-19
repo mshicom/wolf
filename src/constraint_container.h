@@ -17,12 +17,13 @@ class ConstraintContainer: public ConstraintSparse<3,2,1,2,1>
 	public:
 		static const unsigned int N_BLOCKS = 4;
 
-	    ConstraintContainer(FeatureBase* _ftr_ptr, LandmarkContainer* _lmk_ptr, const unsigned int _corner, ConstraintStatus _status = CTR_ACTIVE) :
-			ConstraintSparse<3,2,1,2,1>(_ftr_ptr, CTR_CONTAINER, _lmk_ptr, _status, _ftr_ptr->getFramePtr()->getPPtr(),_ftr_ptr->getFramePtr()->getOPtr(), _lmk_ptr->getPPtr(), _lmk_ptr->getOPtr()),
+	    ConstraintContainer(FeatureBase* _ftr_ptr, LandmarkContainer* _lmk_ptr, const unsigned int _corner, bool _apply_loss_function = false, ConstraintStatus _status = CTR_ACTIVE) :
+			ConstraintSparse<3,2,1,2,1>(_ftr_ptr, CTR_CONTAINER, _lmk_ptr, _apply_loss_function, _status, _ftr_ptr->getFramePtr()->getPPtr(),_ftr_ptr->getFramePtr()->getOPtr(), _lmk_ptr->getPPtr(), _lmk_ptr->getOPtr()),
 			lmk_ptr_(_lmk_ptr),
 			corner_(_corner)
 		{
             assert(_corner >= 0 && _corner <= 3 && "Wrong corner id in constraint container constructor");
+            setType("CONTAINER");
 
             std::cout << "new constraint container: corner idx = " << corner_ << std::endl;
 		}
@@ -45,48 +46,41 @@ class ConstraintContainer: public ConstraintSparse<3,2,1,2,1>
 		template <typename T>
 		bool operator()(const T* const _robotP, const T* const _robotO, const T* const _landmarkP, const T* const _landmarkO, T* _residuals) const
 		{
-			//TODO: Not computing the transformations each iteration
 			// Mapping
-			Eigen::Map<const Eigen::Matrix<T,2,1>> landmark_position(_landmarkP);
-			Eigen::Map<const Eigen::Matrix<T,2,1>> robot_position(_robotP);
+			Eigen::Map<const Eigen::Matrix<T,2,1>> landmark_position_map(_landmarkP);
+			Eigen::Map<const Eigen::Matrix<T,2,1>> robot_position_map(_robotP);
+			Eigen::Map<Eigen::Matrix<T,3,1>> residuals_map(_residuals);
 
-//			std::cout << "getSensorPosition: " << std::endl;
-//			std::cout << getCapturePtr()->getSensorPtr()->getSensorPosition()->head(2).transpose() << std::endl;
-//			std::cout << "getSensorRotation: " << std::endl;
-//			std::cout << getCapturePtr()->getSensorPtr()->getSensorRotation()->topLeftCorner<2,2>() << std::endl;
-//			std::cout << "atan2: " << atan2(getCapturePtr()->getSensorPtr()->getSensorRotation()->transpose()(0,1),getCapturePtr()->getSensorPtr()->getSensorRotation()->transpose()(0,0)) << std::endl;
+            //std::cout << "getSensorPosition: " << std::endl;
+            //std::cout << getCapturePtr()->getSensorPtr()->getSensorPosition()->head(2).transpose() << std::endl;
+            //std::cout << "getSensorRotation: " << std::endl;
+            //std::cout << getCapturePtr()->getSensorPtr()->getSensorRotation()->topLeftCorner<2,2>() << std::endl;
+            //std::cout << "atan2: " << atan2(getCapturePtr()->getSensorPtr()->getSensorRotation()->transpose()(0,1),getCapturePtr()->getSensorPtr()->getSensorRotation()->transpose()(0,0)) << std::endl;
 
 			// sensor transformation
-			Eigen::Matrix<T,2,1> sensor_position = getCapturePtr()->getSensorPtr()->getPPtr()->getVector().head(2).cast<T>();
-//			Eigen::Matrix<T,2,2> inverse_R_sensor = (getCapturePtr()->getSensorPtr()->getRotationMatrix2D().transpose()).cast<T>();
-                        Eigen::Rotation2D<Scalar> S_R( getCapturePtr()->getSensorOPtr()->getVector()(0) );
-                        Eigen::Matrix<T,2,2> inverse_R_sensor = (S_R.matrix().transpose()).cast<T>();
+            Eigen::Matrix<T,2,1> sensor_position = getCapturePtr()->getSensorPtr()->getPPtr()->getVector().head(2).cast<T>();
+            Eigen::Matrix<T,2,2> inverse_R_sensor = Eigen::Rotation2D<T>(T(-getCapturePtr()->getSensorOPtr()->getVector()(0))).matrix();
+            // robot information
+            Eigen::Matrix<T,2,2> inverse_R_robot = Eigen::Rotation2D<T>(-_robotO[0]).matrix();
+            Eigen::Matrix<T,2,2> R_landmark = Eigen::Rotation2D<T>(_landmarkO[0]).matrix();
+            Eigen::Matrix<T,2,1> corner_position = lmk_ptr_->getCorner(corner_).head<2>().cast<T>();
 
+            // Expected measurement
+            Eigen::Matrix<T,2,1> expected_measurement_position = inverse_R_sensor * (inverse_R_robot * (landmark_position_map - robot_position_map + R_landmark * corner_position) - sensor_position);
+            T expected_measurement_orientation = _landmarkO[0] - _robotO[0] - T(getCapturePtr()->getSensorPtr()->getOPtr()->getVector()(0)) + T(lmk_ptr_->getCorner(corner_)(2));
 
-			Eigen::Matrix<T,2,2> inverse_R_robot;
-			inverse_R_robot << cos(*_robotO), sin(*_robotO),
-					 	 	  -sin(*_robotO), cos(*_robotO);
-			Eigen::Matrix<T,2,2> R_landmark;
-			R_landmark << cos(*_landmarkO),-sin(*_landmarkO),
-                          sin(*_landmarkO), cos(*_landmarkO);
+            // Error
+            residuals_map.head(2) = expected_measurement_position - getMeasurement().head<2>().cast<T>();
+            residuals_map(2) = expected_measurement_orientation - T(getMeasurement()(2));
 
-			Eigen::Matrix<T,2,1> corner_position = lmk_ptr_->getCorner(corner_).head(2).cast<T>();
-
-			// Expected measurement
-			Eigen::Matrix<T,2,1> expected_measurement_position = inverse_R_sensor * (inverse_R_robot * (landmark_position - robot_position + R_landmark * corner_position) - sensor_position);
-			T expected_measurement_orientation = (*_landmarkO) - (*_robotO) - T( *(getCapturePtr()->getSensorPtr()->getOPtr()->getPtr()) ) + T(lmk_ptr_->getCorner(corner_)(2));
-
-			// Residuals
-			_residuals[0] = (expected_measurement_position(0) - T(getMeasurement()(0))) / T(sqrt(getMeasurementCovariance()(0,0)));
-			_residuals[1] = (expected_measurement_position(1) - T(getMeasurement()(1))) / T(sqrt(getMeasurementCovariance()(1,1)));
-			_residuals[2] = expected_measurement_orientation - T(getMeasurement()(2));
-
-			while (_residuals[2] > T(M_PI))
-			    _residuals[2] = _residuals[2] - T(2*M_PI);
+            // pi 2 pi
+            while (_residuals[2] > T(M_PI))
+                _residuals[2] = _residuals[2] - T(2*M_PI);
             while (_residuals[2] <= T(-M_PI))
                 _residuals[2] = _residuals[2] + T(2*M_PI);
 
-            _residuals[2] = _residuals[2] / T(sqrt(getMeasurementCovariance()(2,2)));
+            // Residuals
+            residuals_map = getMeasurementSquareRootInformation().cast<T>() * residuals_map;
 
             //std::cout << "\nCONSTRAINT: " << nodeId() << std::endl;
             //std::cout << "Feature: " << getFeaturePtr()->nodeId() << std::endl;
@@ -134,6 +128,16 @@ class ConstraintContainer: public ConstraintSparse<3,2,1,2,1>
         {
             return JAC_AUTO;
         }
+
+
+    public:
+        static wolf::ConstraintBase* create(FeatureBase* _feature_ptr, NodeBase* _correspondant_ptr)
+        {
+            unsigned int corner = 0; // Hard-coded, but this class is nevertheless deprecated.
+
+            return new ConstraintContainer(_feature_ptr, (LandmarkContainer*)_correspondant_ptr, corner);
+        }
+
 };
 
 } // namespace wolf

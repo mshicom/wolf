@@ -1,12 +1,19 @@
-/**
+/** \file node_linked.h
+ *
+ * \author Joan Sola
+ *
  * This file defines the basic template class for linked nodes.
  *
  * As a definition of a template class of a significant complexity,
- * this file is organized with member definitions within the class declaration.
+ * this file is organized with member definitions after the class declaration.
  * This has some advantages:
  * - Functions can be inlined.
  * - typedefs within the class can be used straightforwardly in definitions.
  * - Circular references are minimized.
+ *
+ * and some implications:
+ * - After the class declaration, we need to include all headers of the classes acting as the template parameters.
+ * - This makes circular references again a risk.
  */
 
 #ifndef NODE_LINKED_H_
@@ -19,19 +26,42 @@
 namespace wolf
 {
 
+class Problem;
+
 /** \brief Linked node element in the Wolf Tree
  * 
  * \param UpperType the type of node one level up in the Wolf tree.
  * \param LowerType the type of node one level down in the Wolf tree.
  *
  * Inherit from this class to implement a node element to be placed somewhere in the Wolf Tree.
- * A node has five main data members:
- * - An unique ID to identify it over the whole Wolf Tree (inherited from Node)
- * - A label indicating the node nature (inherited from Node)
- * - An enum indicating tree location (see NodeLocation enum at wolf.h)
- * - down_node_list_: A list of shared pointers to derived node objects, specified by the template parameter LowerType.
- * - up_node_: A regular pointer to a derived node object, specified by the template parameter UpperType.
- *
+ * A linked node has seven main data members:
+ *  - An unique ID to identify it over the whole Wolf Tree (inherited from NodeBase)
+ *  - An enum indicating the node location in the tree (see NodeLocation enum in wolf.h)
+ *  - down_node_list_: A list of pointers to derived node objects, specified by the template parameter LowerType.
+ *  - up_node_: A pointer to a derived node object, specified by the template parameter UpperType.
+ *  - A unique class name, inherited from NodeBase, strictly within this range of possibilities:
+ *    - "UNDEFINED"     : used for NodeTerminus
+ *    - "PROBLEM"       : for Problem and all derived classes -- beware: Problem is at this time deriving NodeBase.
+ *    - "HARDWARE"      : for HardwareBase and all derived classes
+ *    - "SENSOR"        : for SensorBase and all derived classes
+ *    - "PROCESSOR"     : for ProcessorBase and all derived classes
+ *    - "TRAJECTORY"    : for TrajectoryBase and all derived classes
+ *    - "FRAME"         : for FrameBase and all derived classes
+ *    - "CAPTURE"       : for CaptureBase and all derived classes
+ *    - "FEATURE"       : for FeatureBase and all derived classes
+ *    - "CONSTRAINT"    : for ConstraintBase and all derived classes
+ *    - "MAP"           : for MapBase and all derived classes
+ *    - "LANDMARK"      : for LandmarkBase and all derived classes
+ *  - A unique type label, inherited from NodeBase, which is a subclass of the above. A few  examples are:
+ *    - "CAMERA"        : for the class SensorCamera
+ *    - "LASER 2D"      : for the class SensorLaser2D
+ *    - "POINT 3D"      : for the class LandmarkPoint3D
+ *    - "PROCESSOR LASER 2D" : for the class ProcessorLaser2D
+ *    Please refer to each base class derived from NodeLinked (those listed just above) for a list of type labels.
+ *  - A name, inherited from NodeBase, defined in each application, which is specific of each object. A few examples follow:
+ *    - "Front-left Camera"
+ *    - "Left-side LIDAR 2D"
+ *    - "Lidar 2D processor"
  */
 template<class UpperType, class LowerType>
 class NodeLinked : public NodeBase
@@ -49,12 +79,14 @@ class NodeLinked : public NodeBase
         UpperNodePtr up_node_ptr_; ///< Pointer to upper node
         LowerNodeList down_node_list_; ///< A list of pointers to lower nodes
         bool is_deleting_; ///< This node is being deleted.
+    private:
+        Problem* problem_ptr_;
 
     public:
 
         /** \brief Constructor without specify up node
          */
-        NodeLinked(const NodeLocation _loc, const std::string& _label);
+        NodeLinked(const NodeLocation _loc, const std::string& _class);
 
         /** \brief Default destructor (not recommended)
          *
@@ -154,15 +186,16 @@ class NodeLinked : public NodeBase
          */
         void unlinkDownNode(const unsigned int _id);
 
-        /** \brief Gets a pointer to the tree top node
-         * 
-         * TODO: Review if it could return a pointer to a derived class instead of NodeBase JVN: I tried to do so...
+        /** \brief Gets a pointer to the tree top node - direct method
          **/
-        virtual Problem* getWolfProblem();
+        Problem* getProblem();
 
-    protected:
+        /** \brief Gets a pointer to the tree top node - recursive method
+         **/
+        Problem* getTop();
 
 };
+
 
 } // namespace wolf
 
@@ -190,11 +223,14 @@ namespace wolf
 {
 
 template<class UpperType, class LowerType>
-NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _label) :
-        NodeBase(_label), //
+NodeLinked<UpperType, LowerType>::NodeLinked(const NodeLocation _loc, const std::string& _class) :
+        NodeBase(_class), //
         location_(_loc), //
-        up_node_ptr_(nullptr), down_node_list_(), is_deleting_(false)
+        up_node_ptr_(nullptr), //
+        down_node_list_(), //
+        is_deleting_(false)
 {
+        problem_ptr_ = nullptr;
 }
 
 template<class UpperType, class LowerType>
@@ -281,7 +317,6 @@ inline void NodeLinked<UpperType, LowerType>::addDownNode(LowerNodePtr _ptr)
     assert(!isBottom() && "Trying to add a down node to a bottom node");
     down_node_list_.push_back(_ptr);
     _ptr->linkToUpperNode((typename LowerType::UpperNodePtr)(this));
-    //std::cout << "node: " << _ptr->nodeId() << " linked to " <<_ptr->upperNodePtr()->nodeId() << std::endl;
 }
 template<class UpperType, class LowerType>
 void NodeLinked<UpperType, LowerType>::addDownNodeList(LowerNodeList& _new_down_node_list)
@@ -360,12 +395,22 @@ inline void NodeLinked<UpperType, LowerType>::unlinkDownNode(const LowerNodeIter
 }
 
 template<class UpperType, class LowerType>
-Problem* NodeLinked<UpperType, LowerType>::getWolfProblem()
+Problem* NodeLinked<UpperType, LowerType>::getProblem()
+{
+    if (problem_ptr_ == nullptr)
+        problem_ptr_ = getTop();
+    return problem_ptr_;
+}
+
+template<class UpperType, class LowerType>
+inline Problem* NodeLinked<UpperType, LowerType>::getTop()
 {
     if (up_node_ptr_ != nullptr)
-        return up_node_ptr_->getWolfProblem();
+        return up_node_ptr_->getTop();
+
     return nullptr;
 }
+
 
 } // namespace wolf
 

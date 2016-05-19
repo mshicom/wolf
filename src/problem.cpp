@@ -6,12 +6,21 @@
 #include "trajectory_base.h"
 #include "map_base.h"
 #include "processor_motion.h"
+#include "sensor_base.h"
+#include "sensor_factory.h"
+#include "processor_factory.h"
 
 namespace wolf
 {
 
+// unnamed namespace used for helper functions local to this file.
+namespace {
+std::string uppercase(std::string& s) {for (auto & c: s) c = std::toupper(c); return s;}
+}
+
+
 Problem::Problem(FrameStructure _frame_structure) :
-        NodeBase("WOLF_PROBLEM"), //
+        NodeBase("PROBLEM"), //
         location_(TOP), trajectory_ptr_(new TrajectoryBase(_frame_structure)), map_ptr_(new MapBase), hardware_ptr_(
                 new HardwareBase), processor_motion_ptr_(nullptr)
 {
@@ -23,16 +32,9 @@ Problem::Problem(FrameStructure _frame_structure) :
 Problem::~Problem()
 {
     //std::cout << "deleting wolf problem " << nodeId() << std::endl;
-    state_block_add_list_.clear();
-    covariances_.clear();
-    state_block_update_list_.clear();
-    state_block_remove_list_.clear();
-    constraint_add_list_.clear();
-    constraint_remove_list_.clear();
-
+    hardware_ptr_->destruct();
     trajectory_ptr_->destruct();
     map_ptr_->destruct();
-    hardware_ptr_->destruct();
 }
 
 void Problem::destruct()
@@ -45,41 +47,66 @@ void Problem::addSensor(SensorBase* _sen_ptr)
     getHardwarePtr()->addSensor(_sen_ptr);
 }
 
+SensorBase* Problem::installSensor(std::string _sen_type, std::string _unique_sensor_name, Eigen::VectorXs& _extrinsics, IntrinsicsBase* _intrinsics)
+{
+    SensorBase* sen_ptr = SensorFactory::get()->create(uppercase(_sen_type), _unique_sensor_name, _extrinsics, _intrinsics);
+    addSensor(sen_ptr);
+    return sen_ptr;
+}
+
+ProcessorBase* Problem::installProcessor(std::string _prc_type, //
+                                         std::string _unique_processor_name, //
+                                         SensorBase* _corresponding_sensor_ptr, //
+                                         ProcessorParamsBase* _prc_params)
+{
+    ProcessorBase* prc_ptr = ProcessorFactory::get()->create(uppercase(_prc_type), _unique_processor_name, _prc_params);
+    _corresponding_sensor_ptr->addProcessor(prc_ptr);
+    return prc_ptr;
+}
+
+ProcessorBase* Problem::installProcessor(std::string _prc_type, //
+                                         std::string _unique_processor_name, //
+                                         std::string _corresponding_sensor_name, //
+                                         ProcessorParamsBase* _prc_params)
+{
+    SensorBase* sen_ptr = getSensorPtr(_corresponding_sensor_name);
+    if (sen_ptr == nullptr)
+        throw std::runtime_error("Sensor not found. Cannot bind Processor.");
+
+    return installProcessor(_prc_type, _unique_processor_name, sen_ptr, _prc_params);
+}
+
 void Problem::setProcessorMotion(ProcessorMotion* _processor_motion_ptr)
 {
     processor_motion_ptr_ = _processor_motion_ptr;
 }
 
-FrameBase* Problem::createFrame(FrameType _frame_type, const TimeStamp& _time_stamp)
+FrameBase* Problem::createFrame(FrameKeyType _frame_type, const TimeStamp& _time_stamp)
 {
+    if (processor_motion_ptr_ != nullptr)
+        return createFrame(_frame_type, getStateAtTimeStamp(_time_stamp), _time_stamp);
     switch (trajectory_ptr_->getFrameStructure())
     {
         case FRM_PO_2D:
-        {
-            trajectory_ptr_->addFrame(new FrameBase(_frame_type, _time_stamp, new StateBlock(2), new StateBlock(1)));
-            break;
-        }
+            return trajectory_ptr_->addFrame(
+                    new FrameBase(_frame_type, _time_stamp, new StateBlock(2), new StateBlock(1)));
+
         case FRM_PO_3D:
-        {
-            trajectory_ptr_->addFrame(new FrameBase(_frame_type, _time_stamp, new StateBlock(3), new StateQuaternion));
-            break;
-        }
+            return trajectory_ptr_->addFrame(
+                    new FrameBase(_frame_type, _time_stamp, new StateBlock(3), new StateQuaternion));
+
         case FRM_POV_3D:
-        {
-            trajectory_ptr_->addFrame(
+            return trajectory_ptr_->addFrame(
                     new FrameBase(_frame_type, _time_stamp, new StateBlock(3), new StateQuaternion, new StateBlock(3)));
-            break;
-        }
+
         default:
-        {
-            assert("Unknown frame structure. Add appropriate frame structure to the switch statement.");
-        }
+            throw std::runtime_error(
+                    "Unknown frame structure. Add appropriate frame structure to the switch statement.");
     }
-    return trajectory_ptr_->getLastFramePtr();
 }
 
-FrameBase* Problem::createFrame(FrameType _frame_type, const Eigen::VectorXs& _frame_state,
-                                    const TimeStamp& _time_stamp)
+FrameBase* Problem::createFrame(FrameKeyType _frame_type, const Eigen::VectorXs& _frame_state,
+                                const TimeStamp& _time_stamp)
 {
     //std::cout << "creating new frame..." << std::endl;
 
@@ -90,52 +117,46 @@ FrameBase* Problem::createFrame(FrameType _frame_type, const Eigen::VectorXs& _f
         case FRM_PO_2D:
         {
             assert(_frame_state.size() == 3 && "Wrong state vector size");
-
-            trajectory_ptr_->addFrame(
+            return trajectory_ptr_->addFrame(
                     new FrameBase(_frame_type, _time_stamp, new StateBlock(_frame_state.head(2)),
                                   new StateBlock(_frame_state.tail(1))));
-            break;
         }
         case FRM_PO_3D:
         {
             assert(_frame_state.size() == 7 && "Wrong state vector size");
-
-            trajectory_ptr_->addFrame(
+            return trajectory_ptr_->addFrame(
                     new FrameBase(_frame_type, _time_stamp, new StateBlock(_frame_state.head(3)),
                                   new StateQuaternion(_frame_state.tail(4))));
-            break;
         }
         case FRM_POV_3D:
         {
             assert(_frame_state.size() == 10 && "Wrong state vector size");
-
-            trajectory_ptr_->addFrame(
+            return trajectory_ptr_->addFrame(
                     new FrameBase(_frame_type, _time_stamp, new StateBlock(_frame_state.head(3)),
                                   new StateQuaternion(_frame_state.segment<3>(4)),
                                   new StateBlock(_frame_state.tail(3))));
-            break;
         }
         default:
-        {
-            assert("Unknown frame structure. Add appropriate frame structure to the switch statement.");
-        }
+            throw std::runtime_error(
+                    "Unknown frame structure. Add appropriate frame structure to the switch statement.");
     }
     //std::cout << "new frame created" << std::endl;
     return trajectory_ptr_->getLastFramePtr();
-}
-
-void Problem::getCurrentState(Eigen::VectorXs& state)
-{
-    if (processor_motion_ptr_ != nullptr)
-        processor_motion_ptr_->getState(state);
-    else
-        throw std::runtime_error("WolfProblem::getCurrentState: processor motion not set!");
 }
 
 Eigen::VectorXs Problem::getCurrentState()
 {
     if (processor_motion_ptr_ != nullptr)
         return processor_motion_ptr_->getState();
+    else
+        throw std::runtime_error("WolfProblem::getCurrentState: processor motion not set!");
+}
+
+
+void Problem::getCurrentState(Eigen::VectorXs& state)
+{
+    if (processor_motion_ptr_ != nullptr)
+        processor_motion_ptr_->getState(state);
     else
         throw std::runtime_error("WolfProblem::getCurrentState: processor motion not set!");
 }
@@ -161,9 +182,18 @@ bool Problem::permitKeyFrame(ProcessorBase* _processor_ptr)
     return true;
 }
 
-void Problem::addLandmark(LandmarkBase* _lmk_ptr)
+void Problem::keyFrameCallback(FrameBase* _keyframe_ptr, ProcessorBase* _processor_ptr, const Scalar& _time_tolerance)
+{
+    for (auto sensor : (*hardware_ptr_->getSensorListPtr()))
+        for (auto processor : (*sensor->getProcessorListPtr()))
+            if (processor->id() != _processor_ptr->id())
+                processor->keyFrameCallback(_keyframe_ptr, _time_tolerance);
+}
+
+LandmarkBase* Problem::addLandmark(LandmarkBase* _lmk_ptr)
 {
     getMapPtr()->addLandmark(_lmk_ptr);
+    return _lmk_ptr;
 }
 
 void Problem::addLandmarkList(LandmarkBaseList _lmk_list)
@@ -171,18 +201,22 @@ void Problem::addLandmarkList(LandmarkBaseList _lmk_list)
     getMapPtr()->addLandmarkList(_lmk_list);
 }
 
-void Problem::addStateBlockPtr(StateBlock* _state_ptr)
+StateBlock* Problem::addStateBlockPtr(StateBlock* _state_ptr)
 {
     // add the state unit to the list
     state_block_ptr_list_.push_back(_state_ptr);
     // queue for solver manager
-    state_block_add_list_.push_back(_state_ptr);
+    //state_block_add_list_.push_back(_state_ptr);
+    state_block_notification_list_.push_back(StateBlockNotification({ADD,_state_ptr}));
+
+    return _state_ptr;
 }
 
 void Problem::updateStateBlockPtr(StateBlock* _state_ptr)
 {
     // queue for solver manager
-    state_block_update_list_.push_back(_state_ptr);
+    //state_block_update_list_.push_back(_state_ptr);
+    state_block_notification_list_.push_back(StateBlockNotification({UPDATE,_state_ptr}));
 }
 
 void Problem::removeStateBlockPtr(StateBlock* _state_ptr)
@@ -190,19 +224,24 @@ void Problem::removeStateBlockPtr(StateBlock* _state_ptr)
     // add the state unit to the list
     state_block_ptr_list_.remove(_state_ptr);
     // queue for solver manager
-    state_block_remove_list_.push_back(_state_ptr->getPtr());
+    //state_block_remove_list_.push_back(_state_ptr->getPtr());
+    state_block_notification_list_.push_back(StateBlockNotification({REMOVE, nullptr, _state_ptr->getPtr()}));
 }
 
-void Problem::addConstraintPtr(ConstraintBase* _constraint_ptr)
+ConstraintBase* Problem::addConstraintPtr(ConstraintBase* _constraint_ptr)
 {
     // queue for solver manager
-    constraint_add_list_.push_back(_constraint_ptr);
+    //constraint_add_list_.push_back(_constraint_ptr);
+    constraint_notification_list_.push_back(ConstraintNotification({ADD, _constraint_ptr, _constraint_ptr->id()}));
+
+    return _constraint_ptr;
 }
 
 void Problem::removeConstraintPtr(ConstraintBase* _constraint_ptr)
 {
     // queue for solver manager
-    constraint_remove_list_.push_back(_constraint_ptr->nodeId());
+    //constraint_remove_list_.push_back(_constraint_ptr->nodeId());
+    constraint_notification_list_.push_back(ConstraintNotification({REMOVE, nullptr, _constraint_ptr->id()}));
 }
 
 void Problem::clearCovariance()
@@ -218,34 +257,27 @@ void Problem::addCovarianceBlock(StateBlock* _state1, StateBlock* _state2, const
     covariances_[std::pair<StateBlock*, StateBlock*>(_state1, _state2)] = _cov;
 }
 
-bool Problem::getCovarianceBlock(StateBlock* _state1, StateBlock* _state2, Eigen::MatrixXs& _cov_block)
-{
-    if (covariances_.find(std::pair<StateBlock*, StateBlock*>(_state1, _state2)) != covariances_.end())
-        _cov_block = covariances_[std::pair<StateBlock*, StateBlock*>(_state1, _state2)];
-    else if (covariances_.find(std::pair<StateBlock*, StateBlock*>(_state2, _state1)) != covariances_.end())
-        _cov_block = covariances_[std::pair<StateBlock*, StateBlock*>(_state2, _state1)].transpose();
-    else
-        return false;
-
-    return true;
-}
-
 bool Problem::getCovarianceBlock(StateBlock* _state1, StateBlock* _state2, Eigen::MatrixXs& _cov, const int _row,
-                                     const int _col)
+                                 const int _col)
 {
-    //std::cout << "entire cov " << std::endl << _cov << std::endl;
+    //std::cout << "entire cov to be filled:" << std::endl << _cov << std::endl;
     //std::cout << "_row " << _row << std::endl;
     //std::cout << "_col " << _col << std::endl;
+    //std::cout << "_state1 size: " << _state1->getSize() << std::endl;
+    //std::cout << "_state2 size: " << _state2->getSize() << std::endl;
+    //std::cout << "part of cov to be filled:" << std::endl <<  _cov.block(_row, _col, _state1->getSize(), _state2->getSize()) << std::endl;
     //if (covariances_.find(std::pair<StateBlock*, StateBlock*>(_state1, _state2)) != covariances_.end())
     //    std::cout << "stored cov" << std::endl << covariances_[std::pair<StateBlock*, StateBlock*>(_state1, _state2)] << std::endl;
     //else if (covariances_.find(std::pair<StateBlock*, StateBlock*>(_state2, _state1)) != covariances_.end())
     //    std::cout << "stored cov" << std::endl << covariances_[std::pair<StateBlock*, StateBlock*>(_state2, _state1)].transpose() << std::endl;
 
+    assert(_row + _state1->getSize() <= _cov.rows() && _col + _state2->getSize() <= _cov.cols() && "Problem::getCovarianceBlock: Bad matrix covariance size!");
+
     if (covariances_.find(std::pair<StateBlock*, StateBlock*>(_state1, _state2)) != covariances_.end())
         _cov.block(_row, _col, _state1->getSize(), _state2->getSize()) =
                 covariances_[std::pair<StateBlock*, StateBlock*>(_state1, _state2)];
     else if (covariances_.find(std::pair<StateBlock*, StateBlock*>(_state2, _state1)) != covariances_.end())
-        _cov.block(_row, _col, _state1->getSize(), _state2->getSize()) =
+       _cov.block(_row, _col, _state1->getSize(), _state2->getSize()) =
                 covariances_[std::pair<StateBlock*, StateBlock*>(_state2, _state1)].transpose();
     else
         return false;
@@ -253,17 +285,51 @@ bool Problem::getCovarianceBlock(StateBlock* _state1, StateBlock* _state2, Eigen
     return true;
 }
 
-void Problem::addMap(MapBase* _map_ptr)
+bool Problem::getFrameCovariance(FrameBase* _frame_ptr, Eigen::MatrixXs& _covariance)
+{
+    return getCovarianceBlock(_frame_ptr->getPPtr(), _frame_ptr->getPPtr(), _covariance, 0, 0) &&
+    getCovarianceBlock(_frame_ptr->getPPtr(), _frame_ptr->getOPtr(), _covariance, 0,_frame_ptr->getPPtr()->getSize()) &&
+    getCovarianceBlock(_frame_ptr->getOPtr(), _frame_ptr->getPPtr(), _covariance, _frame_ptr->getPPtr()->getSize(), 0) &&
+    getCovarianceBlock(_frame_ptr->getOPtr(), _frame_ptr->getOPtr(), _covariance, _frame_ptr->getPPtr()->getSize() ,_frame_ptr->getPPtr()->getSize());
+}
+
+Eigen::MatrixXs Problem::getFrameCovariance(FrameBase* _frame_ptr)
+{
+    Eigen::MatrixXs covariance = Eigen::MatrixXs::Zero(_frame_ptr->getPPtr()->getSize()+_frame_ptr->getOPtr()->getSize(), _frame_ptr->getPPtr()->getSize()+_frame_ptr->getOPtr()->getSize());
+    getFrameCovariance(_frame_ptr, covariance);
+    return covariance;
+}
+
+bool Problem::getLandmarkCovariance(LandmarkBase* _landmark_ptr, Eigen::MatrixXs& _covariance)
+{
+    return getCovarianceBlock(_landmark_ptr->getPPtr(), _landmark_ptr->getPPtr(), _covariance, 0, 0) &&
+    getCovarianceBlock(_landmark_ptr->getPPtr(), _landmark_ptr->getOPtr(), _covariance, 0,_landmark_ptr->getPPtr()->getSize()) &&
+    getCovarianceBlock(_landmark_ptr->getOPtr(), _landmark_ptr->getPPtr(), _covariance, _landmark_ptr->getPPtr()->getSize(), 0) &&
+    getCovarianceBlock(_landmark_ptr->getOPtr(), _landmark_ptr->getOPtr(), _covariance, _landmark_ptr->getPPtr()->getSize() ,_landmark_ptr->getPPtr()->getSize());
+}
+
+Eigen::MatrixXs Problem::getLandmarkCovariance(LandmarkBase* _landmark_ptr)
+{
+    Eigen::MatrixXs covariance = Eigen::MatrixXs::Zero(_landmark_ptr->getPPtr()->getSize()+_landmark_ptr->getOPtr()->getSize(), _landmark_ptr->getPPtr()->getSize()+_landmark_ptr->getOPtr()->getSize());
+    getLandmarkCovariance(_landmark_ptr, covariance);
+    return covariance;
+}
+
+MapBase* Problem::addMap(MapBase* _map_ptr)
 {
     // TODO: not necessary but update map maybe..
     map_ptr_ = _map_ptr;
     map_ptr_->linkToUpperNode(this);
+
+    return map_ptr_;
 }
 
-void Problem::addTrajectory(TrajectoryBase* _trajectory_ptr)
+TrajectoryBase* Problem::addTrajectory(TrajectoryBase* _trajectory_ptr)
 {
     trajectory_ptr_ = _trajectory_ptr;
     trajectory_ptr_->linkToUpperNode(this);
+
+    return trajectory_ptr_;
 }
 
 MapBase* Problem::getMapPtr()
@@ -286,19 +352,27 @@ FrameBase* Problem::getLastFramePtr()
     return trajectory_ptr_->getLastFramePtr();
 }
 
+FrameBase* Problem::getLastKeyFramePtr()
+{
+    return trajectory_ptr_->getLastKeyFramePtr();;
+}
+
 StateBlockList* Problem::getStateListPtr()
 {
     return &state_block_ptr_list_;
 }
 
-std::list<StateBlock*>* Problem::getStateBlockAddList()
+wolf::SensorBase* Problem::getSensorPtr(const std::string& _sensor_name)
 {
-    return &state_block_add_list_;
-}
+    auto sen_it = std::find_if(getHardwarePtr()->getSensorListPtr()->begin(),
+                               getHardwarePtr()->getSensorListPtr()->end(), [&](SensorBase* sb)
+                               {
+                                   return sb->getName() == _sensor_name;
+                               }); // lambda function for the find_if
+    if (sen_it == getHardwarePtr()->getSensorListPtr()->end())
+        return nullptr;
 
-std::list<StateBlock*>* Problem::getStateBlockUpdateList()
-{
-    return &state_block_update_list_;
+    return (*sen_it);
 }
 
 } // namespace wolf

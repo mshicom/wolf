@@ -6,7 +6,6 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0005 NEW) 
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
-
 # MAC OSX RPATH
 SET(CMAKE_MACOSX_RPATH 1)
 

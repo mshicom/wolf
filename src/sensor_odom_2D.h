@@ -7,6 +7,12 @@
 
 namespace wolf {
 
+struct IntrinsicsOdom2D : public IntrinsicsBase
+{
+        Scalar k_disp_to_disp; ///< ratio of displacement variance to displacement, for odometry noise calculation
+        Scalar k_rot_to_rot; ///< ratio of rotation variance to rotation, for odometry noise calculation
+};
+
 class SensorOdom2D : public SensorBase
 {
 
@@ -38,17 +44,22 @@ class SensorOdom2D : public SensorBase
          * Returns displacement noise factor
          * 
          **/        
-        double getDispVarToDispNoiseFactor() const;
+        Scalar getDispVarToDispNoiseFactor() const;
 
         /** \brief Returns rotation noise factor
          * 
          * Returns rotation noise factor
          * 
          **/        
-        double getRotVarToRotNoiseFactor() const;
+        Scalar getRotVarToRotNoiseFactor() const;
         
+
+	public:
+        static SensorBase* create(const std::string& _unique_name, const Eigen::VectorXs& _extrinsics_pq, const IntrinsicsBase* _intrinsics);
+
+
 };
 
 } // namespace wolf
 
-#endif
+#endif // SENSOR_ODOM_2D_H_

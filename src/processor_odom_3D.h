@@ -9,6 +9,7 @@
 #define SRC_PROCESSOR_ODOM_3D_H_
 
 #include "processor_motion.h"
+#include "constraint_odom_2D.h"
 
 
 namespace wolf {
@@ -35,23 +36,30 @@ namespace wolf {
  *
  * All frames are assumed FLU (front, left, up).
  */
-class ProcessorOdom3d : public ProcessorMotion
+class ProcessorOdom3D : public ProcessorMotion
 {
     public:
-        ProcessorOdom3d(Scalar _delta_t = 0);
-        virtual ~ProcessorOdom3d();
-        virtual void data2delta(const Eigen::VectorXs& _data, const Scalar _dt, Eigen::VectorXs& _delta);
+        ProcessorOdom3D();
+        virtual ~ProcessorOdom3D();
+        virtual void data2delta(const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_cov, const Scalar _dt,
+                                Eigen::VectorXs& _delta, Eigen::MatrixXs& _delta_cov);
 
     protected:
-        virtual void preProcess(){}
-        virtual void postProcess(){}
+//        virtual void preProcess(){}
+//        virtual void postProcess(){}
 
     private:
         void xPlusDelta(const Eigen::VectorXs& _x, const Eigen::VectorXs& _delta, Eigen::VectorXs& _x_plus_delta);
         void deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2, Eigen::VectorXs& _delta1_plus_delta2);
+        void deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2,
+                            Eigen::VectorXs& _delta1_plus_delta2, Eigen::MatrixXs& _jacobian1,
+                            Eigen::MatrixXs& _jacobian2);
         virtual void deltaMinusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2,
                                      Eigen::VectorXs& _delta2_minus_delta1);
         Eigen::VectorXs deltaZero() const;
+        Motion interpolate(const Motion& _motion_ref, Motion& _motion, TimeStamp& _ts);
+
+        virtual ConstraintBase* createConstraint(FeatureBase* _feature_motion, FrameBase* _frame_origin);
 
     private:
         Eigen::Map<const Eigen::Vector3s> p1_, p2_;
@@ -59,33 +67,41 @@ class ProcessorOdom3d : public ProcessorMotion
         Eigen::Map<const Eigen::Quaternions> q1_, q2_;
         Eigen::Map<Eigen::Quaternions> q_out_;
         void remap(const Eigen::VectorXs& _x1, const Eigen::VectorXs& _x2, Eigen::VectorXs& _x_out);
+
+    // Factory method
+    public:
+        static ProcessorBase* create(const std::string& _unique_name, const ProcessorParamsBase* _params);
 };
 
 
-inline ProcessorOdom3d::ProcessorOdom3d(Scalar _delta_t) :
-        ProcessorMotion(PRC_ODOM_3D, _delta_t, 7, 7, 6),
-        p1_(nullptr), //, q1_(nullptr)
-        p2_(nullptr), //, q1_(nullptr)
-        p_out_(nullptr), //, q1_(nullptr)
-        q1_(nullptr), //, q1_(nullptr)
-        q2_(nullptr), //, q1_(nullptr)
-        q_out_(nullptr) //, q1_(nullptr)
+inline ProcessorOdom3D::ProcessorOdom3D() :
+        ProcessorMotion(PRC_ODOM_3D, 7, 7, 6),
+        p1_(nullptr),
+        p2_(nullptr),
+        p_out_(nullptr),
+        q1_(nullptr),
+        q2_(nullptr),
+        q_out_(nullptr)
+{
+    setType("ODOM 3D");
+}
+
+inline ProcessorOdom3D::~ProcessorOdom3D()
 {
 }
 
-inline ProcessorOdom3d::~ProcessorOdom3d()
-{
-}
-
-inline void ProcessorOdom3d::data2delta(const Eigen::VectorXs& _data, const Scalar _dt, Eigen::VectorXs& _delta)
+inline void ProcessorOdom3D::data2delta(const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_cov, const Scalar _dt,
+                                        Eigen::VectorXs& _delta, Eigen::MatrixXs& _delta_cov)
 {
     _delta.head(3) = _data.head(3);
     new (&q_out_) Eigen::Map<Eigen::Quaternions>(_delta.data() + 3);
 
-    Eigen::v2q(_data.tail(3), q_out_); // Better use q_out_, but it is a Map. Overload v2q() with Maps.
+    Eigen::v2q(_data.tail(3), q_out_);
+    // TODO: fill delta covariance
+    _delta_cov = Eigen::MatrixXs::Identity(delta_size_, delta_size_) * 0.01;
 }
 
-inline void ProcessorOdom3d::xPlusDelta(const Eigen::VectorXs& _x, const Eigen::VectorXs& _delta, Eigen::VectorXs& _x_plus_delta)
+inline void ProcessorOdom3D::xPlusDelta(const Eigen::VectorXs& _x, const Eigen::VectorXs& _delta, Eigen::VectorXs& _x_plus_delta)
 {
     assert(_x.size() == 7 && "Wrong _x vector size");
     assert(_delta.size() == 7 && "Wrong _delta vector size");
@@ -97,7 +113,7 @@ inline void ProcessorOdom3d::xPlusDelta(const Eigen::VectorXs& _x, const Eigen::
     q_out_ = q1_ * q2_;
 }
 
-inline void ProcessorOdom3d::deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2, Eigen::VectorXs& _delta1_plus_delta2)
+inline void ProcessorOdom3D::deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2, Eigen::VectorXs& _delta1_plus_delta2)
 {
     assert(_delta1.size() == 7 && "Wrong _delta1 vector size");
     assert(_delta2.size() == 7 && "Wrong _delta2 vector size");
@@ -108,7 +124,25 @@ inline void ProcessorOdom3d::deltaPlusDelta(const Eigen::VectorXs& _delta1, cons
     q_out_ = q1_ * q2_;
 }
 
-inline void ProcessorOdom3d::deltaMinusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2,
+inline void ProcessorOdom3D::deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2,
+                                            Eigen::VectorXs& _delta1_plus_delta2, Eigen::MatrixXs& _jacobian1,
+                                            Eigen::MatrixXs& _jacobian2)
+{
+    assert(_delta1.size() == 7 && "Wrong _delta1 vector size");
+    assert(_delta2.size() == 7 && "Wrong _delta2 vector size");
+    assert(_delta1_plus_delta2.size() == 7 && "Wrong _delta1_plus_delta2 vector size");
+    // TODO: assert sizes of jacobians
+
+    remap(_delta1, _delta2, _delta1_plus_delta2);
+    p_out_ = p1_ + q1_ * p2_;
+    q_out_ = q1_ * q2_;
+
+    // TODO: fill the jacobians
+    _jacobian1 = Eigen::MatrixXs::Identity(delta_size_,delta_size_);
+    _jacobian2 = Eigen::MatrixXs::Identity(delta_size_,delta_size_);
+}
+
+inline void ProcessorOdom3D::deltaMinusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2,
                                              Eigen::VectorXs& _delta2_minus_delta1)
 {
     assert(_delta1.size() == 7 && "Wrong _delta1 vector size");
@@ -120,34 +154,35 @@ inline void ProcessorOdom3d::deltaMinusDelta(const Eigen::VectorXs& _delta1, con
     q_out_ = q1_.conjugate() * q2_;
 }
 
-inline Eigen::VectorXs ProcessorOdom3d::deltaZero() const
+inline Eigen::VectorXs ProcessorOdom3D::deltaZero() const
 {
     Eigen::VectorXs delta_zero(7);
     delta_zero << 0, 0, 0, 0, 0, 0, 1;;
     return delta_zero;
 }
 
-inline void ProcessorOdom3d::remap(const Eigen::VectorXs& _x1, const Eigen::VectorXs& _x2, Eigen::VectorXs& _x_out)
+inline Motion ProcessorOdom3D::interpolate(const Motion& _motion_ref, Motion& _motion, TimeStamp& _ts)
 {
-    //            std::cout << "Remap -----------------------------------------" << std::endl;
-    //            std::cout << "_x1:    " << _x1.transpose() << std::endl;
-    //            std::cout << "_x2:    " << _x2.transpose() << std::endl;
-    //            std::cout << "_x_out: " << _x_out.transpose() << std::endl;
-    //            _x_out << 1, 2, 3, 4, 5, 6, 7; // put some values to ckech the outputs below
-    //            std::cout << "_x_out: " << _x_out.transpose() << std::endl;
+    Motion tmp(_motion_ref);
+    tmp.ts_ = _ts;
+    tmp.delta_ = deltaZero();
+    tmp.delta_cov_ = Eigen::MatrixXs::Zero(delta_size_, delta_size_);
+    return tmp;
+}
+
+inline ConstraintBase* ProcessorOdom3D::createConstraint(FeatureBase* _feature_motion, FrameBase* _frame_origin)
+{
+    return new ConstraintOdom2D(_feature_motion, _frame_origin);
+}
+
+inline void ProcessorOdom3D::remap(const Eigen::VectorXs& _x1, const Eigen::VectorXs& _x2, Eigen::VectorXs& _x_out)
+{
     new (&p1_) Eigen::Map<const Eigen::Vector3s>(_x1.data());
     new (&q1_) Eigen::Map<const Eigen::Quaternions>(_x1.data() + 3);
     new (&p2_) Eigen::Map<const Eigen::Vector3s>(_x2.data());
     new (&q2_) Eigen::Map<const Eigen::Quaternions>(_x2.data() + 3);
     new (&p_out_) Eigen::Map<Eigen::Vector3s>(_x_out.data());
     new (&q_out_) Eigen::Map<Eigen::Quaternions>(_x_out.data() + 3);
-    //            std::cout << "p1_: " << p1_.transpose() << std::endl;
-    //            std::cout << "q1_: " << q1_.coeffs().transpose() << std::endl;
-    //            std::cout << "p2_: " << p2_.transpose() << std::endl;
-    //            std::cout << "q2_: " << q2_.coeffs().transpose() << std::endl;
-    //            std::cout << "p_out_: " << p_out_.transpose() << std::endl;
-    //            std::cout << "q_out_: " << q_out_.coeffs().transpose() << std::endl;
-    //            std::cout << "-----------------------------------------------" << std::endl;
 }
 
 } // namespace wolf

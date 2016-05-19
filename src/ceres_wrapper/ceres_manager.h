@@ -40,21 +40,27 @@ class CeresManager
 		std::map<unsigned int, ceres::ResidualBlockId> id_2_residual_idx_;
         std::map<unsigned int, ceres::CostFunction*> id_2_costfunction_;
 		ceres::Problem* ceres_problem_;
+		ceres::Solver::Options ceres_options_;
 		ceres::Covariance* covariance_;
 		Problem* wolf_problem_;
+		bool use_wolf_auto_diff_;
 
 	public:
-		CeresManager(Problem* _wolf_problem, ceres::Problem::Options _options);
+        CeresManager(Problem* _wolf_problem, const ceres::Solver::Options& _ceres_options = ceres::Solver::Options(), const bool _use_wolf_auto_diff = true);
 
 		~CeresManager();
 
-		ceres::Solver::Summary solve(const ceres::Solver::Options& _ceres_options);
+		ceres::Solver::Summary solve();
 
 		void computeCovariances(CovarianceBlocksToBeComputed _blocks = ROBOT_LANDMARKS);
 
-		void update(const bool _self_auto_diff = true, const bool _apply_loss_function = false);
+        ceres::Solver::Options& getSolverOptions();
 
-		void addConstraint(ConstraintBase* _corr_ptr, const bool _self_auto_diff, const bool _apply_loss);
+	private:
+
+		void update();
+
+		void addConstraint(ConstraintBase* _corr_ptr, unsigned int _id);
 
 		void removeConstraint(const unsigned int& _corr_idx);
 
@@ -66,8 +72,13 @@ class CeresManager
 
 		void updateStateBlockStatus(StateBlock* _st_ptr);
 
-		ceres::CostFunction* createCostFunction(ConstraintBase* _corrPtr, const bool _self_auto_diff);
+		ceres::CostFunction* createCostFunction(ConstraintBase* _corrPtr);
 };
+
+inline ceres::Solver::Options& CeresManager::getSolverOptions()
+{
+    return ceres_options_;
+}
 
 } // namespace wolf
 
