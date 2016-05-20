@@ -26,6 +26,10 @@ TARGET_LINK_LIBRARIES(test_virtual_hierarchy ${PROJECT_NAME})
 ADD_EXECUTABLE(test_permutations solver/test_permutations.cpp)
 TARGET_LINK_LIBRARIES(test_permutations ${PROJECT_NAME})
 
+#Pinocchio Spatial test
+ADD_EXECUTABLE(test_spatial test_spatial.cpp)
+TARGET_LINK_LIBRARIES(test_spatial ${PROJECT_NAME})
+
 # Enable Yaml config files
 IF(YAMLCPP_FOUND)
     ADD_EXECUTABLE(test_yaml test_yaml.cpp)
