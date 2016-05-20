@@ -19,8 +19,8 @@
 #define __se3_se3_hpp__
 
 #include <Eigen/Geometry>
-#include "pinocchio/spatial/fwd.hpp"
-#include "pinocchio/spatial/skew.hpp"
+#include "spatial/fwd.hpp"
+#include "spatial/skew.hpp"
 
 
 namespace se3
