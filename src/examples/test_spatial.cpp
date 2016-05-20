@@ -60,17 +60,15 @@ int main()
     q1_map.y() = 3;
     q1_map.z() = 4;
 
-//    Eigen::Matrix3d rotation0;
-//    rotation0 = Eigen::AngleAxisd(q1_map); //get a rotation matrix from a quaternion
 //    //So here is the way to create a SE3 Objectusing quaternions
-//    //Rotation + translation
-//    se3::SE3 operation_matrix3(rotation0, Vec3d_op);
-//    Se3_Object=Se3_Object.act(operation_matrix3); //left hand operation
+    //Rotation + translation
+    se3::SE3 operation_matrix3(q1_map.toRotationMatrix(), Vec3d_op);
+    Se3_Object=Se3_Object.act(operation_matrix3); //left hand operation
 
-//    std::cout << "\n rotation from quaternion + translation"<< std::endl;
-//    operation_matrix3.disp_impl(std::cout);
-//    std::cout << "\n result is : B = " << std::endl;
-//    Se3_Object.disp_impl(std::cout);
+    std::cout << "\n rotation from quaternion + translation"<< std::endl;
+    operation_matrix3.disp_impl(std::cout);
+    std::cout << "\n result is : B = " << std::endl;
+    Se3_Object.disp_impl(std::cout);
 
     return 0;
 }
