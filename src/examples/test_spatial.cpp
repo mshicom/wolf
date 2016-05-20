@@ -71,5 +71,6 @@ int main()
 //    operation_matrix3.disp_impl(std::cout);
 //    std::cout << "\n result is : B = " << std::endl;
 //    Se3_Object.disp_impl(std::cout);
-//    return 0;
+
+    return 0;
 }
