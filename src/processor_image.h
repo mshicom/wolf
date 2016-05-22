@@ -81,6 +81,7 @@ struct ProcessorImageParameters : public ProcessorParamsBase
 //                unsigned int pattern_radius; ///< radius of the pattern used to describe a key-point at pattern_scale = 1.0 and octaves = 0
 //                unsigned int size_bits; ///< length of the descriptor vector in bits
 //        }descriptor;
+
         struct Matcher
         {
                 Scalar min_normalized_score; ///< 0: perfect match; 1 or -1: awful match; out of [-1,1]: error
@@ -88,12 +89,14 @@ struct ProcessorImageParameters : public ProcessorParamsBase
                 unsigned int roi_width; ///< Width of the roi used in the tracking
                 unsigned int roi_height; ///< Height of the roi used in the tracking
         }matcher;
+
         struct Adtive_search
         {
                 unsigned int grid_width; ///< cells per horizontal dimension of image
                 unsigned int grid_height; ///< cells per vertical dimension of image
                 unsigned int separation; ///<
         }active_search;
+
         struct Algorithm
         {
                 unsigned int max_new_features; ///< Max nbr. of features to detect in one frame

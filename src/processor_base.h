@@ -60,7 +60,6 @@ class ProcessorBase : public NodeLinked<SensorBase, NodeTerminus>
 
     protected:
         unsigned int processor_id_;
-//        std::string type_id_;
 };
 
 }
