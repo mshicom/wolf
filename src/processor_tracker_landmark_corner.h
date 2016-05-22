@@ -161,7 +161,13 @@ class ProcessorTrackerLandmarkCorner : public ProcessorTrackerLandmark
 
 inline ProcessorTrackerLandmarkCorner::ProcessorTrackerLandmarkCorner(const laserscanutils::LineFinderIterativeParams& _line_finder_params,
                                                                       const unsigned int& _n_corners_th) :
-        ProcessorTrackerLandmark(PRC_TRACKER_LANDMARK_CORNER, 0), line_finder_(_line_finder_params), n_corners_th_(_n_corners_th), R_sensor_world_(Eigen::Matrix3s::Identity()), R_world_sensor_(Eigen::Matrix3s::Identity()), R_robot_sensor_(Eigen::Matrix3s::Identity()), extrinsics_transformation_computed_(false)
+        ProcessorTrackerLandmark("TRACKER LANDMARK CORNER", 0), //
+        line_finder_(_line_finder_params), //
+        n_corners_th_(_n_corners_th), //
+        R_sensor_world_(Eigen::Matrix3s::Identity()), //
+        R_world_sensor_(Eigen::Matrix3s::Identity()), //
+        R_robot_sensor_(Eigen::Matrix3s::Identity()), //
+        extrinsics_transformation_computed_(false)
 {
 }
 

@@ -22,10 +22,10 @@ FrameBase::FrameBase(const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_pt
     setType("BASE");
 }
 
-FrameBase::FrameBase(const FrameKeyType & _tp, const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _v_ptr) :
+FrameBase::FrameBase(const FrameKeyType & _type, const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _v_ptr) :
             NodeConstrained(MID, "FRAME"),
             frame_id_(++frame_id_count_),
-            type_id_(_tp),
+            type_id_(_type),
             time_stamp_(_ts),
 			status_(ST_ESTIMATED),
 			p_ptr_(_p_ptr),

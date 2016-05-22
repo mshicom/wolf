@@ -55,7 +55,7 @@ class SensorBase : public NodeLinked<HardwareBase, ProcessorBase>
         /** \brief Constructor with noise size
          *
          * Constructor with parameter vector
-         * \param _tp Type of the sensor  (types defined at wolf.h)
+         * \param _type Type of the sensor  (types defined at wolf.h)
          * \param _p_ptr StateBlock pointer to the sensor position
          * \param _o_ptr StateBlock pointer to the sensor orientation
          * \param _intr_ptr TODO update documentation
@@ -63,12 +63,12 @@ class SensorBase : public NodeLinked<HardwareBase, ProcessorBase>
          * \param _extr_dyn TODO update documentation
          *
          **/
-        SensorBase(const SensorType & _tp, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _intr_ptr, const unsigned int _noise_size, const bool _extr_dyn = false);
+        SensorBase(const SensorType & _type, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _intr_ptr, const unsigned int _noise_size, const bool _extr_dyn = false);
 
         /** \brief Constructor with noise std vector
          *
          * Constructor with parameter vector
-         * \param _tp Type of the sensor  (types defined at wolf.h)
+         * \param _type Type of the sensor  (types defined at wolf.h)
          * \param _p_ptr StateBlock pointer to the sensor position
          * \param _o_ptr StateBlock pointer to the sensor orientation
          * \param _intr_ptr TODO update documentation
@@ -76,7 +76,7 @@ class SensorBase : public NodeLinked<HardwareBase, ProcessorBase>
          * \param _extr_dyn TODO update documentation
          *
          **/
-        SensorBase(const SensorType & _tp, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _intr_ptr, const Eigen::VectorXs & _noise_std, const bool _extr_dyn = false);
+        SensorBase(const SensorType & _type, StateBlock* _p_ptr, StateBlock* _o_ptr, StateBlock* _intr_ptr, const Eigen::VectorXs & _noise_std, const bool _extr_dyn = false);
 
 
         /** \brief Default destructor (not recommended)

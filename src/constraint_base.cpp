@@ -7,10 +7,10 @@ namespace wolf {
 
 unsigned int ConstraintBase::constraint_id_count_ = 0;
 
-ConstraintBase::ConstraintBase(ConstraintType _tp, bool _apply_loss_function, ConstraintStatus _status) :
+ConstraintBase::ConstraintBase(ConstraintType _type, bool _apply_loss_function, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
     constraint_id_(++constraint_id_count_),
-    type_id_(_tp),
+    type_id_(_type),
     category_(CTR_ABSOLUTE),
     status_(_status),
     apply_loss_function_(_apply_loss_function),
@@ -22,10 +22,10 @@ ConstraintBase::ConstraintBase(ConstraintType _tp, bool _apply_loss_function, Co
 }
 
 
-ConstraintBase::ConstraintBase(ConstraintType _tp, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status) :
+ConstraintBase::ConstraintBase(ConstraintType _type, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
     constraint_id_(++constraint_id_count_),
-    type_id_(_tp),
+    type_id_(_type),
     category_(CTR_FRAME),
     status_(_status),
     apply_loss_function_(_apply_loss_function),
@@ -38,10 +38,10 @@ ConstraintBase::ConstraintBase(ConstraintType _tp, FrameBase* _frame_ptr, bool _
 }
 
 
-ConstraintBase::ConstraintBase(ConstraintType _tp, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status) :
+ConstraintBase::ConstraintBase(ConstraintType _type, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
     constraint_id_(++constraint_id_count_),
-    type_id_(_tp),
+    type_id_(_type),
     category_(CTR_FEATURE),
     status_(_status),
     apply_loss_function_(_apply_loss_function),
@@ -54,10 +54,10 @@ ConstraintBase::ConstraintBase(ConstraintType _tp, FeatureBase* _feature_ptr, bo
 }
 
 
-ConstraintBase::ConstraintBase(ConstraintType _tp, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status) :
+ConstraintBase::ConstraintBase(ConstraintType _type, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status) :
     NodeLinked(BOTTOM, "CONSTRAINT"),
     constraint_id_(++constraint_id_count_),
-    type_id_(_tp),
+    type_id_(_type),
     category_(CTR_LANDMARK),
     status_(_status),
     apply_loss_function_(_apply_loss_function),

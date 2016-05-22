@@ -4,12 +4,10 @@ namespace wolf {
 
 unsigned int ProcessorBase::processor_id_count_ = 0;
 
-ProcessorBase::ProcessorBase(ProcessorType _tp) :
-        NodeLinked(MID, "PROCESSOR"),
-        processor_id_(++processor_id_count_),
-        type_id_(_tp)
+ProcessorBase::ProcessorBase(const std::string& _type, const std::string& _name) :
+        NodeLinked(MID, "PROCESSOR", _type, _name),
+        processor_id_(++processor_id_count_)
 {
-    //
 }
 
 ProcessorBase::~ProcessorBase()

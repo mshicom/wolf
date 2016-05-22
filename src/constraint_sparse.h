@@ -45,7 +45,7 @@ class ConstraintSparse: public ConstraintBase
          * Constructor of category CTR_ABSOLUTE
          *
          **/
-        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, bool _apply_loss_function, ConstraintStatus _status,
+        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, bool _apply_loss_function, ConstraintStatus _status,
                          StateBlock* _state0Ptr,
                          StateBlock* _state1Ptr = nullptr,
                          StateBlock* _state2Ptr = nullptr,
@@ -62,7 +62,7 @@ class ConstraintSparse: public ConstraintBase
          * Constructor of category CTR_FRAME
          *
          **/
-        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status,
+        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status,
                          StateBlock* _state0Ptr,
                          StateBlock* _state1Ptr = nullptr,
                          StateBlock* _state2Ptr = nullptr,
@@ -79,7 +79,7 @@ class ConstraintSparse: public ConstraintBase
          * Constructor of category CTR_FEATURE
          *
          **/
-        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status,
+        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status,
                          StateBlock* _state0Ptr,
                          StateBlock* _state1Ptr = nullptr,
                          StateBlock* _state2Ptr = nullptr,
@@ -96,7 +96,7 @@ class ConstraintSparse: public ConstraintBase
          * Constructor of category CTR_LANDMARK
          *
          **/
-        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status,
+        ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status,
                          StateBlock* _state0Ptr,
                          StateBlock* _state1Ptr = nullptr,
                          StateBlock* _state2Ptr = nullptr,
@@ -165,7 +165,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                  BLOCK_6_SIZE,
                  BLOCK_7_SIZE,
                  BLOCK_8_SIZE,
-                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, bool _apply_loss_function, ConstraintStatus _status,
+                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, bool _apply_loss_function, ConstraintStatus _status,
                                                  StateBlock* _state0Ptr,
                                                  StateBlock* _state1Ptr,
                                                  StateBlock* _state2Ptr,
@@ -176,7 +176,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                                                  StateBlock* _state7Ptr,
                                                  StateBlock* _state8Ptr,
                                                  StateBlock* _state9Ptr ) :
-            ConstraintBase(_tp, _apply_loss_function, _status),
+            ConstraintBase(_type, _apply_loss_function, _status),
             state_ptr_vector_({_state0Ptr,_state1Ptr,_state2Ptr,_state3Ptr,_state4Ptr,_state5Ptr,_state6Ptr,_state7Ptr,_state8Ptr,_state9Ptr}),
             state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
@@ -204,7 +204,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                  BLOCK_6_SIZE,
                  BLOCK_7_SIZE,
                  BLOCK_8_SIZE,
-                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status,
+                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status,
                                                  StateBlock* _state0Ptr,
                                                  StateBlock* _state1Ptr,
                                                  StateBlock* _state2Ptr,
@@ -215,7 +215,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                                                  StateBlock* _state7Ptr,
                                                  StateBlock* _state8Ptr,
                                                  StateBlock* _state9Ptr ) :
-            ConstraintBase(_tp, _frame_ptr, _apply_loss_function, _status),
+            ConstraintBase(_type, _frame_ptr, _apply_loss_function, _status),
             state_ptr_vector_({_state0Ptr,_state1Ptr,_state2Ptr,_state3Ptr,_state4Ptr,_state5Ptr,_state6Ptr,_state7Ptr,_state8Ptr,_state9Ptr}),
             state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
@@ -243,7 +243,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                  BLOCK_6_SIZE,
                  BLOCK_7_SIZE,
                  BLOCK_8_SIZE,
-                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status,
+                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status,
                                                  StateBlock* _state0Ptr,
                                                  StateBlock* _state1Ptr,
                                                  StateBlock* _state2Ptr,
@@ -254,7 +254,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                                                  StateBlock* _state7Ptr,
                                                  StateBlock* _state8Ptr,
                                                  StateBlock* _state9Ptr ) :
-            ConstraintBase( _tp, _feature_ptr, _apply_loss_function, _status),
+            ConstraintBase( _type, _feature_ptr, _apply_loss_function, _status),
             state_ptr_vector_({_state0Ptr,_state1Ptr,_state2Ptr,_state3Ptr,_state4Ptr,_state5Ptr,_state6Ptr,_state7Ptr,_state8Ptr,_state9Ptr}),
             state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {
@@ -282,7 +282,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                  BLOCK_6_SIZE,
                  BLOCK_7_SIZE,
                  BLOCK_8_SIZE,
-                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _tp, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status,
+                 BLOCK_9_SIZE>::ConstraintSparse(FeatureBase* _ftr_ptr, ConstraintType _type, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status,
                                                  StateBlock* _state0Ptr,
                                                  StateBlock* _state1Ptr,
                                                  StateBlock* _state2Ptr,
@@ -293,7 +293,7 @@ ConstraintSparse<MEASUREMENT_SIZE,
                                                  StateBlock* _state7Ptr,
                                                  StateBlock* _state8Ptr,
                                                  StateBlock* _state9Ptr ) :
-            ConstraintBase( _tp, _landmark_ptr, _apply_loss_function, _status),
+            ConstraintBase( _type, _landmark_ptr, _apply_loss_function, _status),
             state_ptr_vector_({_state0Ptr,_state1Ptr,_state2Ptr,_state3Ptr,_state4Ptr,_state5Ptr,_state6Ptr,_state7Ptr,_state8Ptr,_state9Ptr}),
             state_block_sizes_vector_({BLOCK_0_SIZE,BLOCK_1_SIZE,BLOCK_2_SIZE,BLOCK_3_SIZE,BLOCK_4_SIZE,BLOCK_5_SIZE,BLOCK_6_SIZE,BLOCK_7_SIZE,BLOCK_8_SIZE,BLOCK_9_SIZE})
         {

@@ -33,17 +33,17 @@ class FeatureBase : public NodeConstrained<CaptureBase,ConstraintBase>
         
     public:
         /** \brief Constructor from capture pointer and measure dim
-         * \param _tp type of feature -- see wolf.h
+         * \param _type type of feature -- see wolf.h
          * \param _dim_measurement the dimension of the measurement space
          */
-        FeatureBase(FeatureType _tp, unsigned int _dim_measurement);
+        FeatureBase(FeatureType _type, unsigned int _dim_measurement);
 
         /** \brief Constructor from capture pointer and measure
-         * \param _tp type of feature -- see wolf.h
+         * \param _type type of feature -- see wolf.h
          * \param _measurement the measurement
          * \param _meas_covariance the noise of the measurement
          */
-        FeatureBase(FeatureType _tp, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance);
+        FeatureBase(FeatureType _type, const Eigen::VectorXs& _measurement, const Eigen::MatrixXs& _meas_covariance);
 
         /** \brief Default destructor (not recommended)
          *

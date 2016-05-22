@@ -48,13 +48,13 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
         /** \brief Constructor with type, time stamp and state pointer
          * 
          * Constructor with type, time stamp and state pointer
-         * \param _tp indicates frame type. Generally either NON_KEY_FRAME or KEY_FRAME. (types defined at wolf.h)
+         * \param _type indicates frame type. Generally either NON_KEY_FRAME or KEY_FRAME. (types defined at wolf.h)
          * \param _ts is the time stamp associated to this frame, provided in seconds
          * \param _p_ptr StateBlock pointer to the position (default: nullptr)
          * \param _o_ptr StateBlock pointer to the orientation (default: nullptr)
          * \param _v_ptr StateBlock pointer to the velocity (default: nullptr).
          **/        
-        FrameBase(const FrameKeyType & _tp, const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_ptr = nullptr, StateBlock* _v_ptr = nullptr);
+        FrameBase(const FrameKeyType & _type, const TimeStamp& _ts, StateBlock* _p_ptr, StateBlock* _o_ptr = nullptr, StateBlock* _v_ptr = nullptr);
 
         /** \brief Default destructor (not recommended)
          *

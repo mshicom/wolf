@@ -45,12 +45,14 @@ class ProcessorOdom2D : public ProcessorMotion
 };
 
 inline ProcessorOdom2D::ProcessorOdom2D() :
-        ProcessorMotion(PRC_ODOM_2D, 3, 3, 2)
+        ProcessorMotion("ODOM 2D", 3, 3, 2)
 {
-    setType("ODOM 2D");
+    //
 }
+
 inline ProcessorOdom2D::~ProcessorOdom2D()
 {
+    //
 }
 
 inline void ProcessorOdom2D::data2delta(const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_cov, const Scalar _dt,

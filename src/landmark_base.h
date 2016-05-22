@@ -42,12 +42,12 @@ class LandmarkBase : public NodeConstrained<MapBase, NodeTerminus>
         /** \brief Constructor with type, time stamp and the position state pointer
          *
          * Constructor with type, and state pointer
-         * \param _tp indicates landmark type.(types defined at wolf.h)
+         * \param _type indicates landmark type.(types defined at wolf.h)
          * \param _p_ptr StateBlock pointer to the position
          * \param _o_ptr StateBlock pointer to the orientation (default: nullptr)
          *
          **/
-        LandmarkBase(const LandmarkType & _tp, StateBlock* _p_ptr, StateBlock* _o_ptr = nullptr);
+        LandmarkBase(const LandmarkType & _type, StateBlock* _p_ptr, StateBlock* _o_ptr = nullptr);
 
         /** \brief Default destructor (not recommended)
          *

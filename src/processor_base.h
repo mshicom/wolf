@@ -27,7 +27,7 @@ struct ProcessorParamsBase
 class ProcessorBase : public NodeLinked<SensorBase, NodeTerminus>
 {
     public:
-        ProcessorBase(ProcessorType _tp);
+        ProcessorBase(const std::string& _type, const std::string& _name = "");
 
         /** \brief Default destructor (not recommended)
          *
@@ -60,7 +60,7 @@ class ProcessorBase : public NodeLinked<SensorBase, NodeTerminus>
 
     protected:
         unsigned int processor_id_;
-        ProcessorType type_id_;
+//        std::string type_id_;
 };
 
 }

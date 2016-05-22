@@ -75,7 +75,7 @@ class ProcessorTracker : public ProcessorBase
         Scalar time_tolerance_;         ///< self time tolerance for adding a capture into a frame
 
     public:
-        ProcessorTracker(ProcessorType _tp, const unsigned int _max_new_features = 0, const Scalar& _time_tolerance = 0);
+        ProcessorTracker(const std::string& _type, const unsigned int _max_new_features = 0, const Scalar& _time_tolerance = 0);
         virtual ~ProcessorTracker();
 
         /** \brief Full processing of an incoming Capture.

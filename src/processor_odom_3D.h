@@ -75,7 +75,7 @@ class ProcessorOdom3D : public ProcessorMotion
 
 
 inline ProcessorOdom3D::ProcessorOdom3D() :
-        ProcessorMotion(PRC_ODOM_3D, 7, 7, 6),
+        ProcessorMotion("ODOM 3D", 7, 7, 6),
         p1_(nullptr),
         p2_(nullptr),
         p_out_(nullptr),
@@ -83,11 +83,12 @@ inline ProcessorOdom3D::ProcessorOdom3D() :
         q2_(nullptr),
         q_out_(nullptr)
 {
-    setType("ODOM 3D");
+    //
 }
 
 inline ProcessorOdom3D::~ProcessorOdom3D()
 {
+    //
 }
 
 inline void ProcessorOdom3D::data2delta(const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_cov, const Scalar _dt,

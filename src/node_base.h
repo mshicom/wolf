@@ -35,10 +35,9 @@ namespace wolf {
  *    - "LANDMARK"
  *
  *  - A unique type, which is a subclass of the above. The list here cannot be exhaustive, but a few examples follow:
- *    - "Camera"
- *    - "LIDAR 2D"
- *    - "Point 3D"
- *    - "Lidar 2D processor"
+ *    - "CAMERA"
+ *    - "LASER 2D"
+ *    - "POINT 3D"
  *
  *    please refer to each base class derived from NodeLinked for better examples of their types.
  *
@@ -66,13 +65,12 @@ class NodeBase
     protected:
         unsigned int node_id_;   ///< Node id. It is unique over the whole Wolf Tree
         std::string node_class_; ///< Text label identifying the class of node ("SENSOR", "FEATURE", etc)
-        std::string node_type_;  ///< Text label identifying the type or subclass of node ("Pin Hole", "Point 2D", etc)
+        std::string node_type_;  ///< Text label identifying the type or subclass of node ("CAMERA", "POINT 2D", etc)
         std::string node_name_;  ///< Text label identifying each specific object ("left camera", "LIDAR 1", "PointGrey", "Andrew", etc)
-        bool verbose_; 
 
     public: 
 
-        NodeBase(std::string _class, bool _verbose = false);
+        NodeBase(std::string _class, const std::string& _type = "", const std::string& _name = "");
         virtual ~NodeBase();
 
         unsigned int nodeId() const;
@@ -90,11 +88,13 @@ class NodeBase
 
 namespace wolf{
 
-inline NodeBase::NodeBase(std::string _class, bool _verbose) :
-        node_id_(++node_id_count_), node_class_(_class), verbose_(_verbose)
+inline NodeBase::NodeBase(std::string _class, const std::string& _type, const std::string& _name) :
+        node_id_(++node_id_count_), //
+        node_class_(_class), //
+        node_type_(_type), //
+        node_name_(_name)
 {
-    if (verbose_)
-        std::cout << "NodeBase::NodeBase(). Id: " << node_id_ << " Label: " << node_class_ << std::endl;
+    //
 }
 
 inline NodeBase::~NodeBase()

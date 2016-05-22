@@ -36,19 +36,19 @@ class ConstraintBase : public NodeLinked<FeatureBase, NodeTerminus>
 
         /** \brief Constructor of category CTR_ABSOLUTE
          **/
-        ConstraintBase(ConstraintType _tp, bool _apply_loss_function, ConstraintStatus _status);
+        ConstraintBase(ConstraintType _type, bool _apply_loss_function, ConstraintStatus _status);
 
         /** \brief Constructor of category CTR_FRAME
          **/
-        ConstraintBase(ConstraintType _tp, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status);
+        ConstraintBase(ConstraintType _type, FrameBase* _frame_ptr, bool _apply_loss_function, ConstraintStatus _status);
 
         /** \brief Constructor of category CTR_FEATURE
          **/
-        ConstraintBase(ConstraintType _tp, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status);
+        ConstraintBase(ConstraintType _type, FeatureBase* _feature_ptr, bool _apply_loss_function, ConstraintStatus _status);
 
         /** \brief Constructor of category CTR_LANDMARK
          **/
-        ConstraintBase(ConstraintType _tp, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status);
+        ConstraintBase(ConstraintType _type, LandmarkBase* _landmark_ptr, bool _apply_loss_function, ConstraintStatus _status);
 
         /** \brief Default destructor (not recommended)
          *
