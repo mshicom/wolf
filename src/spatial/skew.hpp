@@ -29,13 +29,13 @@ namespace se3
 ///
 template <typename D>
 inline Eigen::Matrix<typename D::Scalar,3,3,D::Options>
-skew(const Eigen::MatrixBase<D> & v)
+skew(const Eigen::MatrixBase<D> & _v)
 {
     EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(D,3);
     Eigen::Matrix<typename D::Scalar,3,3,D::Options> m;
-    m(0,0) =  0   ;  m(0,1) = -v[2];   m(0,2) =  v[1];
-    m(1,0) =  v[2];  m(1,1) =  0   ;   m(1,2) = -v[0];
-    m(2,0) = -v[1];  m(2,1) =  v[0];   m(2,2) =  0   ;
+    m(0,0) =  0   ;  m(0,1) = -_v[2];   m(0,2) =  _v[1];
+    m(1,0) =  _v[2];  m(1,1) =  0   ;   m(1,2) = -_v[0];
+    m(2,0) = -_v[1];  m(2,1) =  _v[0];   m(2,2) =  0   ;
     return m;
 }
 
@@ -49,41 +49,41 @@ skew(const Eigen::MatrixBase<D> & v)
 ///
 template <typename D>
 inline Eigen::Matrix<typename D::Scalar,3,1,D::Options>
-unSkew(const Eigen::MatrixBase<D> & M)
+unSkew(const Eigen::MatrixBase<D> & _M)
 {
     EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(D,3,3);
-    assert((M + M.transpose()).isMuchSmallerThan(M));
+    assert((_M + _M.transpose()).isMuchSmallerThan(_M));
     Eigen::Matrix<typename D::Scalar,3,1,D::Options> v;
     
-    v[0] = 0.5 * (M(2,1) - M(1,2));
-    v[1] = 0.5 * (M(0,2) - M(2,0));
-    v[2] = 0.5 * (M(1,0) - M(0,1));
+    v[0] = 0.5 * (_M(2,1) - _M(1,2));
+    v[1] = 0.5 * (_M(0,2) - _M(2,0));
+    v[2] = 0.5 * (_M(1,0) - _M(0,1));
     return v;
 }
 
 template <typename D>
 inline Eigen::Matrix<typename D::Scalar,3,3,D::Options>
-alphaSkew (const typename D::Scalar s, const Eigen::MatrixBase<D> & v)
+alphaSkew (const typename D::Scalar s, const Eigen::MatrixBase<D> & _v)
 {
     EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(D,3);
     Eigen::Matrix<typename D::Scalar,3,3,D::Options> m;
-    m(0,0) =  0   ;  m(0,1) = -v[2] * s;   m(0,2) =  v[1] * s;
-    m(1,0) = - m(0,1);  m(1,1) =  0   ;   m(1,2) = -v[0] * s;
+    m(0,0) =  0   ;  m(0,1) = -_v[2] * s;   m(0,2) =  _v[1] * s;
+    m(1,0) = - m(0,1);  m(1,1) =  0   ;   m(1,2) = -_v[0] * s;
     m(2,0) = - m(0,2);  m(2,1) =  - m(1,2);   m(2,2) =  0;
     return m;
 }
 
 template <typename V,typename M>
 inline Eigen::Matrix<typename M::Scalar,3,M::ColsAtCompileTime,M::Options>
-cross(const Eigen::MatrixBase<V> & v,
-      const Eigen::MatrixBase<M> & m)
+cross(const Eigen::MatrixBase<V> & _v,
+      const Eigen::MatrixBase<M> & _m)
 {
     EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(V,3);
 
-    Eigen::Matrix<typename M::Scalar,3,M::ColsAtCompileTime,M::Options> res (3,m.cols());
-    res.row(0) = v[1]*m.row(2) - v[2]*m.row(1);
-    res.row(1) = v[2]*m.row(0) - v[0]*m.row(2);
-    res.row(2) = v[0]*m.row(1) - v[1]*m.row(0);
+    Eigen::Matrix<typename M::Scalar,3,M::ColsAtCompileTime,M::Options> res (3,_m.cols());
+    res.row(0) = _v[1]*_m.row(2) - _v[2]*_m.row(1);
+    res.row(1) = _v[2]*_m.row(0) - _v[0]*_m.row(2);
+    res.row(2) = _v[0]*_m.row(1) - _v[1]*_m.row(0);
     return res;
 }
 } // namespace se3
