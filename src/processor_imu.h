@@ -30,16 +30,74 @@ class ProcessorIMU : public ProcessorMotion{
 
         /**
          * @brief extractData Extract data from the capture_imu object and store them
-         * @param _data
+         * @param _data : acceleration (data[0:2]), angular rates (data[3:5]), (bias random walks) -> 6-vector (12-vector with biases)
+         *                acceleration bias (data[6:8]), gyroscope bias (data[9:11])
          * @param _data_cov
          * @param _dt
-         * @param _delta
+         * @param _delta :  deltas of position, orientation vector, velocity, biases -> 15-vector
          * @param _delta_cov
          */
         virtual void data2delta(const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_cov, const Scalar _dt,
                                 Eigen::VectorXs& _delta, Eigen::MatrixXs& _delta_cov)
         {
             // TODO: all the work to be done here
+            //Euler integration (zero-order integration) for inputs, non-integration for perturbation (perturbation is already integrated)
+//            adt = (am - ab)*dt - an;
+//            wdt = (wm - wb)*dt - wn;
+            Eigen::Vector6s random_walk() = Eigen::Vector6s::Random();
+            Eigen::Vector6s data_euler_int;
+            data_euler_int = (_data.head<6>() - _data.tail<6>())*_dt - random_walk();
+//            ADT_am = dt;
+//            WDT_wm = dt;
+//            ADT_ab = -dt;
+//            WDT_wb = -dt;
+//            ADT_an = -1;
+//            WDT_wn = -1;
+
+            //exponential map
+            Eigen::Matrix<4,3,wolf::Scalar> DQ_wdt;
+            //exp(date_euler_int.tail<3>(), _delta.segment(3,4), DQ_wdt);
+
+            //projection onto the manifold
+            //[dv, DV_adt, DV_dq] = qRot(adt,dq); --> see act and *
+            Eigen::Matrix3s DV_adt;
+            Eigen::Matrix3s DV_dq;
+            _delta.segment(7,3) = qRot(_delta.segment(3,4),data_euler_int.head<3>(), DV_adt, DV_dq);
+            _delta.head<3>() = 1.5*_delta.segment<7,3>()*dt;
+            _delta.tail<6>() = _data.tail<6>(); //BIAS ??
+            Scalar DP_dv = 1.5*dt;
+            Eigen::MatrixXs DP_adt(1.5*dt*DV_adt);
+
+            /// Compute jacobians
+            /// Jacobian wrt bias perturbation in discrete time
+            //        ar     wr
+            //   px  _ _ _ | _ _ _
+            //   py  _ _ _ | _ _ _
+            //   pz  _ _ _ | _ _ _
+            //   qw  _ _ _ | _ _ _
+            //   qx  _ _ _ | _ _ _
+            //   qy  _ _ _ | _ _ _
+            //   qz  _ _ _ | _ _ _
+            //   vx  _ _ _ | _ _ _
+            //   vy  _ _ _ | _ _ _
+            //   vz  _ _ _ | _ _ _
+
+            Eigen::Matrix<10,6,wolf::Scalar> D_nd = Eigen::Matrix<10,6,wolf::Scalar>::Zero();
+//            Eigen::MatrixXs DQ_wn(DQ_wdt * (-1)); //WDT_wn == -1
+//            Eigen::MatrixXs WDT_wn(DV_adt*(-1));
+//            Eigen::MatrixXs DV_wn(DV_dq*DQ_wn);
+//            Eigen::MatrixXs DP_an(DP_adt*(-1));
+//            Eigen::MatrixXs DP_wn(DP_dv*DV_wn);
+            D_nd.block<3,3>(4,3) = DQ_wdt * (-1);
+            D_nd.block<7,0>(3,3) = DV_adt*(-1);
+            D_nd.block<7,3>(3,3) = DV_dq*DQ_wn;
+            D_nd.block<0,0>(3,3) = DP_adt*(-1);
+            D_nd.block<0,3>(3,3) = DP_dv*DV_wn;
+
+            /// Jacobian wrt bias
+            Eigen::Matrix<10,6,wolf::Scalar> D_b = Eigen::Matrix<10,6,wolf::Scalar>::Zero();
+            D_b = D_nd * dt;
+
         }
 
         /** \brief composes a delta-state on top of a state
