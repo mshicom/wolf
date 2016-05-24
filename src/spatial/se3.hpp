@@ -61,8 +61,8 @@ namespace se3
       const Linear_t & translation() const  { return derived().translation_impl(); }
       Angular_t & rotation()  { return derived().rotation_impl(); }
       Linear_t & translation()   { return derived().translation_impl(); }
-      void rotation(const Angular_t & R) { derived().rotation_impl(R); }
-      void translation(const Linear_t & R) { derived().translation_impl(R); }
+      void rotation(const Angular_t & _R) { derived().rotation_impl(_R); }
+      void translation(const Linear_t & _R) { derived().translation_impl(_R); }
 
 
       Matrix4 toHomogeneousMatrix() const
@@ -84,39 +84,39 @@ namespace se3
         static_cast<const Derived_t*>(this)->disp_impl(os);
       }
 
-      Derived_t operator*(const Derived_t & m2) const    { return derived().__mult__(m2); }
+      Derived_t operator*(const Derived_t & _m2) const    { return derived().__mult__(_m2); }
 
       /// ay = aXb.act(by)
       template<typename D>
-      typename internal::ActionReturn<D>::Type act   (const D & d) const 
+      typename internal::ActionReturn<D>::Type act   (const D & _d) const
       { 
-        return derived().act_impl(d);
+        return derived().act_impl(_d);
       }
       
       /// by = aXb.actInv(ay)
-      template<typename D> typename internal::ActionReturn<D>::Type actInv(const D & d) const
+      template<typename D> typename internal::ActionReturn<D>::Type actInv(const D & _d) const
       {
-        return derived().actInv_impl(d);
+        return derived().actInv_impl(_d);
       }
 
 
-      Derived_t act   (const Derived_t& m2) const { return derived().act_impl(m2); }
-      Derived_t actInv(const Derived_t& m2) const { return derived().actInv_impl(m2); }
+      Derived_t act   (const Derived_t& _m2) const { return derived().act_impl(_m2); }
+      Derived_t actInv(const Derived_t& _m2) const { return derived().actInv_impl(_m2); }
 
 
-      bool operator == (const Derived_t & other) const
+      bool operator == (const Derived_t & _other) const
       {
-        return derived().__equal__(other);
+        return derived().__equal__(_other);
       }
 
-      bool isApprox (const Derived_t & other, const Scalar_t & prec = Eigen::NumTraits<Scalar_t>::dummy_precision()) const
+      bool isApprox (const Derived_t & _other, const Scalar_t & prec = Eigen::NumTraits<Scalar_t>::dummy_precision()) const
       {
-        return derived().isApprox_impl(other, prec);
+        return derived().isApprox_impl(_other, prec);
       }
 
-      friend std::ostream & operator << (std::ostream & os,const SE3Base<Derived> & X)
+      friend std::ostream & operator << (std::ostream & os,const SE3Base<Derived> & _X)
       { 
-        X.disp(os);
+        _X.disp(os);
         return os;
       }
 
@@ -156,36 +156,36 @@ namespace se3
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 
-    SE3Tpl(): rot(), trans() {};
+    SE3Tpl(): rot_(), trans_() {};
 
 
     template<typename M3,typename v3>
-    SE3Tpl(const Eigen::MatrixBase<M3> & R, const Eigen::MatrixBase<v3> & p) 
-    : rot(R), trans(p)
+    SE3Tpl(const Eigen::MatrixBase<M3> & _R, const Eigen::MatrixBase<v3> & _p)
+    : rot_(_R), trans_(_p)
     {
       EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(v3,3)
       EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(M3,3,3)
     }
 
     template<typename M4>
-    SE3Tpl(const Eigen::MatrixBase<M4> & m) 
-    : rot(m.template block<3,3>(LINEAR,LINEAR)), trans(m.template block<3,1>(LINEAR,ANGULAR))
+    SE3Tpl(const Eigen::MatrixBase<M4> & _m)
+    : rot_(_m.template block<3,3>(LINEAR,LINEAR)), trans_(_m.template block<3,1>(LINEAR,ANGULAR))
     {
       EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(M4,4,4);
     }
 
-    SE3Tpl(int) : rot(Matrix3::Identity()), trans(Vector3::Zero()) {}
+    SE3Tpl(int) : rot_(Matrix3::Identity()), trans_(Vector3::Zero()) {}
 
     template<typename S2, int O2>
-    SE3Tpl( const SE3Tpl<S2,O2> & clone )
-    : rot(clone.rotation()),trans(clone.translation()) {}
+    SE3Tpl( const SE3Tpl<S2,O2> & _clone )
+    : rot_(_clone.rotation()),trans_(_clone.translation()) {}
 
 
     template<typename S2, int O2>
-    SE3Tpl & operator= (const SE3Tpl<S2,O2> & other)
+    SE3Tpl & operator= (const SE3Tpl<S2,O2> & _other)
     {
-      rot = other.rotation ();
-      trans = other.translation ();
+      rot_ = _other.rotation ();
+      trans_ = _other.translation ();
       return *this;
     }
 
@@ -194,12 +194,12 @@ namespace se3
       return SE3Tpl(1);
     }
 
-    SE3Tpl & setIdentity () { rot.setIdentity (); trans.setZero (); return *this;}
+    SE3Tpl & setIdentity () { rot_.setIdentity (); trans_.setZero (); return *this;}
 
     /// aXb = bXa.inverse()
     SE3Tpl inverse() const
     {
-      return SE3Tpl(rot.transpose(), -rot.transpose()*trans);
+      return SE3Tpl(rot_.transpose(), -rot_.transpose()*trans_);
     }
 
     static SE3Tpl Random()
@@ -213,8 +213,8 @@ namespace se3
     {
       Quaternion_t q(Vector4::Random());
       q.normalize ();
-      rot = q.matrix ();
-      trans.setRandom ();
+      rot_ = q.matrix ();
+      trans_.setRandom ();
 
       return *this;
     }
@@ -222,8 +222,8 @@ namespace se3
     Matrix4 toHomogeneousMatrix_impl() const
     {
       Matrix4 M;
-      M.template block<3,3>(LINEAR,LINEAR) = rot;
-      M.template block<3,1>(LINEAR,ANGULAR) = trans;
+      M.template block<3,3>(LINEAR,LINEAR) = rot_;
+      M.template block<3,1>(LINEAR,ANGULAR) = trans_;
       M.template block<1,3>(ANGULAR,LINEAR).setZero();
       M(3,3) = 1;
       return M;
@@ -235,65 +235,65 @@ namespace se3
       typedef Eigen::Block<Matrix6,3,3> Block3;
       Matrix6 M;
       M.template block<3,3>(ANGULAR,ANGULAR)
-      = M.template block<3,3>(LINEAR,LINEAR) = rot;
+      = M.template block<3,3>(LINEAR,LINEAR) = rot_;
       M.template block<3,3>(ANGULAR,LINEAR).setZero();
       Block3 B = M.template block<3,3>(LINEAR,ANGULAR);
       
-      B.col(0) = trans.cross(rot.col(0));
-      B.col(1) = trans.cross(rot.col(1));
-      B.col(2) = trans.cross(rot.col(2));
+      B.col(0) = trans_.cross(rot_.col(0));
+      B.col(1) = trans_.cross(rot_.col(1));
+      B.col(2) = trans_.cross(rot_.col(2));
       return M;
     }
 
     void disp_impl(std::ostream & os) const
     {
-      os << "  R =\n" << rot << std::endl
-      << "  p = " << trans.transpose() << std::endl;
+      os << "  R =\n" << rot_ << std::endl
+      << "  p = " << trans_.transpose() << std::endl;
     }
 
     /// --- GROUP ACTIONS ON M6, F6 and I6 --- 
 
     /// ay = aXb.act(by)
     template<typename D>
-    typename internal::ActionReturn<D>::Type act_impl   (const D & d) const 
+    typename internal::ActionReturn<D>::Type act_impl   (const D & _d) const
     { 
-      return d.se3Action(*this);
+      return _d.se3Action(*this);
     }
     /// by = aXb.actInv(ay)
-    template<typename D> typename internal::ActionReturn<D>::Type actInv_impl(const D & d) const
+    template<typename D> typename internal::ActionReturn<D>::Type actInv_impl(const D & _d) const
     {
-      return d.se3ActionInverse(*this);
+      return _d.se3ActionInverse(*this);
     }
 
-    Vector3 act_impl   (const Vector3& p) const { return rot*p+trans; }
-    Vector3 actInv_impl(const Vector3& p) const { return rot.transpose()*(p-trans); }
+    Vector3 act_impl   (const Vector3& _p) const { return rot_*_p+trans_; }
+    Vector3 actInv_impl(const Vector3& _p) const { return rot_.transpose()*(_p-trans_); }
 
-    SE3Tpl act_impl    (const SE3Tpl& m2) const { return SE3Tpl( rot*m2.rot,trans+rot*m2.trans);}
-    SE3Tpl actInv_impl (const SE3Tpl& m2) const { return SE3Tpl( rot.transpose()*m2.rot, rot.transpose()*(m2.trans-trans));}
+    SE3Tpl act_impl    (const SE3Tpl& _m2) const { return SE3Tpl( rot_*_m2.rot_,trans_+rot_*_m2.trans_);}
+    SE3Tpl actInv_impl (const SE3Tpl& _m2) const { return SE3Tpl( rot_.transpose()*_m2.rot_, rot_.transpose()*(_m2.trans_-trans_));}
 
 
-    SE3Tpl __mult__(const SE3Tpl & m2) const { return this->act(m2);}
+    SE3Tpl __mult__(const SE3Tpl & _m2) const { return this->act(_m2);}
 
-    bool __equal__( const SE3Tpl & m2 ) const
+    bool __equal__( const SE3Tpl & _m2 ) const
     {
-      return (rotation_impl() == m2.rotation() && translation_impl() == m2.translation());
+      return (rotation_impl() == _m2.rotation() && translation_impl() == _m2.translation());
     }
 
     bool isApprox_impl (const SE3Tpl & m2, const Scalar_t & prec = Eigen::NumTraits<Scalar_t>::dummy_precision()) const
     {
-      return rot.isApprox(m2.rot, prec) && trans.isApprox(m2.trans, prec);
+      return rot_.isApprox(m2.rot_, prec) && trans_.isApprox(m2.trans_, prec);
     }
 
-    const Angular_t & rotation_impl() const { return rot; }
-    Angular_t & rotation_impl() { return rot; }
-    void rotation_impl(const Angular_t & R) { rot = R; }
-    const Linear_t & translation_impl() const { return trans;}
-    Linear_t & translation_impl() { return trans;}
-    void translation_impl(const Linear_t & p) { trans=p; }
+    const Angular_t & rotation_impl() const { return rot_; }
+    Angular_t & rotation_impl() { return rot_; }
+    void rotation_impl(const Angular_t & _R) { rot_ = _R; }
+    const Linear_t & translation_impl() const { return trans_;}
+    Linear_t & translation_impl() { return trans_;}
+    void translation_impl(const Linear_t & _p) { trans_= _p; }
 
   protected:
-    Angular_t rot;
-    Linear_t trans;
+    Angular_t rot_;
+    Linear_t trans_;
     
   }; // class SE3Tpl
 
