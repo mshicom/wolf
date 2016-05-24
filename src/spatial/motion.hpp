@@ -22,7 +22,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "pinocchio/spatial/fwd.hpp"
-#include "pinocchio/spatial/force.hpp"
 
 #define MOTION_SPECIFIC_TYPEDEF \
 typedef typename Eigen::VectorBlock<const Vector6,3> ConstLinear_t; \
@@ -69,8 +68,6 @@ namespace se3
 
     Derived_t se3Action(const SE3 & m) const { return derived().se3Action_impl(m); }
     Derived_t se3ActionInverse(const SE3 & m) const { return derived().se3ActionInverse_impl(m); }
-    
-    Scalar_t dot(const Force & f) const { return static_cast<Derived_t*>(this)->dot(f); }
 
     void disp(std::ostream & os) const { derived().disp_impl(os); }
     friend std::ostream & operator << (std::ostream & os, const MotionBase<Derived_t> & mv)
@@ -97,7 +94,6 @@ namespace se3
     typedef Linear_t Angular_t;
     typedef Eigen::Quaternion<T,U> Quaternion_t;
     typedef SE3Tpl<T,U> SE3;
-    typedef ForceTpl<T,U> Force;
     typedef MotionTpl<T,U> Motion;
     typedef Symmetric3Tpl<T,U> Symmetric3;
     enum {
@@ -192,8 +188,6 @@ namespace se3
     MotionTpl __plus__(const MotionTpl & v2) const { return MotionTpl(data + v2.data); }
     MotionTpl __minus__(const MotionTpl & v2) const { return MotionTpl(data - v2.data); }
     MotionTpl& __pequ__(const MotionTpl & v2) { data += v2.data; return *this; }
-    
-    Scalar_t dot(const Force & f) const { return data.dot(f.toVector()); }
 
     MotionTpl cross(const MotionTpl& v2) const
     {
@@ -201,11 +195,6 @@ namespace se3
                         angular_impl().cross(v2.angular_impl()) );
     }
 
-    Force cross(const Force& phi) const
-    {
-      return Force( angular_impl().cross(phi.linear_impl()),
-                    angular_impl().cross(phi.angular_impl())+linear_impl().cross(phi.linear_impl()) );
-    }
 
     MotionTpl se3Action_impl(const SE3 & m) const
     {
@@ -248,8 +237,6 @@ namespace se3
 
   template<typename S,int O>
   MotionTpl<S,O> operator^( const MotionTpl<S,O> &m1, const MotionTpl<S,O> &m2 ) { return m1.cross(m2); }
-  template<typename S,int O>
-  ForceTpl<S,O> operator^( const MotionTpl<S,O> &m, const ForceTpl<S,O> &f ) { return m.cross(f); }
 
   typedef MotionTpl<double,0> Motion;
 
@@ -274,7 +261,6 @@ namespace se3
     typedef const Vector3 ConstLinear_t;
     typedef Eigen::Quaternion<double,0> Quaternion_t;
     typedef SE3Tpl<double,0> SE3;
-    typedef ForceTpl<double,0> Force;
     typedef MotionTpl<double,0> Motion;
     typedef Symmetric3Tpl<double,0> Symmetric3;
     enum {
