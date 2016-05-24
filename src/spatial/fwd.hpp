@@ -22,14 +22,14 @@
 
 namespace se3
 {
-  template<typename _Scalar, int _Options=0> class SE3Tpl;
-  template<typename _Scalar, int _Options=0> class MotionTpl;
-  template<typename _Scalar, int _Options=0> class InertiaTpl;
-  template<typename _Scalar, int _Options=0> class Symmetric3Tpl;
+template<typename _Scalar, int _Options=0> class SE3Tpl;
+template<typename _Scalar, int _Options=0> class MotionTpl;
+template<typename _Scalar, int _Options=0> class InertiaTpl;
+template<typename _Scalar, int _Options=0> class Symmetric3Tpl;
 
-  template<class C> struct traits {};
+template<class C> struct traits {};
 
-  #define SPATIAL_TYPEDEF_TEMPLATE(derived)              \
+#define SPATIAL_TYPEDEF_TEMPLATE(derived)              \
     typedef typename traits<derived>::Scalar_t Scalar_t; \
     typedef typename traits<derived>::Vector3 Vector3; \
     typedef typename traits<derived>::Vector4 Vector4; \
@@ -45,11 +45,11 @@ namespace se3
     typedef typename traits<derived>::Motion Motion; \
     typedef typename traits<derived>::Symmetric3 Symmetric3; \
     enum {  \
-      LINEAR = traits<derived>::LINEAR,  \
-      ANGULAR = traits<derived>::ANGULAR   \
-    }
+    LINEAR = traits<derived>::LINEAR,  \
+    ANGULAR = traits<derived>::ANGULAR   \
+}
 
-  #define SPATIAL_TYPEDEF_NO_TEMPLATE(derived)              \
+#define SPATIAL_TYPEDEF_NO_TEMPLATE(derived)              \
     typedef traits<derived>::Scalar_t Scalar_t; \
     typedef traits<derived>::Vector3 Vector3; \
     typedef traits<derived>::Vector4 Vector4; \
@@ -65,9 +65,9 @@ namespace se3
     typedef traits<derived>::Motion Motion; \
     typedef traits<derived>::Symmetric3 Symmetric3; \
     enum {  \
-      LINEAR = traits<derived>::LINEAR,  \
-      ANGULAR = traits<derived>::ANGULAR   \
-    }
+    LINEAR = traits<derived>::LINEAR,  \
+    ANGULAR = traits<derived>::ANGULAR   \
+}
 
 
 } // namespace se3
