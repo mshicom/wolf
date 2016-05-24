@@ -24,7 +24,6 @@ namespace se3
 {
   template<typename _Scalar, int _Options=0> class SE3Tpl;
   template<typename _Scalar, int _Options=0> class MotionTpl;
-  template<typename _Scalar, int _Options=0> class ForceTpl;
   template<typename _Scalar, int _Options=0> class InertiaTpl;
   template<typename _Scalar, int _Options=0> class Symmetric3Tpl;
 
@@ -43,7 +42,6 @@ namespace se3
     typedef typename traits<derived>::ActionMatrix_t ActionMatrix_t; \
     typedef typename traits<derived>::Quaternion_t Quaternion_t; \
     typedef typename traits<derived>::SE3 SE3; \
-    typedef typename traits<derived>::Force Force; \
     typedef typename traits<derived>::Motion Motion; \
     typedef typename traits<derived>::Symmetric3 Symmetric3; \
     enum {  \
@@ -64,7 +62,6 @@ namespace se3
     typedef traits<derived>::ActionMatrix_t ActionMatrix_t; \
     typedef traits<derived>::Quaternion_t Quaternion_t; \
     typedef traits<derived>::SE3 SE3; \
-    typedef traits<derived>::Force Force; \
     typedef traits<derived>::Motion Motion; \
     typedef traits<derived>::Symmetric3 Symmetric3; \
     enum {  \

@@ -23,7 +23,6 @@
 #include <cstdlib>
 
 #include "pinocchio/spatial/symmetric3.hpp"
-#include "pinocchio/spatial/force.hpp"
 #include "pinocchio/spatial/motion.hpp"
 #include "pinocchio/spatial/skew.hpp"
 
@@ -56,7 +55,6 @@ namespace se3
     bool operator== (const Derived_t& other) const {return derived().isEqual(other);}
     Derived_t& operator+= (const Derived_t & Yb) { return derived().__pequ__(Yb); }
     Derived_t operator+(const Derived_t & Yb) const { return derived().__plus__(Yb); }
-    Force operator*(const Motion & v) const    { return derived().__mult__(v); }
 
     Scalar_t vtiv(const Motion & v) const { return derived().vtiv_impl(v); }
 
@@ -95,7 +93,6 @@ namespace se3
     typedef Vector3 Linear_t;
     typedef Eigen::Quaternion<T,U> Quaternion_t;
     typedef SE3Tpl<T,U> SE3;
-    typedef ForceTpl<T,U> Force;
     typedef MotionTpl<T,U> Motion;
     typedef Symmetric3Tpl<T,U> Symmetric3;
     enum {
@@ -271,13 +268,6 @@ namespace se3
       return *this;
     }
 
-    Force __mult__(const Motion &v) const 
-    {
-      Force f;
-      f.linear() = m*(v.linear() - c.cross(v.angular()));
-      f.angular() = c.cross(f.linear()) + I*v.angular();
-      return f;
-    }
     
     Scalar_t vtiv_impl(const Motion & v) const
     {
@@ -318,13 +308,6 @@ namespace se3
                         I.rotate(M.rotation().transpose()) );
     }
 
-    Force vxiv( const Motion& v ) const 
-    {
-      const Vector3 & mcxw = m*c.cross(v.angular());
-      const Vector3 & mv_mcxw = m*v.linear()-mcxw;
-      return Force( v.angular().cross(mv_mcxw),
-                    v.angular().cross(c.cross(mv_mcxw)+I*v.angular())-v.linear().cross(mcxw) );
-    }
 
     void disp_impl(std::ostream & os) const
     {

@@ -138,7 +138,6 @@ namespace se3
     typedef Matrix6 ActionMatrix_t;
     typedef Eigen::Quaternion<T,U> Quaternion_t;
     typedef SE3Tpl<T,U> SE3;
-    typedef ForceTpl<T,U> Force;
     typedef MotionTpl<T,U> Motion;
     typedef Symmetric3Tpl<T,U> Symmetric3;
     enum {
