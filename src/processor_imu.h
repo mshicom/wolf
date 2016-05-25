@@ -229,7 +229,22 @@ class ProcessorIMU : public ProcessorMotion{
                                      Eigen::VectorXs& _delta2_minus_delta1)
         {
             // TODO: all the work to be done here
+            /// quaternion integration
+//            dq = q2qc(dq);
+//            [dqi_out, DQI_OUT_dqi, DQI_OUT_dq] = qProd(dqi,dq);
+            Eigen::map<Eigen::Quaternion,Eigen::Aligned>(_delta2_minus_delta1.segment(3,4)) = qProd(Eigen::map<Eigen::Quaternion,Eigen::Aligned>(_delta2.segment(3,4)), Eigen::map<Eigen::Quaternion,Eigen::Aligned>(_delta1.segment(3,4)).conjugate()); //left hand operation
+
+            /// velocity integration
+            //inversed rotation already taken into account in the conjugate form
+            Eigen::Vector3s dv_tmp;
+            dv_tmp = qRot(_delta1.segment(7,3), _delta2_minus_delta1.segment(3,4));
+            _delta2_minus_delta1.segment(7,3) = dv_tmp + _delta2.segment(7,3);
+
+            ///position integration
+            //TODO : need to get dt somewhere --> use timestamps ?
+            _delta2_minus_delta1.head<3>() = _delta2.head<3>() +  1.5*dv_tmp*dt;
         }
+
 
         virtual Eigen::VectorXs deltaZero() const
         {
