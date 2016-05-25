@@ -124,11 +124,24 @@ class ProcessorIMU : public ProcessorMotion{
          */
         virtual void deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2, Eigen::VectorXs& _delta1_plus_delta2)
         {
-            // TODO: all the work to be done here
-            //Quaternion integration
-            //[dqi_out, DQI_OUT_dqi, DQI_OUT_dq] = qProd(dqi,dq);
+            // di: integrated delta (_delta2)
+            // d : instantaneous delta (_delta1)
+            /// Quaternion integration
+            //[dqi_out] = qProd(dqi,dq);
+            _delta1_plus_delta2.segment(3,4) = qProd(_delta2.segment(3,4), _delta1.segment(3,4)); //left hand operation
 
+            /// Velocity Integration
+            //[dv_tmp] =  qRot(dv, dqi_out);
+            Eigen::Vector3s dv_tmp;
+            //TODO : DEFINE qRot
+            dv_tmp = qRot(_delta1.segment(7,3), _delta1_plus_delta2.segment(3,4));
+            _delta1_plus_delta2.segment(7,3) = _dv_tmp + _delta2.segment(7,3);
 
+            /// Position integration
+            _delta1_plus_delta2.head<3>() = _delta2.head<3>() +  1.5*dv_tmp*dt;
+
+            //BIAS
+            _delta1_plus_delta2.tail<6>() = _delta2.tail<6>(); //constant bias model ?
         }
 
         /** \brief composes a delta-state on top of another delta-state and computes jacobians
@@ -213,7 +226,10 @@ class ProcessorIMU : public ProcessorMotion{
          * This function implements the composition (-) so that _delta2_minus_delta1 = _delta2 (-) _delta1.
          */
         virtual void deltaMinusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2,
-                                     Eigen::VectorXs& _delta2_minus_delta1) { };
+                                     Eigen::VectorXs& _delta2_minus_delta1)
+        {
+            // TODO: all the work to be done here
+        }
 
         virtual Eigen::VectorXs deltaZero() const
         {
