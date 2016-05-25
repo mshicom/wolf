@@ -128,14 +128,14 @@ class ProcessorIMU : public ProcessorMotion{
             // d : instantaneous delta (_delta1)
             /// Quaternion integration
             //[dqi_out] = qProd(dqi,dq);
-            _delta1_plus_delta2.segment(3,4) = qProd(_delta2.segment(3,4), _delta1.segment(3,4)); //left hand operation
+            Eigen::map<Eigen::Quaternion,Eigen::Aligned>(_delta1_plus_delta2.segment(3,4)) = Eigen::map<Eigen::Quaternion,Eigen::Aligned>(qProd(_delta2.segment(3,4)), Eigen::map<Eigen::Quaternion,Eigen::Aligned>(_delta1.segment(3,4)), DQI_OUT_dqi, DQI_OUT_dq); //left hand operation
 
             /// Velocity Integration
             //[dv_tmp] =  qRot(dv, dqi_out);
             Eigen::Vector3s dv_tmp;
             //TODO : DEFINE qRot
             dv_tmp = qRot(_delta1.segment(7,3), _delta1_plus_delta2.segment(3,4));
-            _delta1_plus_delta2.segment(7,3) = _dv_tmp + _delta2.segment(7,3);
+            _delta1_plus_delta2.segment(7,3) = dv_tmp + _delta2.segment(7,3);
 
             /// Position integration
             _delta1_plus_delta2.head<3>() = _delta2.head<3>() +  1.5*dv_tmp*dt;
@@ -165,7 +165,7 @@ class ProcessorIMU : public ProcessorMotion{
             //[dqi_out, DQI_OUT_dqi, DQI_OUT_dq] = qProd(dqi,dq);
             Eigen::Matrix4s DQI_OUT_dqi, DQI_OUT_dq;// 4x4 matrix
             //TODO : DEFINE qProd
-            _delta1_plus_delta2.segment(3,4) = qProd(_delta2.segment(3,4), _delta1.segment(3,4), DQI_OUT_dqi, DQI_OUT_dq); //left hand operation
+            Eigen::map<Eigen::Quaternion,Eigen::Aligned>(_delta1_plus_delta2.segment(3,4)) = Eigen::map<Eigen::Quaternion,Eigen::Aligned>(qProd(_delta2.segment(3,4)), Eigen::map<Eigen::Quaternion,Eigen::Aligned>(_delta1.segment(3,4)), DQI_OUT_dqi, DQI_OUT_dq); //left hand operation
 
             /// Velocity Integration
             //[dv_tmp, DVT_dv, DVT_dqi_out] =  qRot(dv, dqi_out);
@@ -174,7 +174,7 @@ class ProcessorIMU : public ProcessorMotion{
             Eigen::Vector3s dv_tmp;
             //TODO : DEFINE qRot
             dv_tmp = qRot(_delta1.segment(7,3), _delta1_plus_delta2.segment(3,4), DVT_dv, DVT_dqi_out);
-            _delta1_plus_delta2.segment(7,3) = _dv_tmp + _delta2.segment(7,3);
+            _delta1_plus_delta2.segment(7,3) = dv_tmp + _delta2.segment(7,3);
 //            DVI_OUT_dvi = 1;
 //            DVI_OUT_dvt = 1;
 //            DVI_OUT_dqi = DVI_OUT_dvt * DVT_dqi_out * DQI_OUT_dqi;
