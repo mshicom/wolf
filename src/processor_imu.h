@@ -40,7 +40,6 @@ class ProcessorIMU : public ProcessorMotion{
         virtual void data2delta(const Eigen::VectorXs& _data, const Eigen::MatrixXs& _data_cov, const Scalar _dt,
                                 Eigen::VectorXs& _delta, Eigen::MatrixXs& _delta_cov)
         {
-            // TODO: all the work to be done here
             //Euler integration (zero-order integration) for inputs, non-integration for perturbation (perturbation is already integrated)
 //            adt = (am - ab)*dt - an;
 //            wdt = (wm - wb)*dt - wn;
@@ -55,10 +54,12 @@ class ProcessorIMU : public ProcessorMotion{
 //            WDT_wn = -1;
 
             //exponential map
+            //TODO : DEFINE EXPONENTIAL MAP METHOD WITH COMPUTATION OF JACOBIAN
             Eigen::Matrix<4,3,wolf::Scalar> DQ_wdt;
             //exp(date_euler_int.tail<3>(), _delta.segment(3,4), DQ_wdt);
 
             //projection onto the manifold
+            //TODO : PROJECTION METHOD WITH COMPUTATION OF JACOBIAN TO BE DEFINED
             //[dv, DV_adt, DV_dq] = qRot(adt,dq); --> see act and *
             Eigen::Matrix3s DV_adt;
             Eigen::Matrix3s DV_dq;
