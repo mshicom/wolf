@@ -108,28 +108,99 @@ class ProcessorIMU : public ProcessorMotion{
          *
          * This function implements the composition (+) so that _x2 = _x1 (+) _delta.
          */
-        virtual void xPlusDelta(const Eigen::VectorXs& _x, const Eigen::VectorXs& _delta, Eigen::VectorXs& _x_plus_delta)
+        virtual void xPlusDelta(const Eigen::VectorXs& _x, const Eigen::VectorXs& _delta, const Scalar _dt, Eigen::VectorXs& _x_plus_delta)
         {
             // TODO: all the work to be done here
+
         }
 
         /** \brief composes a delta-state on top of another delta-state
          * \param _delta1 the first delta-state
          * \param _delta2 the second delta-state
          * \param _delta1_plus_delta2 the delta2 composed on top of delta1. It has the format of delta-state.
+         * (e.g [0:2]-> position, [3:6]->orientation quaternion, [7:9]->velocity, [10:12]-> Acceleration bias, [13:15]->Gyroscope Bias)
          *
          * This function implements the composition (+) so that _delta1_plus_delta2 = _delta1 (+) _delta2
          */
         virtual void deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2, Eigen::VectorXs& _delta1_plus_delta2)
         {
             // TODO: all the work to be done here
+            //Quaternion integration
+            //[dqi_out, DQI_OUT_dqi, DQI_OUT_dq] = qProd(dqi,dq);
+
+
         }
 
-        virtual void deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2,
+        /** \brief composes a delta-state on top of another delta-state and computes jacobians
+         * \param _delta1 the first delta-state
+         * \param _delta2 the second delta-state
+         * \param _delta1_plus_delta2 the delta2 composed on top of delta1. It has the format of delta-state.
+         * (e.g [0:2]-> position, [3:6]->orientation quaternion, [7:9]->velocity, [10:12]-> Acceleration bias, [13:15]->Gyroscope Bias)
+         * \param _jacobian1 : jacobian wrt di (_delta1)
+         * \param _jacobian2 : jacobian wrt d (_delta2)
+         *
+         * This function implements the composition (+) so that _delta1_plus_delta2 = _delta1 (+) _delta2
+         */
+
+        virtual void deltaPlusDelta(const Eigen::VectorXs& _delta1, const Eigen::VectorXs& _delta2, const Scalar _dt,
                                     Eigen::VectorXs& _delta1_plus_delta2, Eigen::MatrixXs& _jacobian1,
                                     Eigen::MatrixXs& _jacobian2)
         {
-            // TODO: all the work to be done here
+            // di: integrated delta (_delta2)
+            // d : instantaneous delta (_delta1)
+            //Quaternion integration
+            //[dqi_out, DQI_OUT_dqi, DQI_OUT_dq] = qProd(dqi,dq);
+            Eigen::Matrix4s DQI_OUT_dqi, DQI_OUT_dq;// 4x4 matrix
+            //TODO : DEFINE qProd
+            _delta1_plus_delta2.segment(3,4) = qProd(_delta2.segment(3,4), _delta1.segment(3,4), DQI_OUT_dqi, DQI_OUT_dq); //left hand operation
+
+            //Velocity Integration
+            //[dv_tmp, DVT_dv, DVT_dqi_out] =  qRot(dv, dqi_out);
+            Eigen::Matrix3s DVT_dv; //3x3 matrix
+            Eigen::Matrix<3,4,wolf::Scalar> DVT_dqi_out; //3x4 matrix
+            Eigen::Vector3s dv_tmp;
+            dv_tmp = qRot(_delta1.segment(7,3), _delta1_plus_delta2.segment(3,4), DVT_dv, DVT_dqi_out);
+            _delta1_plus_delta2.segment(7,3) = _dv_tmp + _delta2.segment(7,3);
+//            DVI_OUT_dvi = 1;
+//            DVI_OUT_dvt = 1;
+//            DVI_OUT_dqi = DVI_OUT_dvt * DVT_dqi_out * DQI_OUT_dqi;
+//            DVI_OUT_dv  = DVI_OUT_dvt * DVT_dv;
+            Eigen::Matrix<3,4,wolf::Scalar> DVI_OUT_dqi(DVT_dqi_out*DQI_OUT_dqi); // 3x4 matrix
+            Eigen::Matrix3s DVI_OUT_dv(DVT_dv); // 3x3 mstrix
+
+            //Position integration
+            _delta1_plus_delta2.head<3>() = _delta2.head<3>() +  1.5*dv_tmp*dt;
+            //DPI_OUT_dpi = 1;
+            wolf::Scalar DPI_OUT_dvt = 1.5 * dt;
+            //DPI_OUT_dqi = DPI_OUT_dvt * DVT_dqi_out * DQI_OUT_dqi;
+            Eigen::Matrix<3,4,wolf::Scalar> DPI_OUT_dqi(DPI_OUT_dvt*DVT_dqi_out*DQI_OUT_dqi); //3x4 matrix
+            //DPI_OUT_dv  = DPI_OUT_dvt * DVT_dv;
+            Eigen::Matrix3s DPI_OUT_dv(DPI_OUT_dvt*DVT_dv); //3x3 matrix
+
+            //BIAS
+            _delta1_plus_delta2.tail<6>() = _delta2.tail<6>(); //constant bias model ?
+
+            // Jacobian wrt di --> _jacobian1
+            Eigen::Matrix<10,10,wolf::Scalar> DI_OUT_di = Eigen::Matrix<10,10,wolf::Scalar>::Zero();
+            DI_OUT_di.block<3,3>(4,4) = DQI_OUT_dqi;
+            DI_OUT_di.block<7,7>(3,3) = DVI_OUT_dvi;
+            DI_OUT_di.block<0,3>(3,4) = DPI_OUT_dqi;
+            DI_OUT_di.block<0,0>(3,3) = DPI_OUT_dpi;
+
+            // Jacobian wrt d --> _jacobian2
+            /*DI_OUT_d(qr,qr) = DQI_OUT_dq;
+            DI_OUT_d(vr,qr) = DVI_OUT_dvt * DVT_dqi_out * DQI_OUT_dq;
+            DI_OUT_d(vr,vr) = DVI_OUT_dv;
+            DI_OUT_d(pr,qr) = DPI_OUT_dvt * DVT_dqi_out * DQI_OUT_dq;
+            DI_OUT_d(pr,vr) = DPI_OUT_dv;*/
+
+            Eigen::Matrix<10,10,wolf::Scalar> DI_OUT_d = Eigen::Matrix<10,10,wolf::Scalar>::Zero();
+            DI_OUT_d.block<3,3>(4,4) = DQI_OUT_dq;
+            DI_OUT_d.block<7,3>(3,4) = DVT_dqi_out * DQI_OUT_dq;
+            DI_OUT_d.block<7,7>(3,3) = DVI_OUT_dv;
+            DI_OUT_d.block<0,3>(3,4) = DPI_OUT_dvt * DVT_dqi_out * DQI_OUT_dq;
+            DI_OUT_d.block<0,7>(3,3) = DPI_OUT_dv;
+
         }
 
         /** \brief Computes the delta-state the goes from one delta-state to another
