@@ -148,17 +148,18 @@ class ProcessorIMU : public ProcessorMotion{
         {
             // di: integrated delta (_delta2)
             // d : instantaneous delta (_delta1)
-            //Quaternion integration
+            /// Quaternion integration
             //[dqi_out, DQI_OUT_dqi, DQI_OUT_dq] = qProd(dqi,dq);
             Eigen::Matrix4s DQI_OUT_dqi, DQI_OUT_dq;// 4x4 matrix
             //TODO : DEFINE qProd
             _delta1_plus_delta2.segment(3,4) = qProd(_delta2.segment(3,4), _delta1.segment(3,4), DQI_OUT_dqi, DQI_OUT_dq); //left hand operation
 
-            //Velocity Integration
+            /// Velocity Integration
             //[dv_tmp, DVT_dv, DVT_dqi_out] =  qRot(dv, dqi_out);
             Eigen::Matrix3s DVT_dv; //3x3 matrix
             Eigen::Matrix<3,4,wolf::Scalar> DVT_dqi_out; //3x4 matrix
             Eigen::Vector3s dv_tmp;
+            //TODO : DEFINE qRot
             dv_tmp = qRot(_delta1.segment(7,3), _delta1_plus_delta2.segment(3,4), DVT_dv, DVT_dqi_out);
             _delta1_plus_delta2.segment(7,3) = _dv_tmp + _delta2.segment(7,3);
 //            DVI_OUT_dvi = 1;
@@ -168,7 +169,7 @@ class ProcessorIMU : public ProcessorMotion{
             Eigen::Matrix<3,4,wolf::Scalar> DVI_OUT_dqi(DVT_dqi_out*DQI_OUT_dqi); // 3x4 matrix
             Eigen::Matrix3s DVI_OUT_dv(DVT_dv); // 3x3 mstrix
 
-            //Position integration
+            /// Position integration
             _delta1_plus_delta2.head<3>() = _delta2.head<3>() +  1.5*dv_tmp*dt;
             //DPI_OUT_dpi = 1;
             wolf::Scalar DPI_OUT_dvt = 1.5 * dt;
@@ -180,14 +181,15 @@ class ProcessorIMU : public ProcessorMotion{
             //BIAS
             _delta1_plus_delta2.tail<6>() = _delta2.tail<6>(); //constant bias model ?
 
-            // Jacobian wrt di --> _jacobian1
+            // ONCE VERIFIED, ASSIGNATE JACOBIANS
+            /// Jacobian wrt di --> _jacobian1
             Eigen::Matrix<10,10,wolf::Scalar> DI_OUT_di = Eigen::Matrix<10,10,wolf::Scalar>::Zero();
             DI_OUT_di.block<3,3>(4,4) = DQI_OUT_dqi;
             DI_OUT_di.block<7,7>(3,3) = DVI_OUT_dvi;
             DI_OUT_di.block<0,3>(3,4) = DPI_OUT_dqi;
             DI_OUT_di.block<0,0>(3,3) = DPI_OUT_dpi;
 
-            // Jacobian wrt d --> _jacobian2
+            /// Jacobian wrt d --> _jacobian2
             /*DI_OUT_d(qr,qr) = DQI_OUT_dq;
             DI_OUT_d(vr,qr) = DVI_OUT_dvt * DVT_dqi_out * DQI_OUT_dq;
             DI_OUT_d(vr,vr) = DVI_OUT_dv;
