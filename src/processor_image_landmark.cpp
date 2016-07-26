@@ -18,7 +18,7 @@ ProcessorImageLandmark::ProcessorImageLandmark(ProcessorImageParameters _params)
     matcher_ptr_(nullptr), detector_descriptor_ptr_(nullptr), params_(_params),
     active_search_grid_()
 {
-    setType("IMAGE");
+    setType("IMAGE LANDMARK");
     // 1. detector-descriptor params
     DetectorDescriptorParamsBase* _dd_params = _params.detector_descriptor_params_ptr;
     switch (_dd_params->type){
@@ -263,7 +263,7 @@ unsigned int ProcessorImageLandmark::detectNewFeatures(const unsigned int& _max_
                 point_ptr->setTrackId(point_ptr->id());
                 addNewFeatureLast(point_ptr);
                 active_search_grid_.hitCell(new_keypoints[0]);
-                active_search_grid_.blockCell(roi);
+//                active_search_grid_.blockCell(roi);
 
                 //std::cout << "Added point " << point_ptr->trackId() << " at: " << new_keypoints[0].pt << std::endl;
 

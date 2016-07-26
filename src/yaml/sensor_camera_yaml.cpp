@@ -34,7 +34,22 @@ static IntrinsicsBase* createIntrinsicsCamera(const std::string & _filename_dot_
         unsigned int width      = camera_config["image_width"]                      .as<unsigned int>();
         unsigned int height     = camera_config["image_height"]                     .as<unsigned int>();
         VectorXd intrinsic      = camera_config["camera_matrix"]["data"]            .as<VectorXd>();
-        VectorXd distortion     = camera_config["distortion_coefficients"]["data"]  .as<VectorXd>();
+        std::string dist_model  = camera_config["distortion_model"]                 .as<std::string>();
+        VectorXd dist_coeff     = camera_config["distortion_coefficients"]["data"]  .as<VectorXd>();
+        VectorXd distortion; // Take only radial part -- ignore tangential part
+        if (dist_coeff(4) == 0)
+        {
+            distortion.resize(2);
+            distortion(0) = dist_coeff(0);
+            distortion(1) = dist_coeff(1);
+        }
+        else
+        {
+            distortion.resize(3);
+            distortion(0) = dist_coeff(0);
+            distortion(1) = dist_coeff(1);
+            distortion(2) = dist_coeff(4);
+        }
 
         // Eigen:: to wolf::
         IntrinsicsCamera* intrinsics_cam = new IntrinsicsCamera;
