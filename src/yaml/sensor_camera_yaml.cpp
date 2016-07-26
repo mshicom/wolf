@@ -37,7 +37,16 @@ static IntrinsicsBase* createIntrinsicsCamera(const std::string & _filename_dot_
         std::string dist_model  = camera_config["distortion_model"]                 .as<std::string>();
         VectorXd dist_coeff     = camera_config["distortion_coefficients"]["data"]  .as<VectorXd>();
         VectorXd distortion; // Take only radial part -- ignore tangential part
-        if (dist_coeff(4) == 0)
+        if (dist_coeff(0) == 0)
+        {
+            distortion.resize(0);
+        }
+        else if (dist_coeff(1) == 0)
+        {
+            distortion.resize(1);
+            distortion(0) = dist_coeff(0);
+        }
+        else if (dist_coeff(4) == 0)
         {
             distortion.resize(2);
             distortion(0) = dist_coeff(0);
