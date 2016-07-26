@@ -651,7 +651,11 @@ void ProcessorImageLandmark::drawFeatures(cv::Mat& _image)
         Eigen::Vector4s vector = landmark_ptr->getPPtr()->getVector();
         Eigen::Vector3s point3D;
 
+        std::cout << "Landmark " << counter << std::endl;
+        std::cout << "[m rho]: " << landmark_ptr->getPPtr()->getVector().transpose() << std::endl;
+
         changeOfReference(landmark_ptr,world2cam_translation_,world2cam_orientation_,point3D);
+        std::cout << "X: " << point3D[0] << "; Y: " << point3D[1] << "; Z: " << point3D[2] << std::endl;
 
         //world2CameraFrameTransformation(world2cam_translation_,world2cam_orientation_,point3D);
 
@@ -659,10 +663,9 @@ void ProcessorImageLandmark::drawFeatures(cv::Mat& _image)
         point2D = pinhole::projectPoint(this->getSensorPtr()->getIntrinsicPtr()->getVector(),
                                         ((SensorCamera*)(this->getSensorPtr()))->getDistortionVector(),point3D);
 
-//        std::cout << "Landmark " << counter << std::endl;
-//        std::cout << "x: " << point2D[0] << "; y: " << point2D[1] << std::endl;
-//        std::cout << "is in the image?: "
-//                  << pinhole::isInImage(point2D,params_.image.width,params_.image.height) << std::endl;
+        std::cout << "x: " << point2D[0] << "; y: " << point2D[1] << std::endl;
+        std::cout << "is in the image?: "
+                  << pinhole::isInImage(point2D,params_.image.width,params_.image.height) << std::endl;
 
         if(pinhole::isInImage(point2D,params_.image.width,params_.image.height))
         {
