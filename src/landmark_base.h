@@ -68,6 +68,10 @@ class LandmarkBase : public NodeConstrained<MapBase, NodeTerminus>
          **/
         void setStatus(LandmarkStatus _st);
 
+        /** \brief returns the status
+         **/
+        LandmarkStatus getStatus() const;
+
         /** \brief Fix the Landmark
          **/
         virtual void fix();
@@ -135,6 +139,11 @@ inline void LandmarkBase::setId(unsigned int _id)
     landmark_id_ = _id;
     if (_id > landmark_id_count_)
         landmark_id_count_ = _id;
+}
+
+inline LandmarkStatus LandmarkBase::getStatus() const
+{
+    return status_;
 }
 
 inline void LandmarkBase::removeConstrainedBy(ConstraintBase* _ctr_ptr)

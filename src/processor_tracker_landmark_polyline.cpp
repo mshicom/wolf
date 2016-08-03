@@ -556,8 +556,8 @@ void ProcessorTrackerLandmarkPolyline::establishConstraints()
 
         assert(polyline_landmark != nullptr && polyline_match != nullptr);
 
-        // Modify landmark (only for not closed)
-        if (!polyline_landmark->isClosed())
+        // Modify landmark (only for not closed and not fixed)
+        if (!polyline_landmark->isClosed() && polyline_landmark->getStatus() != LANDMARK_FIXED)
         {
             //std::cout << std::endl << "MODIFY LANDMARK" << std::endl;
             //std::cout << "feature " << polyline_feature->id() << ": " << std::endl;
@@ -858,7 +858,7 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
     std::vector<LandmarkClassification> object_class({CONTAINER, SMALL_CONTAINER, PALLET});
 
     for (auto lmk_ptr : *_lmk_list)
-        if (lmk_ptr->getTypeId() == LANDMARK_POLYLINE_2D)
+        if (lmk_ptr->getTypeId() == LANDMARK_POLYLINE_2D && lmk_ptr->getStatus() != LANDMARK_FIXED)
         {
             LandmarkPolyline2D* polyline_ptr = (LandmarkPolyline2D*)lmk_ptr;
             auto n_defined_points = polyline_ptr->getNPoints() - (polyline_ptr->isFirstDefined() ? 0 : 1) - (polyline_ptr->isLastDefined() ? 0 : 1);
