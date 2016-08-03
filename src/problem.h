@@ -70,9 +70,10 @@ class Problem : public NodeBase
     public:
 
         /** \brief Constructor from frame structure
-         *
+         * \param _frame_structure: the frame structure (2D, 3D, position, orientation, velocity) see wolf.h
+         * \param _max_window_keyframes: amount of key frames in the window. keep all: 0
          */
-        Problem(FrameStructure _frame_structure);
+        Problem(const FrameStructure _frame_structure, const unsigned int _max_window_keyframes = 0);
 
         /** \brief Default destructor (not recommended)
          *

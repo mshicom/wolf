@@ -269,7 +269,7 @@ void CeresManager::update()
     //std::cout << "wrapper residual blocks: " << id_2_residual_idx_.size() << std::endl;
     //std::cout << "parameter blocks: " << ceres_problem_->NumParameterBlocks() << std::endl;
 
-	assert(ceres_problem_->NumResidualBlocks() == id_2_residual_idx_.size() && "ceres residuals different from wrapper residuals");
+	assert(ceres_problem_->NumResidualBlocks() == (int)(id_2_residual_idx_.size()) && "ceres residuals different from wrapper residuals");
 }
 
 void CeresManager::addConstraint(ConstraintBase* _ctr_ptr, unsigned int _id)

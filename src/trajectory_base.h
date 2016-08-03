@@ -25,7 +25,7 @@ class TrajectoryBase : public NodeLinked<Problem,FrameBase>
         FrameBase* last_key_frame_ptr_;  // keeps pointer to the last key frame
         
     public:
-        TrajectoryBase(FrameStructure _frame_sturcture);
+        TrajectoryBase(const FrameStructure _frame_sturcture);
 
         /** \brief Default destructor (not recommended)
          *
@@ -36,11 +36,11 @@ class TrajectoryBase : public NodeLinked<Problem,FrameBase>
         
         /** \brief Add a frame to the trajectory
          **/
-        FrameBase* addFrame(FrameBase* _frame_ptr);
+        virtual FrameBase* addFrame(FrameBase* _frame_ptr);
 
         /** \brief Remove a frame to the trajectory
          **/
-        void removeFrame(const FrameBaseIter& _frame_iter);
+        virtual void removeFrame(const FrameBaseIter& _frame_iter);
 
         /** \brief Returns a pointer to frame list
          **/
@@ -54,10 +54,6 @@ class TrajectoryBase : public NodeLinked<Problem,FrameBase>
          */
         FrameBase* getLastKeyFramePtr();
 
-        /** \brief Sets the pointer to last key frame
-         */
-        void setLastKeyFramePtr(FrameBase* _key_frame_ptr);
-
         /** \brief Returns a list of all constraints in the trajectory thru reference
          **/
         void getConstraintList(ConstraintBaseList & _ctr_list);
@@ -66,17 +62,24 @@ class TrajectoryBase : public NodeLinked<Problem,FrameBase>
          **/
         FrameStructure getFrameStructure() const;
 
+        /** \brief Sets the frame as keyframe
+         **/
+        virtual void setKeyFrame(FrameBase* _frame_ptr);
+
+        /** \brief Finds the closes key frame to a given timestamp
+         **/
+        FrameBase* closestKeyFrameToTimeStamp(const TimeStamp& _ts);
+
+    protected:
+
         /** \brief Sorts the frame by timestamp
          **/
-        void sortFrame(FrameBase* _frame_iter);
+        void sortFrame(FrameBase* _frame_ptr);
 
         /** \brief Compute the position where the frame should be
          **/
         FrameBaseIter computeFrameOrder(FrameBase* _frame_ptr);
 
-        /** \brief Finds the closes key frame to a given timestamp
-         **/
-        FrameBase* closestKeyFrameToTimeStamp(const TimeStamp& _ts);
 };
 
 inline void TrajectoryBase::removeFrame(const FrameBaseIter& _frame_iter)
@@ -97,11 +100,6 @@ inline FrameBase* TrajectoryBase::getLastFramePtr()
 inline FrameBase* TrajectoryBase::getLastKeyFramePtr()
 {
     return last_key_frame_ptr_;
-}
-
-inline void TrajectoryBase::setLastKeyFramePtr(FrameBase* _key_frame_ptr)
-{
-    last_key_frame_ptr_ = _key_frame_ptr;
 }
 
 inline FrameStructure TrajectoryBase::getFrameStructure() const

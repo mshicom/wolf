@@ -4,6 +4,7 @@
 #include "state_quaternion.h"
 #include "hardware_base.h"
 #include "trajectory_base.h"
+#include "trajectory_window.h"
 #include "map_base.h"
 #include "processor_motion.h"
 #include "sensor_base.h"
@@ -23,9 +24,9 @@ std::string uppercase(std::string s) {for (auto & c: s) c = std::toupper(c); ret
 }
 
 
-Problem::Problem(FrameStructure _frame_structure) :
+Problem::Problem(const FrameStructure _frame_structure, const unsigned int _max_window_keyframes) :
         NodeBase("PROBLEM", ""), //
-        location_(TOP), trajectory_ptr_(new TrajectoryBase(_frame_structure)), map_ptr_(new MapBase), hardware_ptr_(
+        location_(TOP), trajectory_ptr_(_max_window_keyframes == 0 ? new TrajectoryBase(_frame_structure) : new TrajectoryWindow(_frame_structure, _max_window_keyframes)), map_ptr_(new MapBase), hardware_ptr_(
                 new HardwareBase), processor_motion_ptr_(nullptr), origin_setted_(false)
 {
     trajectory_ptr_->linkToUpperNode(this);
@@ -484,7 +485,16 @@ void Problem::setOrigin(const Eigen::VectorXs& _origin_pose, const Eigen::Matrix
         origin_setted_ = true;
     }
     else
-        throw std::runtime_error("Origin already setted!");
+    {
+        for (auto cap_ptr : *(trajectory_ptr_->getFrameListPtr()->front()->getCaptureListPtr()))
+            if (cap_ptr->getType() == "FIX")
+            {
+                std::cout << "Problem::setOrigin: already setted, changing the measurement" << std::endl;
+                cap_ptr->setTimeStamp(_ts);
+                cap_ptr->getFeatureListPtr()->front()->setMeasurement(_origin_pose);
+                cap_ptr->getFeatureListPtr()->front()->setMeasurement(_origin_cov);
+            }
+    }
 }
 
 void Problem::loadMap(const std::string& _filename_dot_yaml)

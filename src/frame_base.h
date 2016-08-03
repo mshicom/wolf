@@ -66,7 +66,6 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
         unsigned int id();
 
 
-
         // Frame properties -----------------------------------------------
 
         // KeyFrame / NonKeyFrame
@@ -77,7 +76,6 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
         void fix();
         void unfix();
         bool isFixed() const;
-
 
 
         // Frame values ------------------------------------------------

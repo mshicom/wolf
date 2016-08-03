@@ -174,6 +174,7 @@ SET(HDRS
     state_quaternion.h
     time_stamp.h
     trajectory_base.h
+    trajectory_window.h
     wolf_manager.h)
    
 SET(HDRS_DTASSC
@@ -234,6 +235,7 @@ SET(SRCS
     sensor_odom_2D.cpp
     time_stamp.cpp
     trajectory_base.cpp
+    trajectory_window.cpp
     wolf_manager.cpp
     data_association/association_solver.cpp
     data_association/association_node.cpp

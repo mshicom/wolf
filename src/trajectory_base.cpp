@@ -2,7 +2,7 @@
 
 namespace wolf {
 
-TrajectoryBase::TrajectoryBase(FrameStructure _frame_structure) :
+TrajectoryBase::TrajectoryBase(const FrameStructure _frame_structure) :
     NodeLinked(MID, "TRAJECTORY"),
     frame_structure_(_frame_structure), last_key_frame_ptr_(nullptr)
 {
@@ -47,6 +47,14 @@ FrameBaseIter TrajectoryBase::computeFrameOrder(FrameBase* _frame_ptr)
         if ((*frm_rit)!= _frame_ptr && (*frm_rit)->isKey() && (*frm_rit)->getTimeStamp() < _frame_ptr->getTimeStamp())
             return frm_rit.base();
     return getFrameListPtr()->begin();
+}
+
+void TrajectoryBase::setKeyFrame(FrameBase* _frame_ptr)
+{
+    if (last_key_frame_ptr_ == nullptr || last_key_frame_ptr_->getTimeStamp() < _frame_ptr->getTimeStamp())
+        last_key_frame_ptr_ = _frame_ptr;
+
+    sortFrame(_frame_ptr);
 }
 
 FrameBase* TrajectoryBase::closestKeyFrameToTimeStamp(const TimeStamp& _ts)
