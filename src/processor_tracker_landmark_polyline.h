@@ -52,6 +52,7 @@ struct ProcessorParamsPolyline : public ProcessorParamsBase
         unsigned int new_features_th;
         unsigned int loop_frames_th;
         Scalar time_tolerance;
+        int max_new_features;
 
         // These values below are constant and defined within the class -- provide a setter or accept them at construction time if you need to configure them
         //        Scalar aperture_error_th_ = 20.0 * M_PI / 180.; //20 degrees
@@ -114,17 +115,14 @@ class ProcessorTrackerLandmarkPolyline : public ProcessorTrackerLandmark
          */
         virtual bool voteForKeyFrame();
 
-        /** \brief Detect new Features
-         * \param _capture_ptr Capture for feature detection. Defaults to incoming_ptr_.
-         * \param _new_features_list The list of detected Features. Defaults to member new_features_list_.
-         * \return The number of detected Features.
+        /** \brief Detect new Features in incoming_ptr_ capture and put them in new_features_incoming_
          *
          * This function detects Features that do not correspond to known Features/Landmarks in the system.
+         * \param _max_features max amount of new features to be detected. unlimited: -1
          *
-         * The function sets the member new_features_list_, the list of newly detected features,
-         * to be used for landmark initialization.
+         * \return The number of detected Features.
          */
-        virtual unsigned int detectNewFeatures(const unsigned int& _max_features);
+        virtual unsigned int detectNewFeatures(const int& _max_features);
 
         /** \brief Creates a landmark for each of new_features_last_
          **/
@@ -175,18 +173,11 @@ class ProcessorTrackerLandmarkPolyline : public ProcessorTrackerLandmark
 };
 
 inline ProcessorTrackerLandmarkPolyline::ProcessorTrackerLandmarkPolyline(const ProcessorParamsPolyline& _params) :
-        ProcessorTrackerLandmark(PRC_TRACKER_LANDMARK_CORNER, "TRACKER LANDMARK POLYLINE", 0, _params.time_tolerance),
+        ProcessorTrackerLandmark(PRC_TRACKER_LANDMARK_CORNER, "TRACKER LANDMARK POLYLINE", _params.max_new_features, _params.time_tolerance),
         line_finder_(_params.line_finder_params),
         params_(_params),
         extrinsics_transformation_computed_(false)
 {
-}
-
-inline unsigned int ProcessorTrackerLandmarkPolyline::detectNewFeatures(const unsigned int& _max_features)
-{
-    // already computed since each scan is computed in preprocess()
-    new_features_last_ = std::move(polylines_last_);
-    return new_features_last_.size();
 }
 
 inline void ProcessorTrackerLandmarkPolyline::advance()

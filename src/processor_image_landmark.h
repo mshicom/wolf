@@ -82,7 +82,7 @@ struct ProcessorParamsImage : public ProcessorParamsBase
         }active_search;
         struct Algorithm
         {
-                unsigned int max_new_features; ///< Max nbr. of features to detect in one frame
+                int max_new_features; ///< Max nbr. of new features to detect in one frame (-1 = unlimited)
                 unsigned int min_features_for_keyframe; ///< minimum nbr. of features to vote for keyframe
         }algorithm;
 };
@@ -183,7 +183,7 @@ class ProcessorImageLandmark : public ProcessorTrackerLandmark
          *
          * \return The number of detected Features.
          */
-        virtual unsigned int detectNewFeatures(const unsigned int& _max_new_features);
+        virtual unsigned int detectNewFeatures(const int& _max_new_features);
 
         /** \brief Create one landmark
          *

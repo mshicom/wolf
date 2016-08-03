@@ -129,17 +129,14 @@ class ProcessorTrackerLandmarkCorner : public ProcessorTrackerLandmark
          */
         virtual bool voteForKeyFrame();
 
-        /** \brief Detect new Features
-         * \param _capture_ptr Capture for feature detection. Defaults to incoming_ptr_.
-         * \param _new_features_list The list of detected Features. Defaults to member new_features_list_.
-         * \return The number of detected Features.
+        /** \brief Detect new Features in incoming_ptr_ capture and put them in new_features_incoming_
          *
          * This function detects Features that do not correspond to known Features/Landmarks in the system.
+         * \param _max_features max amount of new features to be detected. unlimited: -1
          *
-         * The function sets the member new_features_list_, the list of newly detected features,
-         * to be used for landmark initialization.
+         * \return The number of detected Features.
          */
-        virtual unsigned int detectNewFeatures(const unsigned int& _max_features);
+        virtual unsigned int detectNewFeatures(const int& _max_features);
 
         /** \brief Create one landmark
          *
@@ -192,13 +189,6 @@ inline ProcessorTrackerLandmarkCorner::~ProcessorTrackerLandmarkCorner()
         corners_incoming_.front()->destruct();
         corners_incoming_.pop_front();
     }
-}
-
-inline unsigned int ProcessorTrackerLandmarkCorner::detectNewFeatures(const unsigned int& _max_features)
-{
-    // already computed since each scan is computed in preprocess()
-    new_features_last_ = std::move(corners_last_);
-    return new_features_last_.size();
 }
 
 inline LandmarkBase* ProcessorTrackerLandmarkCorner::createLandmark(FeatureBase* _feature_ptr)

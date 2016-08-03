@@ -219,7 +219,7 @@ unsigned int ProcessorImage::detect(cv::Mat _image, cv::Rect& _roi, std::vector<
     return _new_keypoints.size();
 }
 
-unsigned int ProcessorImage::detectNewFeatures(const unsigned int& _max_new_features)
+unsigned int ProcessorImage::detectNewFeatures(const int& _max_new_features)
 {
     std::cout << "\n---------------- detectNewFeatures -------------" << std::endl;
     cv::Rect roi;
@@ -228,7 +228,7 @@ unsigned int ProcessorImage::detectNewFeatures(const unsigned int& _max_new_feat
     cv::KeyPointsFilter keypoint_filter;
     unsigned int n_new_features = 0;
 
-    for (unsigned int n_iterations = 0; _max_new_features == 0 || n_iterations < _max_new_features; n_iterations++)
+    for (unsigned int n_iterations = 0; _max_new_features == -1 || n_iterations < _max_new_features; n_iterations++)
     {
         if (active_search_grid_.pickRoi(roi))
         {

@@ -1015,6 +1015,24 @@ ProcessorBase* ProcessorTrackerLandmarkPolyline::create(const std::string& _uniq
     return prc_ptr;
 }
 
+unsigned int ProcessorTrackerLandmarkPolyline::detectNewFeatures(const int& _max_features)
+{
+    // already computed since each scan is computed in preprocess()
+    if (_max_features == 0)
+        polylines_last_.clear();
+    else if (_max_features != -1 && (int)polylines_last_.size() > _max_features)
+    {
+        auto p_it = polylines_last_.begin();
+        for (auto i = 0; i< _max_features; i++)
+            p_it++;
+        polylines_last_.erase(p_it, polylines_last_.end());
+    }
+
+    new_features_last_ = std::move(polylines_last_);
+
+    return new_features_last_.size();
+}
+
 }        //namespace wolf
 
 // Register in the SensorFactory

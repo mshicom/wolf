@@ -12,7 +12,7 @@
 namespace wolf
 {
 
-ProcessorTrackerLandmarkDummy::ProcessorTrackerLandmarkDummy(const unsigned int& _max_new_features) :
+ProcessorTrackerLandmarkDummy::ProcessorTrackerLandmarkDummy(const int& _max_new_features) :
         ProcessorTrackerLandmark(PRC_TRACKER_DUMMY, "TRACKER LANDMARK DUMMY", _max_new_features), n_feature_(0), landmark_idx_non_visible_(0)
 {
     //
@@ -56,12 +56,12 @@ bool ProcessorTrackerLandmarkDummy::voteForKeyFrame()
     return incoming_ptr_->getFeatureListPtr()->size() < 5;
 }
 
-unsigned int ProcessorTrackerLandmarkDummy::detectNewFeatures(const unsigned int& _max_features)
+unsigned int ProcessorTrackerLandmarkDummy::detectNewFeatures(const int& _max_features)
 {
     std::cout << "\tProcessorTrackerLandmarkDummy::detectNewFeatures" << std::endl;
 
     // detecting 5 new features
-    for (unsigned int i = 1; i <= _max_features; i++)
+    for (int i = 1; i <= _max_features; i++)
     {
         n_feature_++;
         new_features_last_.push_back(

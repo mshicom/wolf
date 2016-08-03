@@ -10,7 +10,7 @@
 namespace wolf
 {
 
-ProcessorTracker::ProcessorTracker(ProcessorType _tp, const std::string& _type, const unsigned int _max_new_features, const Scalar& _time_tolerance) :
+ProcessorTracker::ProcessorTracker(ProcessorType _tp, const std::string& _type, const int _max_new_features, const Scalar& _time_tolerance) :
         ProcessorBase(_tp, _type, _time_tolerance), origin_ptr_(nullptr), last_ptr_(nullptr), incoming_ptr_(nullptr),
         max_new_features_(_max_new_features)
 {
@@ -53,6 +53,9 @@ void ProcessorTracker::process(CaptureBase* const _incoming_ptr)
     {
         //std::cout << "FIRST TIME" << std::endl;
         //std::cout << "Features in origin: " << 0 << "; in last: " << 0 << std::endl;
+
+        // process known (in case there is a loaded map)
+        processKnown();
 
         // advance
         advance();

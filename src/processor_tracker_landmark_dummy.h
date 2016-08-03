@@ -16,7 +16,7 @@ namespace wolf
 class ProcessorTrackerLandmarkDummy : public ProcessorTrackerLandmark
 {
     public:
-        ProcessorTrackerLandmarkDummy(const unsigned int& _max_new_features);
+        ProcessorTrackerLandmarkDummy(const int& _max_new_features);
         virtual ~ProcessorTrackerLandmarkDummy();
 
     protected:
@@ -44,16 +44,14 @@ class ProcessorTrackerLandmarkDummy : public ProcessorTrackerLandmark
          */
         virtual bool voteForKeyFrame();
 
-        /** \brief Detect new Features
-         * \param _max_features maximum number of features to detect.
-         * \return The number of detected Features.
+        /** \brief Detect new Features in incoming_ptr_ capture and put them in new_features_incoming_
          *
          * This function detects Features that do not correspond to known Features/Landmarks in the system.
+         * \param _max_features max amount of new features to be detected. unlimited: -1
          *
-         * The function sets the member new_features_list_, the list of newly detected features,
-         * to be used for landmark initialization.
+         * \return The number of detected Features.
          */
-        virtual unsigned int detectNewFeatures(const unsigned int& _max_features);
+        virtual unsigned int detectNewFeatures(const int& _max_features);
 
         /** \brief Create one landmark
          *

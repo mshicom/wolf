@@ -96,7 +96,7 @@ struct ProcessorParamsImage : public ProcessorParamsBase
         }active_search;
         struct Algorithm
         {
-                unsigned int max_new_features; ///< Max nbr. of features to detect in one frame
+                int max_new_features; ///< Max nbr. of new features to detect in one frame (-1 = unlimited)
                 unsigned int min_features_for_keyframe; ///< minimum nbr. of features to vote for keyframe
         }algorithm;
 };
@@ -175,15 +175,14 @@ class ProcessorImage : public ProcessorTrackerFeature
          */
         virtual bool voteForKeyFrame();
 
-        /** \brief Detect new Features
+        /** \brief Detect new Features in incoming_ptr_ capture and put them in new_features_incoming_
          *
-         * This is intended to create Features that are not among the Features already known in the Map.
-         *
-         * This function sets new_features_last_, the list of newly detected features.
+         * This function detects Features that do not correspond to known Features/Landmarks in the system.
+         * \param _max_features max amount of new features to be detected. unlimited: -1
          *
          * \return The number of detected Features.
          */
-        virtual unsigned int detectNewFeatures(const unsigned int& _max_new_features);
+        virtual unsigned int detectNewFeatures(const int& _max_new_features);
 
         /** \brief Create a new constraint
          *

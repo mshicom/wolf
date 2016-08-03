@@ -10,8 +10,8 @@
 namespace wolf
 {
 
-ProcessorTrackerFeature::ProcessorTrackerFeature(ProcessorType _tp, const std::string& _type, const unsigned int _max_new_features) :
-        ProcessorTracker(_tp, _type, _max_new_features)
+ProcessorTrackerFeature::ProcessorTrackerFeature(ProcessorType _tp, const std::string& _type, const int _max_new_features, const Scalar& _time_tolerance) :
+        ProcessorTracker(_tp, _type, _max_new_features, _time_tolerance)
 {
 }
 
@@ -27,6 +27,10 @@ unsigned int ProcessorTrackerFeature::processKnown()
             && "In ProcessorTrackerFeature::processKnown(): incoming_ptr_ feature list must be empty before processKnown()");
     assert(matches_last_from_incoming_.size() == 0
             && "In ProcessorTrackerFeature::processKnown(): match list from last to incoming must be empty before processKnown()");
+
+    // Nothing if there isn't last capture
+    if (last_ptr_ == nullptr)
+        return 0;
 
     // Track features from last_ptr_ to incoming_ptr_
     trackFeatures(*(last_ptr_->getFeatureListPtr()), known_features_incoming_, matches_last_from_incoming_);

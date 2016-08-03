@@ -10,7 +10,7 @@
 namespace wolf
 {
 
-ProcessorTrackerLandmark::ProcessorTrackerLandmark(ProcessorType _tp, const std::string& _type, const unsigned int& _max_new_features, const Scalar& _time_tolerance) :
+ProcessorTrackerLandmark::ProcessorTrackerLandmark(ProcessorType _tp, const std::string& _type, const int& _max_new_features, const Scalar& _time_tolerance) :
     ProcessorTracker(_tp, _type, _max_new_features, _time_tolerance)
 {
 }
@@ -101,6 +101,9 @@ unsigned int ProcessorTrackerLandmark::processKnown()
     //std::cout << "\tincoming correspondences: " << matches_landmark_from_incoming_.size() << std::endl;
     //std::cout << "\tincoming features: " << (incoming_ptr_ == nullptr ? 0 : incoming_ptr_->getFeatureListPtr()->size()) << std::endl;
     //std::cout << "\tincoming new features: " << new_features_incoming_.size() << std::endl;
+
+    if (getProblem()->getMapPtr()->getLandmarkListPtr()->empty())
+        return 0;
 
     // Find landmarks in incoming_ptr_
     FeatureBaseList known_features_list_incoming;

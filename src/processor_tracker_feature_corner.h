@@ -100,17 +100,14 @@ class ProcessorTrackerFeatureCorner : public ProcessorTrackerFeature
          */
         virtual bool voteForKeyFrame();
 
-        /** \brief Detect new Features
-         * \param _capture_ptr Capture for feature detection. Defaults to incoming_ptr_.
-         * \param _new_features_list The list of detected Features. Defaults to member new_features_list_.
-         * \return The number of detected Features.
+        /** \brief Detect new Features in incoming_ptr_ capture and put them in new_features_incoming_
          *
          * This function detects Features that do not correspond to known Features/Landmarks in the system.
+         * \param _max_features max amount of new features to be detected. unlimited: -1
          *
-         * The function sets the member new_features_list_, the list of newly detected features,
-         * to be used for landmark initialization.
+         * \return The number of detected Features.
          */
-        virtual unsigned int detectNewFeatures(const unsigned int& _max_features);
+        virtual unsigned int detectNewFeatures(const int& _max_features);
 
         /** \brief Create a new constraint
          * \param _feature_ptr pointer to the Feature to constrain
@@ -132,7 +129,7 @@ class ProcessorTrackerFeatureCorner : public ProcessorTrackerFeature
 
 inline ProcessorTrackerFeatureCorner::ProcessorTrackerFeatureCorner(const laserscanutils::LineFinderIterativeParams& _line_finder_params,
                                                                     const unsigned int& _n_corners_th) :
-        ProcessorTrackerFeature(PRC_TRACKER_FEATURE_CORNER, "TRACKER FEATURE CORNER", 0), line_finder_(_line_finder_params), n_tracks_th_(_n_corners_th), R_world_sensor_(Eigen::Matrix3s::Identity()), R_robot_sensor_(Eigen::Matrix3s::Identity()), extrinsics_transformation_computed_(false)
+        ProcessorTrackerFeature(PRC_TRACKER_FEATURE_CORNER, "TRACKER FEATURE CORNER"), line_finder_(_line_finder_params), n_tracks_th_(_n_corners_th), R_world_sensor_(Eigen::Matrix3s::Identity()), R_robot_sensor_(Eigen::Matrix3s::Identity()), extrinsics_transformation_computed_(false)
 {
     // TODO Auto-generated constructor stub
 }

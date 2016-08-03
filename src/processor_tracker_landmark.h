@@ -68,7 +68,7 @@ namespace wolf
 class ProcessorTrackerLandmark : public ProcessorTracker
 {
     public:
-        ProcessorTrackerLandmark(ProcessorType _tp, const std::string& _type, const unsigned int& _max_new_features = 0, const Scalar& _time_tolerance = 0.1);
+        ProcessorTrackerLandmark(ProcessorType _tp, const std::string& _type, const int& _max_new_features = -1, const Scalar& _time_tolerance = 0.1);
         virtual ~ProcessorTrackerLandmark();
 
     protected:
@@ -123,17 +123,14 @@ class ProcessorTrackerLandmark : public ProcessorTracker
          */
         unsigned int processNew(const unsigned int& _max_features);
 
-        /** \brief Detect new Features
-         * \param _capture_ptr Capture for feature detection. Defaults to incoming_ptr_.
-         * \param _new_features_list The list of detected Features. Defaults to member new_features_list_.
-         * \return The number of detected Features.
+        /** \brief Detect new Features in incoming_ptr_ capture and put them in new_features_incoming_
          *
          * This function detects Features that do not correspond to known Features/Landmarks in the system.
+         * \param _max_features max amount of new features to be detected. unlimited: -1
          *
-         * The function sets the member new_features_list_, the list of newly detected features,
-         * to be used for landmark initialization.
+         * \return The number of detected Features.
          */
-        virtual unsigned int detectNewFeatures(const unsigned int& _max_features) = 0;
+        virtual unsigned int detectNewFeatures(const int& _max_features) = 0;
 
         /** \brief Creates a landmark for each of new_features_last_
          **/
