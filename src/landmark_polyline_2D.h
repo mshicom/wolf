@@ -39,7 +39,7 @@ class LandmarkPolyline2D : public LandmarkBase
         LandmarkClassification classification_; ///< The classification of the landmark
 
     public:
-        LandmarkPolyline2D(StateBlock* _p_ptr, StateBlock* _o_ptr, const Eigen::MatrixXs& _points, const bool _first_defined, const bool _last_defined, unsigned int _first_id = 0, LandmarkClassification _class = UNCLASSIFIED);
+        LandmarkPolyline2D(StateBlock* _p_ptr, StateBlock* _o_ptr, const Eigen::MatrixXs& _points, const bool _first_defined, const bool _last_defined, unsigned int _first_id = 0, bool _closed = false, LandmarkClassification _class = UNCLASSIFIED);
         virtual ~LandmarkPolyline2D();
 
         /** \brief Gets a const reference to the point state block pointer vector
@@ -98,6 +98,14 @@ class LandmarkPolyline2D : public LandmarkBase
         /** \brief Set the polyline as closed
          **/
         virtual void setClosed();
+
+        /** \brief Fix the Landmark
+         **/
+        virtual void fix();
+
+        /** \brief Unfix the Landmark
+         **/
+        virtual void unfix();
 
         /** \brief merge points
          **/
@@ -158,11 +166,13 @@ inline int LandmarkPolyline2D::getNPoints() const
     return (int)point_state_ptr_vector_.size();
 }
 
-inline int LandmarkPolyline2D::getFirstId() const {
+inline int LandmarkPolyline2D::getFirstId() const
+{
 	return first_id_;
 }
 
-inline int LandmarkPolyline2D::getLastId() const {
+inline int LandmarkPolyline2D::getLastId() const
+{
 	return first_id_ + (int) (point_state_ptr_vector_.size()) - 1;
 }
 
