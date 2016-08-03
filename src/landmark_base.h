@@ -68,13 +68,13 @@ class LandmarkBase : public NodeConstrained<MapBase, NodeTerminus>
          **/
         void setStatus(LandmarkStatus _st);
 
-        /** \brief Sets the Landmark status to fixed
+        /** \brief Fix the Landmark
          **/
-        void fix();
+        virtual void fix();
 
-        /** \brief Sets the Landmark status to estimated
+        /** \brief Unfix the Landmark
          **/
-        void unfix();
+        virtual void unfix();
 
         /** \brief Remove the given constraint from the list. 
          *  If list becomes empty, deletes this object by calling destruct()
@@ -137,22 +137,10 @@ inline void LandmarkBase::setId(unsigned int _id)
         landmark_id_count_ = _id;
 }
 
-inline void LandmarkBase::fix()
-{
-    //std::cout << "Fixing frame " << nodeId() << std::endl;
-    this->setStatus(LANDMARK_FIXED);
-}
-
-inline void LandmarkBase::unfix()
-{
-    //std::cout << "Unfixing frame " << nodeId() << std::endl;
-    this->setStatus(LANDMARK_ESTIMATED);
-}
-
 inline void LandmarkBase::removeConstrainedBy(ConstraintBase* _ctr_ptr)
 {
     NodeConstrained::removeConstrainedBy(_ctr_ptr);
-    if (getConstrainedByListPtr()->empty())
+    if (getConstrainedByListPtr()->empty() && status_ == LANDMARK_ESTIMATED)
         this->destruct();
 }
 

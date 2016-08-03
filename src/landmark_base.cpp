@@ -53,37 +53,43 @@ LandmarkBase::~LandmarkBase()
 void LandmarkBase::setStatus(LandmarkStatus _st)
 {
     status_ = _st;
+}
 
+void LandmarkBase::fix()
+{
+    //std::cout << "Fixing frame " << nodeId() << std::endl;
+    status_ = LANDMARK_FIXED;
     // State Blocks
-    if (status_ == LANDMARK_FIXED)
+    if (p_ptr_ != nullptr)
     {
-        if (p_ptr_!=nullptr)
-        {
-            p_ptr_->fix();
-            if (getProblem() != nullptr)
-                getProblem()->updateStateBlockPtr(p_ptr_);
-        }
-        if (o_ptr_!=nullptr)
-        {
-            o_ptr_->fix();
-            if (getProblem() != nullptr)
-                getProblem()->updateStateBlockPtr(o_ptr_);
-        }
+        p_ptr_->fix();
+        if (getProblem() != nullptr)
+            getProblem()->updateStateBlockPtr(p_ptr_);
     }
-    else if(status_ == LANDMARK_ESTIMATED)
+    if (o_ptr_ != nullptr)
     {
-        if (p_ptr_!=nullptr)
-        {
-            p_ptr_->unfix();
-            if (getProblem() != nullptr)
-                getProblem()->updateStateBlockPtr(p_ptr_);
-        }
-        if (o_ptr_!=nullptr)
-        {
-            o_ptr_->unfix();
-            if (getProblem() != nullptr)
-                getProblem()->updateStateBlockPtr(o_ptr_);
-        }
+        o_ptr_->fix();
+        if (getProblem() != nullptr)
+            getProblem()->updateStateBlockPtr(o_ptr_);
+    }
+}
+
+void LandmarkBase::unfix()
+{
+    //std::cout << "Unfixing frame " << nodeId() << std::endl;
+    this->setStatus(LANDMARK_ESTIMATED);
+    // State Blocks
+    if (p_ptr_ != nullptr)
+    {
+        p_ptr_->unfix();
+        if (getProblem() != nullptr)
+            getProblem()->updateStateBlockPtr(p_ptr_);
+    }
+    if (o_ptr_ != nullptr)
+    {
+        o_ptr_->unfix();
+        if (getProblem() != nullptr)
+            getProblem()->updateStateBlockPtr(o_ptr_);
     }
 }
 
