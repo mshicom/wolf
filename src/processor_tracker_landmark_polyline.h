@@ -39,10 +39,6 @@ struct LandmarkPolylineMatch : public LandmarkMatch
          int feature_match_from_id_;
          int landmark_match_to_id_;
          int feature_match_to_id_;
-//    std::vector<unsigned int> landmark_points_match_;
-//    std::vector<unsigned int> feature_points_match_;
-//    std::vector<unsigned int> feature_points_add_front_;
-//    std::vector<unsigned int> feature_points_add_back_;
 };
 
 struct ProcessorParamsPolyline : public ProcessorParamsBase
@@ -53,12 +49,6 @@ struct ProcessorParamsPolyline : public ProcessorParamsBase
         unsigned int loop_frames_th;
         Scalar time_tolerance;
         int max_new_features;
-
-        // These values below are constant and defined within the class -- provide a setter or accept them at construction time if you need to configure them
-        //        Scalar aperture_error_th_ = 20.0 * M_PI / 180.; //20 degrees
-        //        Scalar angular_error_th_ = 10.0 * M_PI / 180.; //10 degrees;
-        //        Scalar position_error_th_ = 1;
-        //        Scalar min_features_ratio_th_ = 0.5;
 };
 
 class ProcessorTrackerLandmarkPolyline : public ProcessorTrackerLandmark
