@@ -65,7 +65,6 @@ class Problem : public NodeBase
         StateBlockList state_block_ptr_list_;
         std::list<StateBlockNotification> state_block_notification_list_;
         std::list<ConstraintNotification> constraint_notification_list_;
-        bool origin_setted_;
 
     public:
 
@@ -89,14 +88,12 @@ class Problem : public NodeBase
          */
         virtual void destruct() final;
 
-        /** \brief Sets an origin frame with a covariance
+        /** \brief Sets a pose estimation with a covariance and timestamp
          *
-         * Sets an origin frame with a covariance
-         *
+         * Sets a pose estimation with a covariance and timestamp. It removes other previous pose estimation if there is any.
          */
-        virtual void setOrigin(const Eigen::VectorXs& _origin_pose, const Eigen::MatrixXs& _origin_cov,
-                               const TimeStamp& _ts);
-
+        virtual void setPoseEstimation(const Eigen::VectorXs& _origin_pose, const Eigen::MatrixXs& _origin_cov,
+                                       const TimeStamp& _ts);
 
         /** \brief add sensor to hardware
          * \param _sen_ptr pointer to the sensor to add

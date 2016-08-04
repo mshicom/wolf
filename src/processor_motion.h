@@ -381,11 +381,15 @@ inline void ProcessorMotion::setOrigin(FrameBase* _origin_frame)
     assert(_origin_frame->getTrajectoryPtr() != nullptr && "ProcessorMotion::setOrigin: origin frame must be in the trajectory.");
     assert(_origin_frame->isKey() && "ProcessorMotion::setOrigin: origin frame must be KEY FRAME.");
 
-    // make (empty) origin Capture
-    origin_ptr_ = new CaptureMotion2(_origin_frame->getTimeStamp(), this->getSensorPtr(), Eigen::VectorXs::Zero(data_size_),
-                                     Eigen::MatrixXs::Zero(data_size_, data_size_), nullptr);
-    // Add origin capture to origin frame
-    _origin_frame->addCapture(origin_ptr_);
+    // make (empty) origin capture if _origin_frame hasn't any
+    origin_ptr_ = _origin_frame->findCaptureOfSensor(getSensorPtr());
+    if (origin_ptr_ == nullptr)
+    {
+        origin_ptr_ = new CaptureMotion2(_origin_frame->getTimeStamp(), this->getSensorPtr(), Eigen::VectorXs::Zero(data_size_),
+                                         Eigen::MatrixXs::Zero(data_size_, data_size_), nullptr);
+        // Add origin capture to origin frame
+        _origin_frame->addCapture(origin_ptr_);
+    }
 
     // make (emtpy) last Capture
     last_ptr_ = new CaptureMotion2(_origin_frame->getTimeStamp(), this->getSensorPtr(), Eigen::VectorXs::Zero(data_size_),
@@ -402,6 +406,8 @@ inline void ProcessorMotion::setOrigin(FrameBase* _origin_frame)
 
 inline void ProcessorMotion::process(CaptureBase* _incoming_ptr)
 {
+    assert(origin_ptr_ != nullptr && "process capture without origin capture");
+
     //std::cout << "ProcessorMotion::process:" << std::endl;
     incoming_ptr_ = (CaptureMotion2*)(_incoming_ptr);
     preProcess();
@@ -532,6 +538,13 @@ inline bool ProcessorMotion::keyFrameCallback(FrameBase* _keyframe_ptr, const Sc
     //std::cout << "\tnew keyframe " << _keyframe_ptr->id() << ": " << _keyframe_ptr->getState().transpose() << std::endl;
     //std::cout << "\torigin keyframe " << origin_ptr_->getFramePtr()->id() << std::endl;
 
+    // no origin
+    if (origin_ptr_ == nullptr)
+    {
+        setOrigin(_keyframe_ptr);
+        return true;
+    }
+
     // get time stamp
     TimeStamp ts = _keyframe_ptr->getTimeStamp();
 
@@ -539,11 +552,11 @@ inline bool ProcessorMotion::keyFrameCallback(FrameBase* _keyframe_ptr, const Sc
     CaptureMotion2* capture_ptr = findCaptureContainingTimeStamp(ts);
     assert(capture_ptr != nullptr && "ProcessorMotion::keyFrameCallback: no motion capture containing the required TimeStamp found");
 
-    FrameBase* key_capture_origin = capture_ptr->getOriginFramePtr();
+    FrameBase* keyframe_capture_origin = capture_ptr->getOriginFramePtr();
 
     // create motion capture
     CaptureMotion2* key_capture_ptr = new CaptureMotion2(ts, this->getSensorPtr(), Eigen::VectorXs::Zero(data_size_),
-                                                         Eigen::MatrixXs::Zero(data_size_, data_size_), key_capture_origin);
+                                                         Eigen::MatrixXs::Zero(data_size_, data_size_), keyframe_capture_origin);
 
     // add motion capture to keyframe
     _keyframe_ptr->addCapture(key_capture_ptr);
@@ -572,7 +585,7 @@ inline bool ProcessorMotion::keyFrameCallback(FrameBase* _keyframe_ptr, const Sc
                                                    key_capture_ptr->getBufferPtr()->get().back().delta_integr_cov_ :
                                                    Eigen::MatrixXs::Identity(delta_size_, delta_size_)*1e-8);
     key_capture_ptr->addFeature(key_feature_ptr);
-    key_feature_ptr->addConstraint(createConstraint(key_feature_ptr, key_capture_origin));
+    key_feature_ptr->addConstraint(createConstraint(key_feature_ptr, keyframe_capture_origin));
 
     // Fix the remaining capture
     if (capture_ptr == last_ptr_)
@@ -699,7 +712,7 @@ inline CaptureMotion2* ProcessorMotion::findCaptureContainingTimeStamp(const Tim
             return nullptr;
         else
         {
-            CaptureBase* capture_base_ptr = capture_ptr->getOriginFramePtr()->hasCaptureOf(getSensorPtr());
+            CaptureBase* capture_base_ptr = capture_ptr->getOriginFramePtr()->findCaptureOfSensor(getSensorPtr());
             if (capture_base_ptr == nullptr)
                 return nullptr;
             else

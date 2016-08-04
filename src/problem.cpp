@@ -26,8 +26,11 @@ std::string uppercase(std::string s) {for (auto & c: s) c = std::toupper(c); ret
 
 Problem::Problem(const FrameStructure _frame_structure, const unsigned int _max_window_keyframes) :
         NodeBase("PROBLEM", ""), //
-        location_(TOP), trajectory_ptr_(_max_window_keyframes == 0 ? new TrajectoryBase(_frame_structure) : new TrajectoryWindow(_frame_structure, _max_window_keyframes)), map_ptr_(new MapBase), hardware_ptr_(
-                new HardwareBase), processor_motion_ptr_(nullptr), origin_setted_(false)
+        location_(TOP),
+        trajectory_ptr_(_max_window_keyframes == 0 ? new TrajectoryBase(_frame_structure) : new TrajectoryWindow(_frame_structure, _max_window_keyframes)),
+        map_ptr_(new MapBase),
+        hardware_ptr_(new HardwareBase),
+        processor_motion_ptr_(nullptr)
 {
     trajectory_ptr_->linkToUpperNode(this);
     map_ptr_->linkToUpperNode(this);
@@ -77,10 +80,6 @@ ProcessorBase* Problem::installProcessor(const std::string& _prc_type, //
 {
     ProcessorBase* prc_ptr = ProcessorFactory::get().create(uppercase(_prc_type), _unique_processor_name, _prc_params);
     _corresponding_sensor_ptr->addProcessor(prc_ptr);
-
-    // setting the origin in all processor motion if origin already setted
-    if (prc_ptr->isMotion() && origin_setted_)
-        ((ProcessorMotion*)prc_ptr)->setOrigin(getLastKeyFramePtr());
 
     // setting the main processor motion
     if (prc_ptr->isMotion() && processor_motion_ptr_ == nullptr)
@@ -243,10 +242,10 @@ bool Problem::permitKeyFrame(ProcessorBase* _processor_ptr)
 
 void Problem::keyFrameCallback(FrameBase* _keyframe_ptr, ProcessorBase* _processor_ptr, const Scalar& _time_tolerance)
 {
-    //std::cout << "Problem::keyFrameCallback: processor " << _processor_ptr->getName() << std::endl;
+    //std::cout << "Problem::keyFrameCallback: processor " << (_processor_ptr == nullptr ? "fix" : _processor_ptr->getName()) << std::endl;
     for (auto sensor : (*hardware_ptr_->getSensorListPtr()))
     	for (auto processor : (*sensor->getProcessorListPtr()))
-    		if (processor->id() != _processor_ptr->id())
+    		if (processor != _processor_ptr)
                 processor->keyFrameCallback(_keyframe_ptr, _time_tolerance);
 }
 
@@ -450,51 +449,39 @@ StateBlockList* Problem::getStateListPtr()
     return &state_block_ptr_list_;
 }
 
-wolf::SensorBase* Problem::getSensorPtr(const std::string& _sensor_name)
+SensorBase* Problem::getSensorPtr(const std::string& _sensor_name)
 {
-    auto sen_it = std::find_if(getHardwarePtr()->getSensorListPtr()->begin(),
-                               getHardwarePtr()->getSensorListPtr()->end(), [&](SensorBase* sb)
-                               {
-                                   return sb->getName() == _sensor_name;
-                               }); // lambda function for the find_if
-    if (sen_it == getHardwarePtr()->getSensorListPtr()->end())
-        return nullptr;
-
-    return (*sen_it);
+    return hardware_ptr_->findSensor(_sensor_name);
 }
 
-void Problem::setOrigin(const Eigen::VectorXs& _origin_pose, const Eigen::MatrixXs& _origin_cov, const TimeStamp& _ts)
+void Problem::setPoseEstimation(const Eigen::VectorXs& _estimated_pose, const Eigen::MatrixXs& _estimated_cov, const TimeStamp& _ts)
 {
-    if (!origin_setted_)
-    {
-        // Create origin frame
-        FrameBase* origin_frame_ptr = createFrame(KEY_FRAME, _origin_pose, _ts);
-        // FIXME: create a fix sensor
-        IntrinsicsBase fix_instrinsics;
-        SensorBase* fix_sensor_ptr = installSensor("GPS", "initial pose", Eigen::VectorXs::Zero(3), &fix_instrinsics );
-        CaptureFix* init_capture = new CaptureFix(_ts, fix_sensor_ptr, _origin_pose, _origin_cov);
-        origin_frame_ptr->addCapture(init_capture);
-        init_capture->process();
+    // Find sensor fix ptr (and create it if it's not found)
+    SensorBase* sensor_fix = hardware_ptr_->findSensor("initial pose");
+    if (sensor_fix == nullptr)
+        sensor_fix = installSensor("FIX", "initial pose", Eigen::VectorXs::Zero(0), nullptr );
 
-        // notify processors about the new keyframe
-        for (auto sensor_ptr : (*hardware_ptr_->getSensorListPtr()))
-            for (auto processor_ptr : (*sensor_ptr->getProcessorListPtr()))
-                if (processor_ptr->isMotion())
-                    ((ProcessorMotion*)processor_ptr)->setOrigin(origin_frame_ptr);
-
-        origin_setted_ = true;
-    }
-    else
-    {
-        for (auto cap_ptr : *(trajectory_ptr_->getFrameListPtr()->front()->getCaptureListPtr()))
-            if (cap_ptr->getType() == "FIX")
+    // Remove previous pose estimation (if there is any)
+    for (auto key_frame_ptr : *(trajectory_ptr_->getFrameListPtr()))
+        if (key_frame_ptr->isKey())
+        {
+            auto prev_fix_cap = key_frame_ptr->findCaptureOfSensor(sensor_fix);
+            if (prev_fix_cap != nullptr)
             {
-                std::cout << "Problem::setOrigin: already setted, changing the measurement" << std::endl;
-                cap_ptr->setTimeStamp(_ts);
-                cap_ptr->getFeatureListPtr()->front()->setMeasurement(_origin_pose);
-                cap_ptr->getFeatureListPtr()->front()->setMeasurement(_origin_cov);
+                prev_fix_cap->destruct();
+                std::cout << "previous fix removed" << std::endl;
+                break; // there is only one fix capture
             }
-    }
+        }
+
+    // create fix capture
+    FrameBase* keyframe_ptr = createFrame(KEY_FRAME, _estimated_pose, _ts);
+    CaptureFix* fix_capture = new CaptureFix(_ts, sensor_fix, _estimated_pose, _estimated_cov);
+    keyframe_ptr->addCapture(fix_capture);
+    fix_capture->process();
+
+    // notify processors about the new keyframe
+    keyFrameCallback(keyframe_ptr, nullptr , 0.1);
 }
 
 void Problem::loadMap(const std::string& _filename_dot_yaml)
