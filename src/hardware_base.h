@@ -34,6 +34,12 @@ class HardwareBase : public NodeLinked<Problem, SensorBase>
 
         SensorBaseList* getSensorListPtr();
 
+        /** \brief Finds a sensor by name
+         *
+         * Finds a sensor by name, if not found nullptr is returned
+         **/
+        SensorBase* findSensor(const std::string _sensor_name);
+
 };
 
 } // namespace wolf

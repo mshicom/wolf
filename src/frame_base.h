@@ -104,7 +104,11 @@ class FrameBase : public NodeConstrained<TrajectoryBase,CaptureBase>
         CaptureBase* addCapture(CaptureBase* _capt_ptr);
         void removeCapture(CaptureBaseIter& _capt_iter);
         void removeCapture(CaptureBase* _capt_ptr);
-        CaptureBase* hasCaptureOf(const SensorBase* _sensor_ptr);
+
+        /** \brief Find if the frame has a capture of a sensor (by pointer or name)
+         **/
+        CaptureBase* findCaptureOfSensor(const SensorBase* _sensor_ptr);
+        CaptureBase* findCaptureOfSensor(const std::string _sensor_name);
 
         void getConstraintList(ConstraintBaseList & _ctr_list);
 

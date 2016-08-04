@@ -31,4 +31,17 @@ void HardwareBase::removeSensor(SensorBase* _sensor_ptr)
     removeDownNode(_sensor_ptr->nodeId());
 }
 
+SensorBase* HardwareBase::findSensor(const std::string _sensor_name)
+{
+    auto sen_it = std::find_if(getSensorListPtr()->begin(),
+                               getSensorListPtr()->end(), [&](SensorBase* sb)
+                               {
+                                   return sb->getName() == _sensor_name;
+                               }); // lambda function for the find_if
+    if (sen_it == getSensorListPtr()->end())
+        return nullptr;
+
+    return (*sen_it);
+}
+
 } // namespace wolf

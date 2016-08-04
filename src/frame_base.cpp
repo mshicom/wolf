@@ -159,12 +159,30 @@ void FrameBase::getState(Eigen::VectorXs& state) const
     }
 }
 
-CaptureBase* FrameBase::hasCaptureOf(const SensorBase* _sensor_ptr)
+CaptureBase* FrameBase::findCaptureOfSensor(const SensorBase* _sensor_ptr)
 {
-    for (auto capture_ptr : *getCaptureListPtr())
-        if (capture_ptr->getSensorPtr() == _sensor_ptr)
-            return capture_ptr;
-    return nullptr;
+    auto cap_it = std::find_if(getCaptureListPtr()->begin(),
+                               getCaptureListPtr()->end(), [&](CaptureBase* cp)
+                               {
+                                   return cp->getSensorPtr() == _sensor_ptr;
+                               }); // lambda function for the find_if
+    if (cap_it == getCaptureListPtr()->end())
+        return nullptr;
+
+    return (*cap_it);
+}
+
+CaptureBase* FrameBase::findCaptureOfSensor(const std::string _sensor_name)
+{
+    auto cap_it = std::find_if(getCaptureListPtr()->begin(),
+                               getCaptureListPtr()->end(), [&](CaptureBase* cp)
+                               {
+                                   return cp->getSensorPtr()->getName() == _sensor_name;
+                               }); // lambda function for the find_if
+    if (cap_it == getCaptureListPtr()->end())
+        return nullptr;
+
+    return (*cap_it);
 }
 
 void FrameBase::getConstraintList(ConstraintBaseList & _ctr_list)
