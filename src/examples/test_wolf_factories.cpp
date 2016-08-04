@@ -90,7 +90,7 @@ int main(void)
     // print available sensors
     for (auto sen : *(problem.getHardwarePtr()->getSensorListPtr())){
         cout << "Sensor " << setw(2) << left << sen->id()
-                << " | type " << setw(2) << sen->typeId()
+                << " | type " << setw(2) << sen->getTypeId()
                 << ": " << setw(8) << sen->getType()
                 << " | name: " << sen->getName() << endl;
     }

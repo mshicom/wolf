@@ -165,6 +165,7 @@ SET(HDRS
     sensor_base.h
     sensor_camera.h
     sensor_factory.h
+    sensor_fix.h
     sensor_gps.h
     sensor_gps_fix.h
     sensor_imu.h
@@ -229,6 +230,7 @@ SET(SRCS
     sensor_base.cpp
     sensor_camera.cpp
     sensor_factory.cpp
+    sensor_fix.cpp
     sensor_gps.cpp
     sensor_gps_fix.cpp
     sensor_imu.cpp

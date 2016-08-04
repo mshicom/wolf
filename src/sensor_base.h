@@ -88,7 +88,7 @@ class SensorBase : public NodeLinked<HardwareBase, ProcessorBase>
 
         unsigned int id();
 
-        SensorType typeId();
+        SensorType getTypeId();
 
         ProcessorBase* addProcessor(ProcessorBase* _proc_ptr);
 
@@ -126,7 +126,7 @@ inline unsigned int SensorBase::id()
     return sensor_id_;
 }
 
-inline wolf::SensorType SensorBase::typeId()
+inline wolf::SensorType SensorBase::getTypeId()
 {
     return type_id_;
 }

@@ -216,7 +216,7 @@ typedef enum
     SEN_GPS_RAW,        ///< GPS pseudo ranges, Doppler and satellite ephemerides
     SEN_LIDAR,		    ///< Laser Range Finder, 2D
     SEN_RADAR,		    ///< Radar
-    SEN_ABSOLUTE_POSE   ///< Full absolute pose (XYZ+quaternion)
+    SEN_ABSOLUTE_POSE   ///< Full absolute pose (XY+theta or XYZ+quaternion)
 } SensorType;
 
 /** \brief Enumeration of all possible Processor types
