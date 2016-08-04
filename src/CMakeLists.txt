@@ -99,6 +99,22 @@ ENDIF(YAMLCPP_FOUND)
 SET(HDRS_BASE
     wolf.h)
 
+SET(${PROJECT_NAME}_MATH_HEADERS
+  math/sincos.hpp
+  )
+
+SET(${PROJECT_NAME}_SPATIAL_HEADERS
+  spatial/symmetric3.hpp
+  spatial/se3.hpp
+  spatial/motion.hpp
+  spatial/inertia.hpp
+  spatial/fwd.hpp
+  spatial/skew.hpp
+  spatial/act-on-set.hpp
+  spatial/explog.hpp
+  spatial/frame.hpp
+  )
+
 SET(HDRS
     capture_base.h
     capture_fix.h
@@ -165,7 +181,9 @@ SET(HDRS
     state_quaternion.h
     time_stamp.h
     trajectory_base.h
-    wolf_manager.h)
+    wolf_manager.h
+	${${PROJECT_NAME}_MATH_HEADERS}
+	${${PROJECT_NAME}_SPATIAL_HEADERS})
    
 SET(HDRS_DTASSC
     data_association/matrix.h
@@ -226,6 +244,7 @@ SET(SRCS
     data_association/association_node.cpp
     data_association/association_tree.cpp
     data_association/association_nnls.cpp)
+
 
 #optional HDRS and SRCS
 IF (Ceres_FOUND)
