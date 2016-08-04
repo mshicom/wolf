@@ -43,7 +43,7 @@ class ProcessorIMU : public ProcessorMotion{
             //Euler integration (zero-order integration) for inputs, non-integration for perturbation (perturbation is already integrated)
 //            adt = (am - ab)*dt - an;
 //            wdt = (wm - wb)*dt - wn;
-            Eigen::Vector6s random_walk() = Eigen::Vector6s::Random();
+            Eigen::Vector6s random_walk() = Eigen::Vector6s::Random(); //do it more precisely
             Eigen::Vector6s data_euler_int;
             data_euler_int = (_data.head<6>() - _data.tail<6>())*_dt - random_walk();
 //            ADT_am = dt;
@@ -102,15 +102,23 @@ class ProcessorIMU : public ProcessorMotion{
         }
 
         /** \brief composes a delta-state on top of a state
-         * \param _x the initial state
+         * \param _x the initial state (e.g [0:2]-> position, [3:6]->orientation quaternion, [10:12]-> Acceleration bias, [13:15]->Gyroscope Bias)
          * \param _delta the delta-state
          * \param _x_plus_delta the updated state. It has the same format as the initial state.
+         * (delta format is [0:2]-> position, [3:6]->orientation quaternion, [7:9]->velocity, [10:12]-> Acceleration bias, [13:15]->Gyroscope Bias)
          *
          * This function implements the composition (+) so that _x2 = _x1 (+) _delta.
          */
         virtual void xPlusDelta(const Eigen::VectorXs& _x, const Eigen::VectorXs& _delta, const Scalar _dt, Eigen::VectorXs& _x_plus_delta)
         {
             // TODO: all the work to be done here
+            const Eigen::Vector3s theta = _delta.segment<4>(3);
+            const Eigen::Vector3s position = _delta.segment<3>(0);
+            const Eigen::Vector3s velocity = _delta.segment<3>(7);
+
+            //map back angular velocity in tangent space
+            //const Eigen::Vector3s wdt_tangent = exp(); //apply exp() to x_w (_x.segment.head<7>)
+
 
         }
 
