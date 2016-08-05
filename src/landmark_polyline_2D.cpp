@@ -202,14 +202,14 @@ void LandmarkPolyline2D::defineExtreme(const bool _back)
 
 void LandmarkPolyline2D::setClosed()
 {
-    std::cout << "setting polyline landmark closed" << std::endl;
+    //std::cout << "setting polyline landmark closed" << std::endl;
 
     assert(getNPoints() - (first_defined_ ? 0 : 1) - (last_defined_ ? 0 : 1)  >= 2 && "closing a polyline with less than 2 defined points");
 
     // merge first not defined with last defined
     if (!first_defined_)
     {
-        std::cout << "not defined first point: merging with last definite point" << std::endl;
+        //std::cout << "not defined first point: merging with last definite point" << std::endl;
 
         mergePoints(first_id_, getLastId() - (last_defined_ ? 0 : 1));
         first_id_++;
@@ -218,7 +218,7 @@ void LandmarkPolyline2D::setClosed()
     // merge last not defined with first (defined for sure)
     if (!last_defined_)
     {
-        std::cout << "not defined last point: merging with first point" << std::endl;
+        //std::cout << "not defined last point: merging with first point" << std::endl;
 
         mergePoints(getLastId(), first_id_);
         last_defined_ = true;
@@ -252,7 +252,7 @@ void LandmarkPolyline2D::unfix()
 
 void LandmarkPolyline2D::mergePoints(int _remove_id, int _remain_id)
 {
-    std::cout << "merge points: remove " << _remove_id << " and keep " << _remain_id << " (ids: " << first_id_ << " to " << getLastId() << ")" << std::endl;
+    //std::cout << "merge points: remove " << _remove_id << " and keep " << _remain_id << " (ids: " << first_id_ << " to " << getLastId() << ")" << std::endl;
 
     assert(_remove_id >= first_id_ && _remove_id <= getLastId());
     assert(_remain_id >= first_id_ && _remain_id <= getLastId());
@@ -261,11 +261,11 @@ void LandmarkPolyline2D::mergePoints(int _remove_id, int _remain_id)
 
     // take a defined extreme as remaining
     StateBlock* remove_state = getPointStateBlockPtr(_remove_id);
-    std::cout << "state block to remove " << remove_state->getVector().transpose() << std::endl;
+    //std::cout << "state block to remove " << remove_state->getVector().transpose() << std::endl;
 
     // Change constraints from remove_state to remain_state
     ConstraintBaseList old_constraints_list = *getConstrainedByListPtr();
-    std::cout << "changing constraints: " << old_constraints_list.size() << std::endl;
+    //std::cout << "changing constraints: " << old_constraints_list.size() << std::endl;
     ConstraintBase* new_ctr_ptr = nullptr;
     for (auto ctr_ptr : old_constraints_list)
     {
@@ -311,8 +311,8 @@ void LandmarkPolyline2D::mergePoints(int _remove_id, int _remain_id)
         // If new constraint
         if (new_ctr_ptr != nullptr)
         {
-            std::cout << "created new constraint: " << new_ctr_ptr->id() << std::endl;
-            std::cout << "deleting constraint: " << ctr_ptr->id() << std::endl;
+            //std::cout << "created new constraint: " << new_ctr_ptr->id() << std::endl;
+            //std::cout << "deleting constraint: " << ctr_ptr->id() << std::endl;
 
             // add new constraint
             ctr_ptr->getFeaturePtr()->addConstraint(new_ctr_ptr);
@@ -327,14 +327,14 @@ void LandmarkPolyline2D::mergePoints(int _remove_id, int _remain_id)
     // Remove remove_state
     if (getProblem() != nullptr)
         getProblem()->removeStateBlockPtr(remove_state);
-    std::cout << "state removed " << std::endl;
+    //std::cout << "state removed " << std::endl;
 
     delete remove_state;
-    std::cout << "state deleted " << std::endl;
+    //std::cout << "state deleted " << std::endl;
 
     // remove element from deque
     point_state_ptr_vector_.erase(point_state_ptr_vector_.begin() + _remove_id - first_id_);
-    std::cout << "state removed from point vector " << std::endl;
+    //std::cout << "state removed from point vector " << std::endl;
 }
 
 void LandmarkPolyline2D::registerNewStateBlocks()
@@ -366,7 +366,6 @@ LandmarkBase* LandmarkPolyline2D::create(const YAML::Node& _lmk_node)
         points.col(i)               = _lmk_node["points"][i].as<Eigen::Vector2s>();
 
     // Create a new landmark
-    std::cout << "LandmarkPolyline2D::create: creating landmark" << std::endl;
     LandmarkPolyline2D* lmk_ptr = new LandmarkPolyline2D(new StateBlock(pos), new StateBlock(ori), points, first_defined, last_defined, first_id, closed, classification);
     lmk_ptr->setId(id);
 

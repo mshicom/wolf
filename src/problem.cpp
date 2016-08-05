@@ -465,6 +465,7 @@ void Problem::setPoseEstimation(const Eigen::VectorXs& _estimated_pose, const Ei
     for (auto key_frame_ptr : *(trajectory_ptr_->getFrameListPtr()))
         if (key_frame_ptr->isKey())
         {
+            assert(!key_frame_ptr->isFixed());
             auto prev_fix_cap = key_frame_ptr->findCaptureOfSensor(sensor_fix);
             if (prev_fix_cap != nullptr)
             {

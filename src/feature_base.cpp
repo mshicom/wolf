@@ -35,7 +35,7 @@ FeatureBase::~FeatureBase()
 
     while (!getConstrainedByListPtr()->empty())
     {
-        //std::cout << "destruct() constraint " << (*constrained_by_list_.begin())->nodeId() << std::endl;
+        //std::cout << "destruct() constraint " << getConstrainedByListPtr()->front()->id() << std::endl;
         getConstrainedByListPtr()->front()->destruct();
         //std::cout << "deleted " << std::endl;
     }
