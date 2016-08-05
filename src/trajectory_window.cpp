@@ -23,8 +23,6 @@ TrajectoryWindow::~TrajectoryWindow()
 
 FrameBase* TrajectoryWindow::addFrame(FrameBase* _frame_ptr)
 {
-    std::cout << "TrajectoryWindow::addFrame: " << _frame_ptr->id() << std::endl;
-
     // add frame
     FrameBase* new_frame = TrajectoryBase::addFrame(_frame_ptr);
 
@@ -34,8 +32,6 @@ FrameBase* TrajectoryWindow::addFrame(FrameBase* _frame_ptr)
         window_keyframes_++;
         manageWindow();
     }
-
-    std::cout << "window keyframes: " << window_keyframes_ << std::endl;
 
     return new_frame;
 }
@@ -60,7 +56,6 @@ void TrajectoryWindow::manageWindow()
     // threshold exceeded -> remove first keyframe
     if (window_keyframes_ > max_window_keyframes_)
     {
-        std::cout << "max_window_keyframes exceed" << std::endl;
         // find first keyframe
         auto first_key_frame_it = getDownNodeListPtr()->begin();
         while (!(*first_key_frame_it)->isKey() && first_key_frame_it != getDownNodeListPtr()->end())
