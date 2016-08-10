@@ -105,7 +105,7 @@ SET(HDRS
     capture_base.h
     capture_fix.h
     capture_gps_fix.h
-    capture_motion2.h
+    #capture_motion2.h
     capture_imu.h
     capture_void.h
     constraint_analytic.h
