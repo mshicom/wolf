@@ -456,6 +456,13 @@ SensorBase* Problem::getSensorPtr(const std::string& _sensor_name)
 
 void Problem::setPoseEstimation(const Eigen::VectorXs& _estimated_pose, const Eigen::MatrixXs& _estimated_cov, const TimeStamp& _ts)
 {
+
+    // store the prior of the keyframe
+    Eigen::VectorXs prior(getStateAtTimeStamp(_ts));
+
+    // store transformation
+    Eigen::Vector
+
     // Find sensor fix ptr (and create it if it's not found)
     SensorBase* sensor_fix = hardware_ptr_->findSensor("initial pose");
     if (sensor_fix == nullptr)
@@ -483,6 +490,8 @@ void Problem::setPoseEstimation(const Eigen::VectorXs& _estimated_pose, const Ei
 
     // notify processors about the new keyframe
     keyFrameCallback(keyframe_ptr, nullptr , 0.1);
+
+
 }
 
 void Problem::loadMap(const std::string& _filename_dot_yaml)

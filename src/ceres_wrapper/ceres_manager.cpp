@@ -276,7 +276,7 @@ void CeresManager::addConstraint(ConstraintBase* _ctr_ptr, unsigned int _id)
 {
     id_2_costfunction_[_id] = createCostFunction(_ctr_ptr);
 
-    //std::cout << "adding residual " << _ctr_ptr->id() << std::endl;
+    //std::cout << "adding residual "  << _ctr_ptr->getType() << ": " << _ctr_ptr->id() << std::endl;
 
     if (_ctr_ptr->getApplyLossFunction())
         id_2_residual_idx_[_id] = ceres_problem_->AddResidualBlock(id_2_costfunction_[_id], new ceres::CauchyLoss(0.5), _ctr_ptr->getStateBlockPtrVector());

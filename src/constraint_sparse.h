@@ -536,7 +536,9 @@ void ConstraintSparse<MEASUREMENT_SIZE,
             state_block_sizes_vector_.resize(ii);
             break;
         }
+
     }
+	std::cout << "resize vectors " << this->getType() << ": " << state_block_sizes_vector_.size() << std::endl;
 }
 
 } // namespace wolf

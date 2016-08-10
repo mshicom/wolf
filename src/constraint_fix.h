@@ -49,30 +49,29 @@ class ConstraintFix: public ConstraintSparse<3,2,1>
 template<typename T>
 inline bool ConstraintFix::operator ()(const T* const _p, const T* const _o, T* _residuals) const
 {
+
+    Eigen::Map<Eigen::Matrix<T,3,1>> residuals_map(_residuals);
+    Eigen::Map<const Eigen::Matrix<T,2,1>> robot_position_map(_p);
+
     std::cout << "computing constraint fix " << ((ConstraintBase*)this)->id() << std::endl;
     std::cout << "\tmeasurement: " << getMeasurement().transpose() << std::endl;
     std::cout << "\tstate x:  " << _p[0] << std::endl;
     std::cout << "\tstate y:  " << _p[1] << std::endl;
     std::cout << "\tstate th: " << _o[0] << std::endl;
 
-    _residuals[0] = (T(getMeasurement()(0)) - _p[0]) / T(sqrt(getMeasurementCovariance()(0, 0)));
-    _residuals[1] = (T(getMeasurement()(1)) - _p[1]) / T(sqrt(getMeasurementCovariance()(1, 1)));
-    _residuals[2] = T(getMeasurement()(2)) - _o[0];
+    residuals_map.head(2) = getMeasurement().head(2).cast<T>() - robot_position_map;
+    residuals_map(2) = T(getMeasurement()(2)) - _o[0];
 
-    //std::cout << "is > PI        " << bool(_residuals[2] > T(2*M_PI)) << std::endl;
-    //std::cout << "is >= PI       " << bool(_residuals[2] <= T(-2*M_PI)) << std::endl;
+    while (residuals_map(2) > T(M_PI))
+    	residuals_map(2) = residuals_map(2) - T(2 * M_PI);
+    while (residuals_map(2) <= T(-M_PI))
+    	residuals_map(2) = residuals_map(2) + T(2 * M_PI);
 
-    while (_residuals[2] > T(M_PI))
-        _residuals[2] = _residuals[2] - T(2 * M_PI);
-    while (_residuals[2] <= T(-M_PI))
-        _residuals[2] = _residuals[2] + T(2 * M_PI);
-
-    _residuals[2] = _residuals[2] / T(sqrt(getMeasurementCovariance()(2, 2)));
+    residuals_map = getMeasurementSquareRootInformation().cast<T>() * residuals_map;
 
     std::cout << "+++++++  fix constraint +++++++" << std::endl;
     std::cout << "orientation:   " << _o[0] << std::endl;
     std::cout << "measurement:   " << T(getMeasurement()(2)) << std::endl;
-    std::cout << "residual:      " << _residuals[2] << std::endl;
     std::cout << "residual:      " << _residuals[2] << std::endl << std::endl;
     //std::cout << "constraint fix computed!" << std::endl;
     return true;
