@@ -192,7 +192,7 @@ void Problem::getStateAtTimeStamp(const TimeStamp& _ts, Eigen::VectorXs& state)
 {
     assert(state.size() == getFrameStructureSize() && "Problem::getStateAtTimeStamp: bad state size");
 
-    if (processor_motion_ptr_ != nullptr)
+    if (processor_motion_ptr_ != nullptr && processor_motion_ptr_->getOriginCapturePtr() != nullptr)
         processor_motion_ptr_->getState(_ts, state);
     else
     {
@@ -456,31 +456,54 @@ SensorBase* Problem::getSensorPtr(const std::string& _sensor_name)
 
 void Problem::setPoseEstimation(const Eigen::VectorXs& _estimated_pose, const Eigen::MatrixXs& _estimated_cov, const TimeStamp& _ts)
 {
+    std::cout << "setPoseEstimation:" << std::endl;
 
     // store the prior of the keyframe
     Eigen::VectorXs prior(getStateAtTimeStamp(_ts));
 
+    std::cout << "prior          " << prior.transpose() << std::endl;
+    std::cout << "estimated pose " << _estimated_pose.transpose() << std::endl;
+
     // store transformation
-    Eigen::Vector
+    // FIXME: generalize for all frame structures
+    Eigen::Vector3s translation = _estimated_pose - prior;
+    Eigen::Rotation2Ds rotation = Eigen::Rotation2Ds(_estimated_pose(2) - prior(2));
+    std::cout << "translation    " << translation.transpose() << std::endl;
+    std::cout << "rotation       " << std::endl << rotation.matrix() << std::endl;
 
     // Find sensor fix ptr (and create it if it's not found)
     SensorBase* sensor_fix = hardware_ptr_->findSensor("initial pose");
     if (sensor_fix == nullptr)
         sensor_fix = installSensor("FIX", "initial pose", Eigen::VectorXs::Zero(0), nullptr );
 
-    // Remove previous pose estimation (if there is any)
-    for (auto key_frame_ptr : *(trajectory_ptr_->getFrameListPtr()))
-        if (key_frame_ptr->isKey())
+    // Transform all frames & remove all constraints [PREVIOUSLY : previous pose estimation (if there is any)]
+    bool prev_fix_removed = false;
+    for (auto frame_ptr : *(trajectory_ptr_->getFrameListPtr()))
+    {
+        std::cout << "frame init pose  " << frame_ptr->getState().transpose() << std::endl;
+        // transform frame
+        // FIXME: generalize for all frame structures
+        frame_ptr->getPPtr()->setVector(rotation * (frame_ptr->getPPtr()->getVector() + translation.head<2>()));
+        frame_ptr->getOPtr()->setVector(frame_ptr->getOPtr()->getVector().tail<1>() + translation.tail<1>());
+        std::cout << "frame final pose " << frame_ptr->getState().transpose() << std::endl;
+
+        // in keyframes find any other pose estimation and remove it
+        if (frame_ptr->isKey() && !prev_fix_removed)
         {
-            assert(!key_frame_ptr->isFixed());
-            auto prev_fix_cap = key_frame_ptr->findCaptureOfSensor(sensor_fix);
-            if (prev_fix_cap != nullptr)
-            {
-                prev_fix_cap->destruct();
-                std::cout << "previous fix removed" << std::endl;
-                break; // there is only one fix capture
-            }
+            assert(!frame_ptr->isFixed());
+            //auto prev_fix_cap = frame_ptr->findCaptureOfSensor(sensor_fix);
+            //if (prev_fix_cap != nullptr)
+            //{
+            //    prev_fix_cap->destruct();
+            //    std::cout << "previous fix removed" << std::endl;
+            //    prev_fix_removed = true;
+            //}
+            for (auto cap_ptr : *(frame_ptr->getCaptureListPtr()))
+                for (auto feat_ptr : *(cap_ptr->getFeatureListPtr()))
+                    for (auto ctr_ptr : *(feat_ptr->getConstraintListPtr()))
+                        ctr_ptr->destruct();
         }
+    }
 
     // create fix capture
     FrameBase* keyframe_ptr = createFrame(KEY_FRAME, _estimated_pose, _ts);
@@ -490,8 +513,6 @@ void Problem::setPoseEstimation(const Eigen::VectorXs& _estimated_pose, const Ei
 
     // notify processors about the new keyframe
     keyFrameCallback(keyframe_ptr, nullptr , 0.1);
-
-
 }
 
 void Problem::loadMap(const std::string& _filename_dot_yaml)

@@ -169,6 +169,8 @@ class ProcessorMotion : public ProcessorBase
          */
         void setOrigin(const Eigen::VectorXs& _x_origin, const TimeStamp& _ts_origin);
 
+        CaptureBase* getOriginCapturePtr();
+
         virtual bool keyFrameCallback(FrameBase* _keyframe_ptr, const Scalar& _time_tol);
 
         // Helper functions:
@@ -531,6 +533,11 @@ inline void ProcessorMotion::reintegrate(CaptureMotion2* _capture_ptr)
     }
 }
 
+inline CaptureBase* ProcessorMotion::getOriginCapturePtr()
+{
+    return origin_ptr_;
+}
+
 inline bool ProcessorMotion::keyFrameCallback(FrameBase* _keyframe_ptr, const Scalar& _time_tol)
 {
     assert(_keyframe_ptr->getTrajectoryPtr() != nullptr && "ProcessorMotion::keyFrameCallback: key frame must be in the trajectory.");
@@ -643,6 +650,7 @@ inline Eigen::VectorXs& ProcessorMotion::getState(const TimeStamp& _ts)
 
 inline void ProcessorMotion::getState(const TimeStamp& _ts, Eigen::VectorXs& _x)
 {
+    assert(origin_ptr_ != nullptr && origin_ptr_->getTimeStamp() < _ts);
     xPlusDelta(origin_ptr_->getFramePtr()->getState(), getBufferPtr()->getDelta(_ts), _x);
 }
 
@@ -660,6 +668,7 @@ inline const Eigen::VectorXs& ProcessorMotion::getCurrentState(TimeStamp& _ts)
 
 inline const void ProcessorMotion::getCurrentState(Eigen::VectorXs& _x)
 {
+    assert(origin_ptr_ != nullptr);
     xPlusDelta(origin_ptr_->getFramePtr()->getState(), getBufferPtr()->get().back().delta_integr_, _x);
 }
 
