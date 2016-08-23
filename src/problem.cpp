@@ -454,60 +454,47 @@ SensorBase* Problem::getSensorPtr(const std::string& _sensor_name)
     return hardware_ptr_->findSensor(_sensor_name);
 }
 
-void Problem::setPoseEstimation(const Eigen::VectorXs& _estimated_pose, const Eigen::MatrixXs& _estimated_cov, const TimeStamp& _ts)
+void Problem::setPoseEstimation(const Eigen::VectorXs& _new_pose, const Eigen::MatrixXs& _new_cov, const TimeStamp& _ts)
 {
-    std::cout << "setPoseEstimation:" << std::endl;
+    //std::cout << "setPoseEstimation:" << std::endl;
 
     // store the prior of the keyframe
-    Eigen::VectorXs prior(getStateAtTimeStamp(_ts));
-
-    std::cout << "prior          " << prior.transpose() << std::endl;
-    std::cout << "estimated pose " << _estimated_pose.transpose() << std::endl;
+    Eigen::VectorXs old_pose(getStateAtTimeStamp(_ts));
 
     // store transformation
     // FIXME: generalize for all frame structures
-    Eigen::Vector3s translation = _estimated_pose - prior;
-    Eigen::Rotation2Ds rotation = Eigen::Rotation2Ds(_estimated_pose(2) - prior(2));
-    std::cout << "translation    " << translation.transpose() << std::endl;
-    std::cout << "rotation       " << std::endl << rotation.matrix() << std::endl;
+    Eigen::Vector1s theta_rotation;
+    theta_rotation(0) = _new_pose(2) - old_pose(2);
+    Eigen::Vector2s translation = _new_pose.head<2>() - Eigen::Rotation2Ds(theta_rotation(0))*old_pose.head<2>();
+    Eigen::Rotation2Ds rotation = Eigen::Rotation2Ds(theta_rotation(0));
 
     // Find sensor fix ptr (and create it if it's not found)
     SensorBase* sensor_fix = hardware_ptr_->findSensor("initial pose");
     if (sensor_fix == nullptr)
         sensor_fix = installSensor("FIX", "initial pose", Eigen::VectorXs::Zero(0), nullptr );
 
-    // Transform all frames & remove all constraints [PREVIOUSLY : previous pose estimation (if there is any)]
-    bool prev_fix_removed = false;
+    // Transform all frames
+    //bool prev_fix_removed = false;
     for (auto frame_ptr : *(trajectory_ptr_->getFrameListPtr()))
     {
-        std::cout << "frame init pose  " << frame_ptr->getState().transpose() << std::endl;
         // transform frame
         // FIXME: generalize for all frame structures
-        frame_ptr->getPPtr()->setVector(rotation * (frame_ptr->getPPtr()->getVector() + translation.head<2>()));
-        frame_ptr->getOPtr()->setVector(frame_ptr->getOPtr()->getVector().tail<1>() + translation.tail<1>());
-        std::cout << "frame final pose " << frame_ptr->getState().transpose() << std::endl;
-
-        // in keyframes find any other pose estimation and remove it
-        if (frame_ptr->isKey() && !prev_fix_removed)
-        {
-            assert(!frame_ptr->isFixed());
-            //auto prev_fix_cap = frame_ptr->findCaptureOfSensor(sensor_fix);
-            //if (prev_fix_cap != nullptr)
-            //{
-            //    prev_fix_cap->destruct();
-            //    std::cout << "previous fix removed" << std::endl;
-            //    prev_fix_removed = true;
-            //}
-            for (auto cap_ptr : *(frame_ptr->getCaptureListPtr()))
-                for (auto feat_ptr : *(cap_ptr->getFeatureListPtr()))
-                    for (auto ctr_ptr : *(feat_ptr->getConstraintListPtr()))
-                        ctr_ptr->destruct();
-        }
+        frame_ptr->getPPtr()->setVector(rotation * frame_ptr->getPPtr()->getVector() + translation);
+        frame_ptr->getOPtr()->setVector(frame_ptr->getOPtr()->getVector() + theta_rotation);
     }
 
+    // Remove all non-odometry constraints
+    ConstraintBaseList all_constraints;
+    trajectory_ptr_->getConstraintList(all_constraints);
+    for (auto ctr_ptr : all_constraints)
+    	if (ctr_ptr->getCategory() != CTR_FRAME)
+    		ctr_ptr->destruct();
+
+    // TODO: matching and constraints for all old captures's features
+
     // create fix capture
-    FrameBase* keyframe_ptr = createFrame(KEY_FRAME, _estimated_pose, _ts);
-    CaptureFix* fix_capture = new CaptureFix(_ts, sensor_fix, _estimated_pose, _estimated_cov);
+    FrameBase* keyframe_ptr = createFrame(KEY_FRAME, _new_pose, _ts);
+    CaptureFix* fix_capture = new CaptureFix(_ts, sensor_fix, _new_pose, _new_cov);
     keyframe_ptr->addCapture(fix_capture);
     fix_capture->process();
 

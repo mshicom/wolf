@@ -260,16 +260,10 @@ void NodeLinked<UpperType, LowerType>::destruct()
     //std::cout << "destruct() " << node_id_ << " down_node_list_.size() " << down_node_list_.size() << std::endl;
     if (!is_deleting_)
     {
-        if (up_node_ptr_ != nullptr && !up_node_ptr_->isTop())
-        {
-            //std::cout << "upper node is not WolfProblem " << std::endl;
+    	if (up_node_ptr_ != nullptr && !up_node_ptr_->isTop())
             up_node_ptr_->removeDownNode((typename UpperType::LowerNodePtr)(this));
-        }
         else
-        {
-            //std::cout << "upper node is WolfProblem or nullptr" << std::endl;
             delete this;
-        }
     }
 }
 
