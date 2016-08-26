@@ -190,9 +190,11 @@ void Problem::getCurrentState(Eigen::VectorXs& state, TimeStamp& ts)
 
 void Problem::getStateAtTimeStamp(const TimeStamp& _ts, Eigen::VectorXs& state)
 {
+	//std::cout << "getStateAtTimeStamp: " << _ts.get() << std::endl;
+
     assert(state.size() == getFrameStructureSize() && "Problem::getStateAtTimeStamp: bad state size");
 
-    if (processor_motion_ptr_ != nullptr && processor_motion_ptr_->getOriginCapturePtr() != nullptr)
+    if (processor_motion_ptr_ != nullptr && processor_motion_ptr_->getOriginCapturePtr() != nullptr &&  processor_motion_ptr_->getOriginCapturePtr()->getTimeStamp() < _ts)
         processor_motion_ptr_->getState(_ts, state);
     else
     {
@@ -456,7 +458,7 @@ SensorBase* Problem::getSensorPtr(const std::string& _sensor_name)
 
 void Problem::setPoseEstimation(const Eigen::VectorXs& _new_pose, const Eigen::MatrixXs& _new_cov, const TimeStamp& _ts)
 {
-    //std::cout << "setPoseEstimation:" << std::endl;
+    std::cout << "setPoseEstimation, stamp: " << _ts.get() << std::endl;
 
     // store the prior of the keyframe
     Eigen::VectorXs old_pose(getStateAtTimeStamp(_ts));

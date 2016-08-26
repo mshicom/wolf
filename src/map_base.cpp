@@ -103,10 +103,12 @@ void MapBase::save(const std::string& _map_file_yaml, const std::string& _map_na
     }
     emitter << YAML::EndSeq << YAML::EndMap;
 
-
+    std::cout << "saving map in " << _map_file_yaml << std::endl;
     std::ofstream fout(_map_file_yaml);
     fout << emitter.c_str();
     fout.close();
+
+    std::cout << "saved!" << std::endl;
 }
 
 } // namespace wolf
