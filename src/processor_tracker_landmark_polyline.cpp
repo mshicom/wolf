@@ -167,7 +167,7 @@ unsigned int ProcessorTrackerLandmarkPolyline::findLandmarks(const LandmarkBaseL
 
                     // All squared distances should be witin a threshold
                     // Choose the most overlapped one
-                    if ((dist2 < params_.position_error_th*params_.position_error_th).all() && (best_match == nullptr ||
+                    if ((dist2 < params_.match_position_error_th*params_.match_position_error_th).all() && (best_match == nullptr ||
                                                                                   (N_overlapped >= best_match->feature_match_to_id_-best_match->feature_match_from_id_+1 &&
                                                                                    dist2.mean() < best_match->normalized_score_ )))
                     {
@@ -244,7 +244,7 @@ unsigned int ProcessorTrackerLandmarkPolyline::findLandmarks(const LandmarkBaseL
 
                     // All squared distances should be witin a threshold
                     // Choose the most overlapped one
-                    if ((dist2 < params_.position_error_th*params_.position_error_th).all() && (best_match == nullptr || dist2.mean() < best_match->normalized_score_ ))
+                    if ((dist2 < params_.match_position_error_th*params_.match_position_error_th).all() && (best_match == nullptr || dist2.mean() < best_match->normalized_score_ ))
                     {
                         //std::cout << "BEST MATCH" << std::endl;
                         best_match = new LandmarkPolylineMatch();
@@ -610,9 +610,9 @@ void ProcessorTrackerLandmarkPolyline::establishConstraints()
                 for (int id_lmk = lmk_last_defined_point; id_lmk > polyline_match->landmark_match_to_id_; id_lmk--)
                 {
                     //std::cout << "\t\tid_lmk " << id_lmk << std::endl;
-                    //std::cout << "\t\td2 = " << (points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() << " (th = " << params_.position_error_th*params_.position_error_th << std::endl;
+                    //std::cout << "\t\td2 = " << (points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() << " (th = " << params_.match_position_error_th*params_.match_position_error_th << std::endl;
 
-                    if ((points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() < params_.position_error_th*params_.position_error_th)
+                    if ((points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() < params_.match_position_error_th*params_.match_position_error_th)
                     {
                         std::cout << "CLOSING POLYLINE" << std::endl;
 
@@ -705,9 +705,9 @@ void ProcessorTrackerLandmarkPolyline::establishConstraints()
                 for (int id_lmk = lmk_first_defined_point; id_lmk < polyline_match->landmark_match_from_id_; id_lmk++)
                 {
                     //std::cout << "\t\tid_lmk " << id_lmk << std::endl;
-                    //std::cout << "\t\td2 = " << (points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() << " (th = " << params_.position_error_th*params_.position_error_th << std::endl;
+                    //std::cout << "\t\td2 = " << (points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() << " (th = " << params_.match_position_error_th*params_.match_position_error_th << std::endl;
 
-                    if ((points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() < params_.position_error_th*params_.position_error_th)
+                    if ((points_global.col(feat_point_id_matching)-polyline_landmark->getPointVector(id_lmk)).squaredNorm() < params_.match_position_error_th*params_.match_position_error_th)
                     {
                         std::cout << "CLOSING POLYLINE" << std::endl;
 
@@ -852,10 +852,13 @@ void ProcessorTrackerLandmarkPolyline::establishConstraints()
 void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_list)
 {
     //std::cout << "ProcessorTrackerLandmarkPolyline::classifyPolilines: " << _lmk_list->size() << std::endl;
-    std::vector<Scalar> object_L({12, 5.9, 1.2});
-    std::vector<Scalar> object_W({2.345, 2.345, 0.9});
-    std::vector<Scalar> object_D({sqrt(12*12+2.345*2.345), sqrt(5.9*5.9+2.345*2.345), sqrt(0.9*0.9+1.2*1.2)});
-    std::vector<LandmarkClassification> object_class({CONTAINER, SMALL_CONTAINER, PALLET});
+    std::vector<Scalar> object_L({12, 5.9, 1.2, 2.4, 1.8, 3.6, 2.4});
+    std::vector<Scalar> object_W({2.345, 2.345, 0.9, 1.2, 0.9, 1.8});
+    std::vector<Scalar> object_D(object_L.size());
+    for (auto i = 0; i<object_L.size(); i++)
+    	object_D[i] = sqrt(object_L[i]*object_L[i]+object_W[i]*object_W[i]);
+
+    std::vector<LandmarkClassification> object_class({CONTAINER, SMALL_CONTAINER, PALLET, DOUBLE_PALLET_L, DOUBLE_PALLET_W, TRIPLE_PALLET_L, QUAD_PALLET});
 
     for (auto lmk_ptr : *_lmk_list)
         if (lmk_ptr->getTypeId() == LANDMARK_POLYLINE_2D && lmk_ptr->getStatus() != LANDMARK_FIXED)
@@ -870,7 +873,8 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
             // necessary conditions
             if (polyline_ptr->getClassification() != UNCLASSIFIED ||
                 n_defined_points < 3 ||
-                n_defined_points > 4 )
+                n_defined_points > 4 ||
+                (n_defined_points == 3 && polyline_ptr->isClosed()))
                 continue;
 
             //std::cout << "landmark " << lmk_ptr->id() << std::endl;
@@ -880,9 +884,9 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
             Scalar dBC = (polyline_ptr->getPointVector(B_id) - polyline_ptr->getPointVector(C_id)).norm();
             Scalar dAC = (polyline_ptr->getPointVector(A_id) - polyline_ptr->getPointVector(C_id)).norm();
 
-            //std::cout << "dAB = " << dAB << " error 1: " << fabs(dAB-CONT_L) << " error 2: " << fabs(dAB-CONT_W) << std::endl;
-            //std::cout << "dBC = " << dBC << " error 1: " << fabs(dBC-CONT_W) << " error 2: " << fabs(dBC-CONT_L)   << std::endl;
-            //std::cout << "dAC = " << dAC << " error 1&2: " << fabs(dAC-CONT_D) << std::endl;
+            //std::cout << "dAB = " << dAB << std::endl;
+            //std::cout << "dBC = " << dBC << std::endl;
+            //std::cout << "dAC = " << dAC << std::endl;
 
             auto classification = -1;
             bool configuration;
@@ -890,9 +894,9 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
             for (unsigned int i = 0; i < object_L.size(); i++)
             {
                 // check configuration 1
-                if(fabs(dAB-object_L[i]) < params_.position_error_th &&
-                   fabs(dBC-object_W[i]) < params_.position_error_th &&
-                   fabs(dAC-object_D[i]) < params_.position_error_th)
+                if(fabs(dAB-object_L[i]) < params_.class_position_error_th &&
+                   fabs(dBC-object_W[i]) < params_.class_position_error_th &&
+                   fabs(dAC-object_D[i]) < params_.class_position_error_th)
                 {
                     configuration = true;
                     classification = i;
@@ -900,9 +904,9 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
                 }
 
                 // check configuration 2
-                if(fabs(dAB-object_W[i]) < params_.position_error_th &&
-                   fabs(dBC-object_L[i]) < params_.position_error_th &&
-                   fabs(dAC-object_D[i]) < params_.position_error_th)
+                if(fabs(dAB-object_W[i]) < params_.class_position_error_th &&
+                   fabs(dBC-object_L[i]) < params_.class_position_error_th &&
+                   fabs(dAC-object_D[i]) < params_.class_position_error_th)
                 {
                     configuration = false;
                     classification = i;
@@ -923,9 +927,9 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
                     Scalar dCD = (polyline_ptr->getPointVector(C_id) - polyline_ptr->getPointVector(D_id)).norm();
 
                     // necessary conditions
-                    if (fabs(dAD-dBC) > params_.position_error_th ||
-                        fabs(dBD-dAC) > params_.position_error_th ||
-                        fabs(dCD-dAB) > params_.position_error_th)
+                    if (fabs(dAD-dBC) > params_.class_position_error_th ||
+                        fabs(dBD-dAC) > params_.class_position_error_th ||
+                        fabs(dCD-dAB) > params_.class_position_error_th)
                         continue;
                 }
 
@@ -943,7 +947,7 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
                     else
                         polyline_ptr->addPoint(Eigen::Vector2s::Zero(), true, true);
                 }
-                //std::cout << "landmark " << lmk_ptr->id() << " classified as " << object_class[classification] << " in configuration " << configuration << std::endl;
+                std::cout << "Landmark " << lmk_ptr->id() << " classified as " << object_class[classification] << " in configuration " << configuration << std::endl;
 
                 // Close
                 polyline_ptr->setClosed();
@@ -989,6 +993,7 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
                     polyline_ptr->getPointStateBlockPtr(id)->fix();
                     getProblem()->updateStateBlockPtr(polyline_ptr->getPointStateBlockPtr(id));
                 }
+                //std::cout << "Classified polyline landmark converted" << std::endl;
             }
         }
 }

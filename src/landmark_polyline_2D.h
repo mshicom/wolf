@@ -26,6 +26,10 @@ typedef enum
     CONTAINER,        ///< A container 12.2 x 2.44 (m)
     SMALL_CONTAINER,  ///< A small container 6.1 x 2.44 (m)
     PALLET,           ///< A pallet box 0.9 x 1.2 (m)
+    DOUBLE_PALLET_L,  ///< 2 pallets longside 0.9 x 2.4 (m)
+    DOUBLE_PALLET_W,  ///< 2 pallets wideside 1.8 x 1.2 (m)
+    TRIPLE_PALLET_L,  ///< 3 pallets longside 0.9 x 3.6 (m)
+    QUAD_PALLET,      ///< 4 pallets 1.8 x 2.4 (m)
 } LandmarkClassification;
 
 class LandmarkPolyline2D : public LandmarkBase

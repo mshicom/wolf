@@ -44,7 +44,8 @@ struct LandmarkPolylineMatch : public LandmarkMatch
 struct ProcessorParamsPolyline : public ProcessorParamsBase
 {
         laserscanutils::LineFinderIterativeParams line_finder_params;
-        Scalar position_error_th;
+        Scalar match_position_error_th;
+        Scalar class_position_error_th;
         unsigned int new_features_th;
         unsigned int loop_frames_th;
         Scalar time_tolerance;
