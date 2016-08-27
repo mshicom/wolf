@@ -852,13 +852,14 @@ void ProcessorTrackerLandmarkPolyline::establishConstraints()
 void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_list)
 {
     //std::cout << "ProcessorTrackerLandmarkPolyline::classifyPolilines: " << _lmk_list->size() << std::endl;
-    std::vector<Scalar> object_L({12, 5.9, 1.2, 2.4, 1.8, 3.6, 2.4});
-    std::vector<Scalar> object_W({2.345, 2.345, 0.9, 1.2, 0.9, 1.8});
+    std::vector<Scalar> object_L({12,    5.9,   1.2, 2.4, 1.8, 3.6});
+    std::vector<Scalar> object_W({2.345, 2.345, 0.9, 0.9, 1.2, 0.9});
     std::vector<Scalar> object_D(object_L.size());
     for (auto i = 0; i<object_L.size(); i++)
     	object_D[i] = sqrt(object_L[i]*object_L[i]+object_W[i]*object_W[i]);
 
-    std::vector<LandmarkClassification> object_class({CONTAINER, SMALL_CONTAINER, PALLET, DOUBLE_PALLET_L, DOUBLE_PALLET_W, TRIPLE_PALLET_L, QUAD_PALLET});
+    std::vector<LandmarkClassification> object_class({CONTAINER, SMALL_CONTAINER, PALLET, DOUBLE_PALLET_L, DOUBLE_PALLET_W, TRIPLE_PALLET_L});
+    std::vector<std::string> object_name({"CONTAINER", "SMALL_CONTAINER", "PALLET", "DOUBLE_PALLET_L", "DOUBLE_PALLET_W", "TRIPLE_PALLET_L"});
 
     for (auto lmk_ptr : *_lmk_list)
         if (lmk_ptr->getTypeId() == LANDMARK_POLYLINE_2D && lmk_ptr->getStatus() != LANDMARK_FIXED)
@@ -890,27 +891,37 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
 
             auto classification = -1;
             bool configuration;
+            Scalar min_max_error = 10;
+            Eigen::Array<Scalar,3,1> errors(Eigen::Array<Scalar,3,1>::Zero());
 
             for (unsigned int i = 0; i < object_L.size(); i++)
             {
-                // check configuration 1
-                if(fabs(dAB-object_L[i]) < params_.class_position_error_th &&
-                   fabs(dBC-object_W[i]) < params_.class_position_error_th &&
-                   fabs(dAC-object_D[i]) < params_.class_position_error_th)
-                {
-                    configuration = true;
-                    classification = i;
-                    break;
-                }
+            	// check configuration 1
+				errors <<  fabs(dAB-object_L[i]),
+						   fabs(dBC-object_W[i]),
+						   fabs(dAC-object_D[i]);
+
+				//std::cout << "classification " << object_name[i] << " errors: " << errors.transpose() << " - max error: " << params_.class_position_error_th << std::endl;
+				if( (errors < params_.class_position_error_th).all() && errors.maxCoeff() < min_max_error)
+				{
+					configuration = true;
+					classification = i;
+					min_max_error = errors.maxCoeff();
+					//std::cout << "better classification&configuration, new min_max_error: " << min_max_error << std::endl;
+				}
 
                 // check configuration 2
-                if(fabs(dAB-object_W[i]) < params_.class_position_error_th &&
-                   fabs(dBC-object_L[i]) < params_.class_position_error_th &&
-                   fabs(dAC-object_D[i]) < params_.class_position_error_th)
+            	errors <<  fabs(dAB-object_W[i]),
+						   fabs(dBC-object_L[i]),
+						   fabs(dAC-object_D[i]);
+
+				//std::cout << "classification " << object_name[i] << " errors: " << errors.transpose() << std::endl;
+				if( (errors < params_.class_position_error_th).all() && errors.maxCoeff() < min_max_error)
                 {
                     configuration = false;
                     classification = i;
-                    break;
+					min_max_error = errors.maxCoeff();
+					//std::cout << "better classification&configuration, new min_max_error: " << min_max_error << std::endl;
                 }
             }
 
@@ -947,7 +958,8 @@ void ProcessorTrackerLandmarkPolyline::classifyPolilines(LandmarkBaseList* _lmk_
                     else
                         polyline_ptr->addPoint(Eigen::Vector2s::Zero(), true, true);
                 }
-                std::cout << "Landmark " << lmk_ptr->id() << " classified as " << object_class[classification] << " in configuration " << configuration << std::endl;
+                //std::cout << "Landmark " << lmk_ptr->id() << " classified as " << object_name[classification] << " in configuration " << configuration << std::endl;
+                //std::cout << "sizes: " << object_L[classification] << " " << object_W[classification] << std::endl;
 
                 // Close
                 polyline_ptr->setClosed();
