@@ -260,7 +260,7 @@ template<class UpperType, class LowerType>
 void NodeLinked<UpperType, LowerType>::destruct()
 {
     //std::cout << "destruct() " << node_id_ << " down_node_list_.size() " << down_node_list_.size() << std::endl;
-    if (!is_deleting_)
+    if (!is_deleting_)  // the destructor has not been called yet
     {
         if (up_node_ptr_ != nullptr && !up_node_ptr_->isTop())
         {
