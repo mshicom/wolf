@@ -39,7 +39,7 @@ bool RosDataSource::open(const std::string &bagFile,
                          const std::string &imageTopic) {
   try {
     mbag.open(bagFile, rosbag::bagmode::Read);
-  } catch (rosbag::BagException e) {
+  } catch (rosbag::BagException& e) {
     return false;
   }
   std::vector<std::string> topics;
@@ -66,7 +66,7 @@ void RosDataSource::close(void) {
 }
 
 void RosDataSource::dropFrames(int count) {
-  for (int i = 0; i < count && mit != mpview->end(); i++) mit++;
+  for (int i = 0; i < count && mit != mpview->end(); i++) ++mit;
 }
 
 bool RosDataSource::update(cv::Mat &out, double &ts) {

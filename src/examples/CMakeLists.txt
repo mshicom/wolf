@@ -3,13 +3,11 @@
 
 #ADD_EXECUTABLE(test_eigen_template test_eigen_template.cpp)
 
-find_package(catkin REQUIRED COMPONENTS
-             cpp_common rostime roscpp_traits
-             roscpp_serialization sensor_msgs rosbag)
+#find_package(catkin REQUIRED COMPONENTS
+#             cpp_common rostime roscpp_traits
+#             roscpp_serialization sensor_msgs rosbag)
 
-# Map load and save test
-ADD_EXECUTABLE(test_map_yaml test_map_yaml.cpp)
-TARGET_LINK_LIBRARIES(test_map_yaml ${PROJECT_NAME})
+
 
 ADD_EXECUTABLE(test_motion_2d test_motion_2d.cpp)
 TARGET_LINK_LIBRARIES(test_motion_2d ${PROJECT_NAME})
@@ -40,6 +38,10 @@ TARGET_LINK_LIBRARIES(test_sort_keyframes ${PROJECT_NAME})
 
 # Enable Yaml config files
 IF(YAMLCPP_FOUND)
+    # Map load and save test
+    ADD_EXECUTABLE(test_map_yaml test_map_yaml.cpp)
+    TARGET_LINK_LIBRARIES(test_map_yaml ${PROJECT_NAME})
+
     ADD_EXECUTABLE(test_yaml test_yaml.cpp)
     TARGET_LINK_LIBRARIES(test_yaml ${PROJECT_NAME})
 
@@ -101,8 +103,8 @@ ENDIF(Suitesparse_FOUND)
 #TARGET_LINK_LIBRARIES(test_analytic_odom_constraint ${PROJECT_NAME})
 
 IF(OpenCV_FOUND)
-    ADD_EXECUTABLE(test_image_ros test_image_ros.cpp rosbag_image_source.cpp)
-    TARGET_LINK_LIBRARIES(test_image_ros ${PROJECT_NAME} ${catkin_LIBRARIES})
+#    ADD_EXECUTABLE(test_image_ros test_image_ros.cpp rosbag_image_source.cpp)
+#    TARGET_LINK_LIBRARIES(test_image_ros ${PROJECT_NAME} ${catkin_LIBRARIES})
 
     # Testing many things for the 3D image odometry
     ADD_EXECUTABLE(test_image test_image.cpp)

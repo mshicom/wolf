@@ -14,7 +14,7 @@ class RosDataSource {
   unsigned int height, width;
 
  public:
-  RosDataSource(){}
+  RosDataSource() :mpview(nullptr),height(0),width(0){}
   ~RosDataSource(){ close(); }
   inline unsigned int get_height() const { return height; }
   inline unsigned int get_width() const { return width; }

@@ -228,8 +228,6 @@ int main(int argc, char** argv)
 
 
     // CAPTURES
-    CaptureImage* image_ptr;
-
     unsigned int f  = 1;
     double ts;
     bool success = capture.update(frame[f % buffer_size], ts);
@@ -250,7 +248,7 @@ int main(int argc, char** argv)
         //        prc_image->process(capture_image_ptr);
 
         // Preferred method with factory objects:
-        image_ptr = new CaptureImage(t, camera_ptr, frame[f % buffer_size]);
+        CaptureImage* image_ptr = new CaptureImage(t, camera_ptr, frame[f % buffer_size]);
         image_ptr->process();
         //cv::imshow("test",frame[f % buffer_size]);
         std::cout << "Time: " << ((double) clock() - t1) / CLOCKS_PER_SEC << "s" << std::endl;
