@@ -43,7 +43,7 @@ endif()
 
 
 ADD_SUBDIRECTORY(src)
-
+add_subdirectory(test)
 FIND_PACKAGE(Doxygen)
 
 FIND_PATH(IRI_DOC_DIR doxygen.conf ${CMAKE_SOURCE_DIR}/doc/iri_doc/)

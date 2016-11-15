@@ -24,6 +24,6 @@ target_link_libraries(test_node wolf pthread gmock ) #gtest_main
 add_test(test_node ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_node)
 
 include_directories(/usr/include/eigen3)
-add_executable(test_ceres test_ceres.cpp)
+add_executable(test_ceres test_ceres.cpp read_g2o.cc)
 target_link_libraries(test_ceres wolf pthread gmock ) #gtest_main
 add_test(test_ceres ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_ceres)
